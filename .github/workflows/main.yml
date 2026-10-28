@@ -1,0 +1,52 @@
+name: 🚀 Build & Deploy School ERP on Push
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    name: 🎉 Build & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚚 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install Frontend Dependencies
+        run: npm ci
+
+      - name: 🏗️ Build Frontend Application
+        run: npm run build
+
+      - name: 📦 Install Backend Dependencies
+        run: |
+          cd backend
+          npm ci --omit=dev
+
+      # Deploy Frontend (Dist) to FTP web root / public_html
+      - name: 📂 Deploy Frontend to FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.ftp_server }}
+          username: ${{ secrets.ftp_username }}
+          password: ${{ secrets.ftp_password }}
+          local-dir: ./dist/
+          server-dir: ${{ secrets.ftp_frontend_dir || '/' }}
+
+      # Deploy Backend to FTP API / Backend Directory
+      - name: 📂 Deploy Backend to FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.ftp_server }}
+          username: ${{ secrets.ftp_username }}
+          password: ${{ secrets.ftp_password }}
+          local-dir: ./backend/
+          server-dir: ${{ secrets.ftp_backend_dir || '/backend/' }}

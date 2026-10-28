@@ -1,0 +1,472 @@
+import React, { useState, useEffect } from 'react';
+import { UserX, UserCheck, Search, CheckCircle2, AlertCircle, Loader2, X, Eye } from 'lucide-react';
+import { getStudents, inactivateStudent, reactivateStudent } from '../../services/api';
+export const InactiveStudentsView = ({ branchId, academicYearId, onViewStudent, onRefresh }) => {
+    const [activeTab, setActiveTab] = useState('list');
+    // Inactive students list
+    const [inactiveStudents, setInactiveStudents] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [isLoading, setIsLoading] = useState(false);
+    // Inactivation Modal / Form
+    const [activeCandidateSearch, setActiveCandidateSearch] = useState('');
+    const [activeCandidates, setActiveCandidates] = useState([]);
+    const [selectedStudentToInactivate, setSelectedStudentToInactivate] = useState(null);
+    const [inactivateForm, setInactivateForm] = useState({
+        status: 'TC Issued',
+        effective_date: new Date().toISOString().split('T')[0],
+        reason: 'Parent relocation / Transfer certificate requested',
+        remarks: '',
+        tc_number: `TC-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`,
+        tc_date: new Date().toISOString().split('T')[0]
+    });
+    // Reactivate Modal
+    const [selectedStudentToReactivate, setSelectedStudentToReactivate] = useState(null);
+    const [reactivateForm, setReactivateForm] = useState({
+        effective_date: new Date().toISOString().split('T')[0],
+        reason: 'Re-admission upon parent return',
+        remarks: ''
+    });
+    // Status History
+    const [historyList, setHistoryList] = useState([]);
+    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+    // Feedback states
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [successMessage, setSuccessMessage] = useState(null);
+    const [errorMessage, setErrorMessage] = useState(null);
+    // Load inactive students
+    const loadInactiveStudents = () => {
+        if (!branchId)
+            return;
+        setIsLoading(true);
+        // Fetch all non-active statuses
+        getStudents({
+            branch_id: branchId,
+            academic_year_id: academicYearId,
+            status: statusFilter !== 'all' ? statusFilter : undefined,
+            search: searchQuery.trim() || undefined,
+            page_size: 150
+        })
+            .then(res => {
+            // filter for inactive/withdrawn/transferred/tc issued
+            const filtered = (res.data || []).filter(s => s.current_status !== 'Active');
+            setInactiveStudents(filtered);
+        })
+            .catch(console.error)
+            .finally(() => setIsLoading(false));
+    };
+    useEffect(() => {
+        loadInactiveStudents();
+    }, [branchId, academicYearId, statusFilter, searchQuery]);
+    // Search active candidates to inactivate
+    useEffect(() => {
+        if (activeCandidateSearch.trim().length > 1 && branchId) {
+            getStudents({
+                branch_id: branchId,
+                academic_year_id: academicYearId,
+                status: 'Active',
+                search: activeCandidateSearch.trim(),
+                page_size: 10
+            })
+                .then(res => setActiveCandidates(res.data || []))
+                .catch(console.error);
+        }
+        else {
+            setActiveCandidates([]);
+        }
+    }, [branchId, academicYearId, activeCandidateSearch]);
+    // Load History
+    const loadHistory = () => {
+        if (!branchId)
+            return;
+        setIsLoadingHistory(true);
+        fetch(`/api/students-status-history?branch_id=${branchId}`)
+            .then(res => res.json())
+            .then(data => setHistoryList(data.data || []))
+            .catch(console.error)
+            .finally(() => setIsLoadingHistory(false));
+    };
+    useEffect(() => {
+        if (activeTab === 'history') {
+            loadHistory();
+        }
+    }, [activeTab, branchId]);
+    // Handle Inactivation Submit
+    const handleInactivateSubmit = async (e) => {
+        e.preventDefault();
+        if (!selectedStudentToInactivate) {
+            setErrorMessage('Please select a student to mark as inactive.');
+            return;
+        }
+        setIsSubmitting(true);
+        setErrorMessage(null);
+        setSuccessMessage(null);
+        try {
+            await inactivateStudent(selectedStudentToInactivate.id, {
+                branch_id: branchId,
+                academic_year_id: academicYearId,
+                status: inactivateForm.status,
+                effective_date: inactivateForm.effective_date,
+                reason: inactivateForm.reason,
+                remarks: inactivateForm.remarks,
+                tc_number: inactivateForm.status === 'TC Issued' ? inactivateForm.tc_number : undefined,
+                tc_date: inactivateForm.status === 'TC Issued' ? inactivateForm.tc_date : undefined
+            });
+            setSuccessMessage(`Successfully updated ${selectedStudentToInactivate.full_name} to ${inactivateForm.status}.`);
+            setSelectedStudentToInactivate(null);
+            setActiveCandidateSearch('');
+            setActiveTab('list');
+            loadInactiveStudents();
+            if (onRefresh)
+                onRefresh();
+        }
+        catch (err) {
+            setErrorMessage(err.message || 'Failed to inactivate student.');
+        }
+        finally {
+            setIsSubmitting(false);
+        }
+    };
+    // Handle Reactivation Submit
+    const handleReactivateSubmit = async (e) => {
+        e.preventDefault();
+        if (!selectedStudentToReactivate)
+            return;
+        setIsSubmitting(true);
+        setErrorMessage(null);
+        setSuccessMessage(null);
+        try {
+            await reactivateStudent(selectedStudentToReactivate.id, {
+                branch_id: branchId,
+                academic_year_id: academicYearId,
+                effective_date: reactivateForm.effective_date,
+                reason: reactivateForm.reason,
+                remarks: reactivateForm.remarks
+            });
+            setSuccessMessage(`Successfully reactivated ${selectedStudentToReactivate.full_name} to Active status.`);
+            setSelectedStudentToReactivate(null);
+            loadInactiveStudents();
+            if (onRefresh)
+                onRefresh();
+        }
+        catch (err) {
+            setErrorMessage(err.message || 'Failed to reactivate student.');
+        }
+        finally {
+            setIsSubmitting(false);
+        }
+    };
+    return (<div className="space-y-5">
+      {/* Top Header & Sub-navigation */}
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h3 className="text-base font-bold text-slate-900 flex items-center space-x-2">
+            <UserX className="w-5 h-5 text-rose-600"/>
+            <span>Inactive Students & Transfer Certificates (TC)</span>
+          </h3>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Preserve archived student records for transferred, withdrawn, or TC-issued students with full reactivation capabilities.
+          </p>
+        </div>
+
+        <div className="bg-slate-100 p-1 rounded-xl flex items-center space-x-1 text-xs font-semibold self-start sm:self-auto">
+          <button type="button" onClick={() => { setActiveTab('list'); setSuccessMessage(null); }} className={`px-3.5 py-1.5 rounded-lg transition-colors cursor-pointer ${activeTab === 'list' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'}`}>
+            Inactive Roster ({inactiveStudents.length})
+          </button>
+
+          <button type="button" onClick={() => { setActiveTab('inactivate'); setSuccessMessage(null); }} className={`px-3.5 py-1.5 rounded-lg transition-colors cursor-pointer ${activeTab === 'inactivate' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'}`}>
+            Issue TC / Inactivate
+          </button>
+
+          <button type="button" onClick={() => { setActiveTab('history'); setSuccessMessage(null); }} className={`px-3.5 py-1.5 rounded-lg transition-colors cursor-pointer ${activeTab === 'history' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'}`}>
+            Audit Log
+          </button>
+        </div>
+      </div>
+
+      {/* Messages */}
+      {successMessage && (<div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center space-x-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0"/>
+          <span>{successMessage}</span>
+        </div>)}
+
+      {errorMessage && (<div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 flex items-center space-x-2">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0"/>
+          <span>{errorMessage}</span>
+        </div>)}
+
+      {/* 1. INACTIVE ROSTER TAB */}
+      {activeTab === 'list' && (<div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden space-y-4 p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="relative max-w-sm w-full">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"/>
+              <input type="text" placeholder="Search archived students..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-600"/>
+            </div>
+
+            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="text-xs px-3 py-2 border border-slate-300 rounded-xl bg-white text-slate-700 font-semibold">
+              <option value="all">All Non-Active Statuses</option>
+              <option value="Inactive">Inactive</option>
+              <option value="Transferred">Transferred</option>
+              <option value="TC Issued">TC Issued</option>
+              <option value="Withdrawn">Withdrawn</option>
+              <option value="Left School">Left School</option>
+            </select>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs text-left">
+              <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 uppercase tracking-wider">
+                <tr>
+                  <th className="p-3">Admission No</th>
+                  <th className="p-3">Student Name</th>
+                  <th className="p-3">Last Enrolled Class</th>
+                  <th className="p-3">Guardian</th>
+                  <th className="p-3">Status</th>
+                  <th className="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {isLoading ? (<tr>
+                    <td colSpan={6} className="p-12 text-center text-slate-400">
+                      <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-emerald-600"/>
+                      <span>Loading archived records...</span>
+                    </td>
+                  </tr>) : inactiveStudents.length === 0 ? (<tr>
+                    <td colSpan={6} className="p-12 text-center text-slate-400">
+                      No inactive or transferred student records found.
+                    </td>
+                  </tr>) : (inactiveStudents.map((s) => (<tr key={s.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="p-3 font-mono font-semibold text-slate-700">{s.admission_number}</td>
+                      <td className="p-3">
+                        <button type="button" onClick={() => onViewStudent(s.id)} className="font-bold text-slate-900 hover:text-emerald-700 text-left block cursor-pointer">
+                          {s.full_name}
+                        </button>
+                        <span className="text-[11px] text-slate-400 font-mono">ID: {s.student_id}</span>
+                      </td>
+                      <td className="p-3">
+                        <span className="font-semibold text-slate-800">{s.class_name}</span> - {s.section_name}
+                      </td>
+                      <td className="p-3">
+                        <div className="text-slate-700">{s.father_name || 'N/A'}</div>
+                        <div className="text-[11px] text-slate-400 font-mono">{s.father_mobile}</div>
+                      </td>
+                      <td className="p-3">
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-800 border border-rose-200">
+                          {s.current_status}
+                        </span>
+                      </td>
+                      <td className="p-3 text-right">
+                        <div className="flex items-center justify-end space-x-1.5">
+                          <button type="button" onClick={() => onViewStudent(s.id)} className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer" title="View Complete Archive">
+                            <Eye className="w-3.5 h-3.5"/>
+                          </button>
+
+                          <button type="button" onClick={() => setSelectedStudentToReactivate(s)} className="flex items-center space-x-1 px-2.5 py-1 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors cursor-pointer">
+                            <UserCheck className="w-3.5 h-3.5 text-emerald-600"/>
+                            <span>Reactivate</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>)))}
+              </tbody>
+            </table>
+          </div>
+        </div>)}
+
+      {/* 2. INACTIVATE / ISSUE TC TAB */}
+      {activeTab === 'inactivate' && (<div className="bg-white p-6 rounded-xl border border-slate-200 shadow-2xs space-y-6">
+          <div className="border-b border-slate-100 pb-3">
+            <h3 className="text-sm font-bold text-slate-900">Issue Transfer Certificate or Inactivate Student</h3>
+            <p className="text-xs text-slate-500">
+              The student will be safely archived without deleting any historical grades, fee records, or attendances.
+            </p>
+          </div>
+
+          <form onSubmit={handleInactivateSubmit} className="space-y-5 text-xs max-w-2xl">
+            {/* Step 1: Select Active Pupil */}
+            <div>
+              <label className="font-bold text-slate-800 block mb-1">Select Active Student *</label>
+              <div className="relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"/>
+                <input type="text" placeholder="Type name or admission number of pupil..." value={activeCandidateSearch} onChange={(e) => setActiveCandidateSearch(e.target.value)} className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600"/>
+              </div>
+
+              {/* Candidate Dropdown */}
+              {activeCandidates.length > 0 && (<div className="mt-1 border border-slate-200 rounded-lg max-h-48 overflow-y-auto divide-y divide-slate-100 shadow-sm">
+                  {activeCandidates.map(c => (<button key={c.id} type="button" onClick={() => {
+                        setSelectedStudentToInactivate(c);
+                        setActiveCandidates([]);
+                        setActiveCandidateSearch('');
+                    }} className="w-full text-left p-2.5 hover:bg-slate-50 transition-colors flex items-center justify-between cursor-pointer">
+                      <div>
+                        <div className="font-bold text-slate-900">{c.full_name}</div>
+                        <div className="text-[11px] text-slate-400 font-mono">{c.admission_number} • {c.class_name}-{c.section_name}</div>
+                      </div>
+                      <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-semibold">Select</span>
+                    </button>))}
+                </div>)}
+
+              {selectedStudentToInactivate && (<div className="mt-2 p-3 bg-emerald-50/60 border border-emerald-200 rounded-lg flex items-center justify-between">
+                  <div>
+                    <span className="font-bold text-emerald-950 block">{selectedStudentToInactivate.full_name}</span>
+                    <span className="text-emerald-800 font-mono text-[11px]">
+                      {selectedStudentToInactivate.admission_number} • {selectedStudentToInactivate.class_name}-{selectedStudentToInactivate.section_name}
+                    </span>
+                  </div>
+                  <button type="button" onClick={() => setSelectedStudentToInactivate(null)} className="text-rose-600 hover:text-rose-800 font-semibold">
+                    Change
+                  </button>
+                </div>)}
+            </div>
+
+            {/* Inactivation Details */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="font-semibold text-slate-700 block mb-1">New Archived Status *</label>
+                <select value={inactivateForm.status} onChange={(e) => setInactivateForm(prev => ({ ...prev, status: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600">
+                  <option value="TC Issued">TC Issued</option>
+                  <option value="Transferred">Transferred to another school</option>
+                  <option value="Inactive">Inactive</option>
+                  <option value="Withdrawn">Withdrawn</option>
+                  <option value="Left School">Left School</option>
+                  <option value="Completed">Course Completed</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="font-semibold text-slate-700 block mb-1">Effective Date *</label>
+                <input type="date" value={inactivateForm.effective_date} onChange={(e) => setInactivateForm(prev => ({ ...prev, effective_date: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600" required/>
+              </div>
+
+              {inactivateForm.status === 'TC Issued' && (<>
+                  <div>
+                    <label className="font-semibold text-slate-700 block mb-1">TC Serial Number *</label>
+                    <input type="text" value={inactivateForm.tc_number} onChange={(e) => setInactivateForm(prev => ({ ...prev, tc_number: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 font-mono" required/>
+                  </div>
+
+                  <div>
+                    <label className="font-semibold text-slate-700 block mb-1">TC Date of Issue *</label>
+                    <input type="date" value={inactivateForm.tc_date} onChange={(e) => setInactivateForm(prev => ({ ...prev, tc_date: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600" required/>
+                  </div>
+                </>)}
+
+              <div className="sm:col-span-2">
+                <label className="font-semibold text-slate-700 block mb-1">Reason for Inactivation / TC *</label>
+                <input type="text" value={inactivateForm.reason} onChange={(e) => setInactivateForm(prev => ({ ...prev, reason: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600" required/>
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="font-semibold text-slate-700 block mb-1">Administrative Remarks / Notes</label>
+                <textarea rows={2} value={inactivateForm.remarks} onChange={(e) => setInactivateForm(prev => ({ ...prev, remarks: e.target.value }))} placeholder="Record fee clearance, library clearance, or conduct notes..." className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600"/>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button type="submit" disabled={isSubmitting || !selectedStudentToInactivate} className="px-6 py-2.5 bg-rose-700 hover:bg-rose-800 disabled:opacity-50 text-white font-bold rounded-xl flex items-center space-x-2 transition-all shadow-xs cursor-pointer">
+                {isSubmitting ? (<>
+                    <Loader2 className="w-4 h-4 animate-spin"/>
+                    <span>Processing Archive...</span>
+                  </>) : (<>
+                    <UserX className="w-4 h-4"/>
+                    <span>Confirm Inactivation / TC</span>
+                  </>)}
+              </button>
+            </div>
+          </form>
+        </div>)}
+
+      {/* 3. STATUS HISTORY TAB */}
+      {activeTab === 'history' && (<div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden p-5 space-y-4">
+          <div className="border-b border-slate-100 pb-2">
+            <h3 className="text-sm font-bold text-slate-900">Student Status Modification History</h3>
+            <p className="text-xs text-slate-500">Every pupil inactivation and reactivation event is recorded here.</p>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs text-left">
+              <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 uppercase tracking-wider">
+                <tr>
+                  <th className="p-3">Date</th>
+                  <th className="p-3">Action</th>
+                  <th className="p-3">Student ID</th>
+                  <th className="p-3">Previous Status</th>
+                  <th className="p-3">New Status</th>
+                  <th className="p-3">Reason / TC Details</th>
+                  <th className="p-3">Officer</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {isLoadingHistory ? (<tr>
+                    <td colSpan={7} className="p-8 text-center text-slate-400">Loading audit history...</td>
+                  </tr>) : historyList.length === 0 ? (<tr>
+                    <td colSpan={7} className="p-8 text-center text-slate-400">No status modification logs found.</td>
+                  </tr>) : (historyList.map(h => (<tr key={h.id} className="hover:bg-slate-50/70">
+                      <td className="p-3 font-mono text-slate-600">{h.effective_date}</td>
+                      <td className="p-3 font-bold">
+                        <span className={`px-2 py-0.5 rounded-full text-[11px] ${h.action_type === 'Reactivated' ? 'bg-emerald-50 text-emerald-800' : 'bg-rose-50 text-rose-800'}`}>
+                          {h.action_type}
+                        </span>
+                      </td>
+                      <td className="p-3 font-mono text-slate-800">#{h.student_id}</td>
+                      <td className="p-3 text-slate-500">{h.previous_status}</td>
+                      <td className="p-3 font-semibold text-slate-900">{h.new_status}</td>
+                      <td className="p-3 text-slate-700">
+                        <div>{h.reason}</div>
+                        {h.tc_number && (<div className="text-[11px] text-emerald-700 font-mono">TC No: {h.tc_number} ({h.tc_date})</div>)}
+                      </td>
+                      <td className="p-3 font-mono text-[11px] text-slate-400">{h.performed_by}</td>
+                    </tr>)))}
+              </tbody>
+            </table>
+          </div>
+        </div>)}
+
+      {/* REACTIVATION MODAL */}
+      {selectedStudentToReactivate && (<div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden">
+            <div className="p-4 px-5 bg-slate-900 text-white flex items-center justify-between">
+              <h3 className="text-sm font-bold flex items-center space-x-2">
+                <UserCheck className="w-4 h-4 text-emerald-400"/>
+                <span>Reactivate Student Record</span>
+              </h3>
+              <button onClick={() => setSelectedStudentToReactivate(null)} className="p-1 rounded-lg bg-white/10 hover:bg-white/20 text-white cursor-pointer">
+                <X className="w-4 h-4"/>
+              </button>
+            </div>
+
+            <form onSubmit={handleReactivateSubmit} className="p-5 space-y-4 text-xs">
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <div className="font-bold text-slate-900 text-sm">{selectedStudentToReactivate.full_name}</div>
+                <div className="text-slate-500 text-[11px] font-mono">
+                  {selectedStudentToReactivate.admission_number} • Currently: {selectedStudentToReactivate.current_status}
+                </div>
+              </div>
+
+              <div>
+                <label className="font-semibold text-slate-700 block mb-1">Reactivation Date *</label>
+                <input type="date" value={reactivateForm.effective_date} onChange={(e) => setReactivateForm(prev => ({ ...prev, effective_date: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600" required/>
+              </div>
+
+              <div>
+                <label className="font-semibold text-slate-700 block mb-1">Justification Reason *</label>
+                <input type="text" value={reactivateForm.reason} onChange={(e) => setReactivateForm(prev => ({ ...prev, reason: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600" required/>
+              </div>
+
+              <div>
+                <label className="font-semibold text-slate-700 block mb-1">Remarks</label>
+                <textarea rows={2} value={reactivateForm.remarks} onChange={(e) => setReactivateForm(prev => ({ ...prev, remarks: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600"/>
+              </div>
+
+              <div className="pt-2 flex justify-end space-x-2">
+                <button type="button" onClick={() => setSelectedStudentToReactivate(null)} className="px-4 py-2 border border-slate-300 rounded-lg font-semibold hover:bg-slate-50 cursor-pointer">
+                  Cancel
+                </button>
+                <button type="submit" disabled={isSubmitting} className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-bold rounded-lg transition-colors cursor-pointer">
+                  {isSubmitting ? 'Reactivating...' : 'Restore to Active'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>)}
+    </div>);
+};
