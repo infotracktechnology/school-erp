@@ -93,6 +93,7 @@ export const BRANCH_TYPES = [
     'Coaching Centre',
     'Other'
 ];
+
 export const EDUCATION_BOARDS = [
     'CBSE',
     'ICSE',
