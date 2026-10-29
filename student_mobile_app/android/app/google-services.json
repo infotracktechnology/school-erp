@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "446425245973",
+    "project_id": "school-erp-66d10",
+    "storage_bucket": "school-erp-66d10.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:446425245973:android:5b2c8641091ce036f9e11c",
+        "android_client_info": {
+          "package_name": "com.campuseye.student.student_mobile_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBeyMLEZJExilCIRzlBh7ySFJrIlZvk2Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

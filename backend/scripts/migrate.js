@@ -1,7 +1,7 @@
 import { initDatabase, sutando } from '../config/database.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { seedAllData } from './seed_campuseyeplus.js';
+// import { seedAllData } from './seed_campuseyeplus.js';
 
 export async function runMigrations(options = {}) {
   const isFresh = options.fresh || process.argv.includes('--fresh') || process.argv.includes('-f');
@@ -613,6 +613,17 @@ export async function runMigrations(options = {}) {
       table.unique(['academic_year_id', 'student_id', 'subject_code']);
     });
     console.log('✓ Created student_subjects table');
+  }
+
+  // User FCM Tokens
+  if (!(await conn.schema.hasTable('user_fcm_tokens'))) {
+    await conn.schema.createTable('user_fcm_tokens', (table) => {
+      table.increments('id').primary();
+      table.integer('user_id').unsigned().notNullable().unique();
+      table.string('token', 500).notNullable();
+      table.timestamps(true, true);
+    });
+    console.log('✓ Created user_fcm_tokens table');
   }
 
   console.log('[Sutando Migrations] All schema migrations completed successfully!');
