@@ -1,29 +1,33 @@
 import React from 'react';
 import { Eye, Edit3, Power, ArrowUpDown, CheckCircle2, XCircle, Lock, Unlock } from 'lucide-react';
+import { Card } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '../ui/table';
 
 export const ClassTable = ({ classes, onView, onEdit, onToggleStatus, isReadOnly = false }) => {
-    return (<div className="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs sm:text-sm">
-          <thead>
-            <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-[11px]">
-              <th className="py-3.5 px-4">Class Code</th>
-              <th className="py-3.5 px-4">Class Name</th>
-              <th className="py-3.5 px-4">Level / Stream</th>
-              <th className="py-3.5 px-4">Short Name</th>
-              <th className="py-3.5 px-4">
-                <div className="flex items-center space-x-1">
-                  <span>Display Order</span>
-                  <ArrowUpDown className="w-3 h-3 text-slate-400"/>
-                </div>
-              </th>
-              <th className="py-3.5 px-4">Assigned Sections</th>
-              <th className="py-3.5 px-4">Student Status</th>
-              <th className="py-3.5 px-4">Status</th>
-              <th className="py-3.5 px-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+    return (
+      <Card className="shadow-xs overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table className="w-full text-left text-xs sm:text-sm">
+            <TableHeader>
+              <TableRow className="bg-slate-50/80 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-[11px]">
+                <TableHead className="py-3.5 px-4">Class Code</TableHead>
+                <TableHead className="py-3.5 px-4">Class Name</TableHead>
+                <TableHead className="py-3.5 px-4">Level / Stream</TableHead>
+                <TableHead className="py-3.5 px-4">Short Name</TableHead>
+                <TableHead className="py-3.5 px-4">
+                  <div className="flex items-center space-x-1">
+                    <span>Display Order</span>
+                    <ArrowUpDown className="w-3 h-3 text-slate-400"/>
+                  </div>
+                </TableHead>
+                <TableHead className="py-3.5 px-4">Assigned Sections</TableHead>
+                <TableHead className="py-3.5 px-4">Student Status</TableHead>
+                <TableHead className="py-3.5 px-4">Status</TableHead>
+                <TableHead className="py-3.5 px-4 text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="divide-y divide-slate-100 font-medium text-slate-700">
             {classes.map((cls) => {
             const isActive = cls.status === 'Active';
             return (<tr key={cls.id} className="hover:bg-slate-50/70 transition-colors">
@@ -137,8 +141,9 @@ export const ClassTable = ({ classes, onView, onEdit, onToggleStatus, isReadOnly
                   </td>
                 </tr>);
         })}
-          </tbody>
-        </table>
-      </div>
-    </div>);
+            </TableBody>
+          </Table>
+        </div>
+      </Card>
+    );
 };

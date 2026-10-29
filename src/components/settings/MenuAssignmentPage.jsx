@@ -41,6 +41,11 @@ import {
   ShieldCheck,
   Building2
 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import permissionService from '../../services/permissionService';
 
 const ICON_MAP = {
@@ -926,62 +931,57 @@ export default function MenuAssignmentPage() {
       )}
 
       {/* ROLE MODAL: ADD / EDIT ROLE */}
-      {isRoleModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-5 animate-in fade-in zoom-in-95 border border-gray-100">
-            <div className="flex justify-between items-center pb-3 border-b border-gray-100">
-              <h3 className="font-bold text-gray-900 text-sm">
-                {editingRole ? 'Edit Role Name' : 'Create New Master Role'}
-              </h3>
-              <button
-                onClick={() => setIsRoleModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600 text-sm p-1 rounded-lg"
-              >
-                ✕
-              </button>
+      <Dialog open={isRoleModalOpen} onOpenChange={(open) => { if (!open) setIsRoleModalOpen(false); }}>
+        <DialogContent className="max-w-md p-5 border border-slate-200">
+          <DialogHeader className="pb-3 border-b border-slate-100">
+            <DialogTitle className="font-bold text-slate-900 text-sm">
+              {editingRole ? 'Edit Role Name' : 'Create New Master Role'}
+            </DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleSaveRoleModal} className="mt-4 space-y-4 text-xs">
+            {roleModalError && (
+              <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{roleModalError}</span>
+              </div>
+            )}
+
+            <div>
+              <label className="block font-bold text-slate-700 mb-1">Role Name *</label>
+              <Input
+                type="text"
+                value={roleNameInput}
+                onChange={e => setRoleNameInput(e.target.value)}
+                placeholder="e.g. Lab Incharge, Sports Coordinator"
+                required
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-semibold"
+              />
             </div>
 
-            <form onSubmit={handleSaveRoleModal} className="mt-4 space-y-4 text-xs">
-              {roleModalError && (
-                <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  <span>{roleModalError}</span>
-                </div>
-              )}
-
-              <div>
-                <label className="block font-bold text-gray-700 mb-1">Role Name *</label>
-                <input
-                  type="text"
-                  value={roleNameInput}
-                  onChange={e => setRoleNameInput(e.target.value)}
-                  placeholder="e.g. Lab Incharge, Sports Coordinator"
-                  required
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-gray-50/50 text-xs font-semibold"
-                />
-              </div>
-
-              <div className="pt-3 border-t border-gray-100 flex items-center justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsRoleModalOpen(false)}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={roleModalSaving}
-                  className="px-5 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition flex items-center gap-1.5 shadow-xs disabled:opacity-50"
-                >
-                  <Save className="w-4 h-4" />
-                  {roleModalSaving ? 'Saving...' : editingRole ? 'Update Role' : 'Create Role'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsRoleModalOpen(false)}
+                className="rounded-lg text-xs font-semibold text-slate-700"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                size="sm"
+                disabled={roleModalSaving}
+                className="bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-lg transition flex items-center gap-1.5 shadow-xs disabled:opacity-50"
+              >
+                <Save className="w-4 h-4 mr-1" />
+                {roleModalSaving ? 'Saving...' : editingRole ? 'Update Role' : 'Create Role'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

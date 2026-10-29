@@ -13,6 +13,9 @@ import {
   Mail,
   UserCheck
 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import staffService from '../../services/staffService';
 
 export default function AddStaffModal({ isOpen, onClose, onSuccess, branchId = 1, editStaff = null }) {
@@ -96,31 +99,25 @@ export default function AddStaffModal({ isOpen, onClose, onSuccess, branchId = 1
   const selectedRoleName = roles.find(r => r.id === Number(selectedRoleId))?.name || 'Assigned Role';
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 border border-gray-100">
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent className="max-w-2xl max-h-[92vh] flex flex-col p-0 overflow-hidden border border-slate-200/90">
         
         {/* Header */}
-        <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-gray-50 to-indigo-50/40">
+        <DialogHeader className="p-4 border-b border-slate-100 flex flex-row items-center justify-between bg-gradient-to-r from-slate-50 to-sky-50/40">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold shadow-xs">
+            <div className="w-9 h-9 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold shadow-xs">
               <UserPlus className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 text-sm">
+              <DialogTitle className="font-bold text-slate-900 text-sm">
                 {editStaff ? 'Edit Staff Profile' : 'Add Staff & Assign Role'}
-              </h3>
-              <p className="text-[11px] text-gray-500">
+              </DialogTitle>
+              <p className="text-[11px] text-slate-500">
                 Staff profile and ERP Login account are automatically created and linked.
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+        </DialogHeader>
 
         {/* Scrollable Form Body */}
         <form onSubmit={handleSubmit} className="overflow-y-auto p-5 space-y-4 text-xs flex-1">
@@ -293,25 +290,26 @@ export default function AddStaffModal({ isOpen, onClose, onSuccess, branchId = 1
           </div>
 
           {/* Footer Actions */}
-          <div className="pt-3 border-t border-gray-100 flex items-center justify-end gap-2">
-            <button
+          <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+            <Button
               type="button"
+              variant="outline"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition"
+              className="rounded-lg text-slate-700"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={saving}
-              className="px-6 py-2.5 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition flex items-center gap-2 shadow-xs disabled:opacity-50"
+              className="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-lg transition flex items-center gap-2 shadow-xs disabled:opacity-50"
             >
-              <Save className="w-4 h-4" />
+              <Save className="w-4 h-4 mr-1.5" />
               {saving ? 'Creating Staff & User...' : 'Save Staff & Auto-Create Login'}
-            </button>
+            </Button>
           </div>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

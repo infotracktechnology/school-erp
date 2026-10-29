@@ -4,6 +4,10 @@ import {
   Search, FileText, Image as ImageIcon, Link as LinkIcon, Video, 
   ExternalLink, Sparkles, CalendarDays
 } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 // ─── Date Helpers ───────────────────────────────────────────────────────────
 const getMonthKey = (d) => {
@@ -109,16 +113,16 @@ export const StudentHomeworkPortal = ({ homework = [], student, assignedSubjects
     <div className="space-y-5">
       {/* ── Stats ────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center justify-between">
+        <Card className="p-4 sm:p-5 shadow-xs flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-slate-500">Total Assigned</p>
+            <p className="text-xs font-semibold text-muted-foreground">Total Assigned</p>
             <p className="text-2xl font-black text-slate-900 mt-1">{homework.length}</p>
           </div>
           <div className="w-12 h-12 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center">
             <BookOpen className="w-6 h-6" />
           </div>
-        </div>
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center justify-between">
+        </Card>
+        <Card className="p-4 sm:p-5 shadow-xs flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold text-amber-600">This Month</p>
             <p className="text-2xl font-black text-amber-700 mt-1">{thisMonthCount}</p>
@@ -126,16 +130,16 @@ export const StudentHomeworkPortal = ({ homework = [], student, assignedSubjects
           <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
             <Clock className="w-6 h-6" />
           </div>
-        </div>
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center justify-between">
+        </Card>
+        <Card className="p-4 sm:p-5 shadow-xs flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-rose-600">Due This Week</p>
-            <p className="text-2xl font-black text-rose-700 mt-1">{dueThisWeek}</p>
+            <p className="text-xs font-semibold text-destructive">Due This Week</p>
+            <p className="text-2xl font-black text-destructive mt-1">{dueThisWeek}</p>
           </div>
           <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
             <AlertCircle className="w-6 h-6" />
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* ── Month Input + All Days Horizontal Tabs ──────────────────── */}
@@ -207,33 +211,31 @@ export const StudentHomeworkPortal = ({ homework = [], student, assignedSubjects
       </div>
 
       {/* ── Search + Status Filter ────────────────────────────────────── */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      <Card className="p-4 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
           {['all', 'pending'].map(status => (
-            <button
+            <Button
               key={status}
+              variant={filterStatus === status ? (status === 'pending' ? 'default' : 'secondary') : 'outline'}
+              size="sm"
               onClick={() => setFilterStatus(status)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer capitalize ${
-                filterStatus === status
-                  ? status === 'pending' ? 'bg-amber-600 text-white shadow-xs' : 'bg-slate-900 text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
+              className="text-xs font-bold capitalize h-8"
             >
               {status === 'all' ? `All (${homework.length})` : 'Pending'}
-            </button>
+            </Button>
           ))}
         </div>
         <div className="relative flex-1 md:w-64">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground z-10" />
+          <Input
             type="text"
             placeholder="Search homework..."
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 bg-slate-50 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
+            className="pl-9 h-8 text-xs"
           />
         </div>
-      </div>
+      </Card>
 
       {/* ── Subject Pills ─────────────────────────────────────────────── */}
       {subjects.length > 0 && (
@@ -287,14 +289,14 @@ export const StudentHomeworkPortal = ({ homework = [], student, assignedSubjects
           {filteredList.map(hw => {
             const atts = hw.attachments;
             return (
-              <div key={hw.id}
-                className="bg-white rounded-2xl border border-slate-200/80 hover:border-cyan-300 hover:shadow-sm transition-all p-5 flex flex-col justify-between space-y-4 shadow-xs">
+              <Card key={hw.id}
+                className="hover:border-primary/50 hover:shadow-md transition-all p-5 flex flex-col justify-between space-y-4 shadow-xs">
                 <div className="space-y-3">
                   {/* Subject + Due */}
                   <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-1 rounded-lg text-[11px] font-extrabold uppercase bg-cyan-50 text-cyan-800 tracking-wider">
+                    <Badge variant="secondary" className="px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wider">
                       {hw.subject_name || 'General Subject'}
-                    </span>
+                    </Badge>
                     <div className="flex items-center space-x-1.5 text-xs font-semibold text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full">
                       <Clock className="w-3.5 h-3.5" />
                       <span>Due: {hw.due_date || 'N/A'}</span>
@@ -350,10 +352,10 @@ export const StudentHomeworkPortal = ({ homework = [], student, assignedSubjects
                 </div>
 
                 {/* Footer */}
-                <div className="pt-3 border-t border-slate-100 text-[11px] text-slate-400">
+                <div className="pt-3 border-t border-slate-100 text-[11px] text-muted-foreground">
                   Assigned: {hw.created_at ? new Date(hw.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>

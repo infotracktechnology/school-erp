@@ -1,5 +1,7 @@
 import React from 'react';
 import { Building2, ChevronDown, Shield, CheckCircle2 } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { useErp } from '../../context/ErpContext';
 
 export const AcademicBranchYearSelector = ({ branches, selectedBranchId, onSelectBranch, academicYears, selectedAcademicYearId, onSelectAcademicYear, isLoading = false, moduleName = 'Academic Management' }) => {
@@ -10,29 +12,30 @@ export const AcademicBranchYearSelector = ({ branches, selectedBranchId, onSelec
     // Academic years are organization-wide entities with branch-wise start/end dates
     const branchScopedYears = safeAcademicYears;
     const selectedYear = branchScopedYears.find((y) => y.id === selectedAcademicYearId) || branchScopedYears.find((y) => y.is_current) || branchScopedYears[0] || null;
-    return (<div className="bg-white border border-slate-200/90 rounded-xl p-4 sm:p-5 shadow-xs mb-6">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-        {/* Left info */}
-        <div className="flex items-start sm:items-center space-x-3.5">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-700 text-white flex items-center justify-center shadow-xs shrink-0">
-            <Building2 className="w-5 h-5"/>
-          </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                Scope Filter
-              </span>
-              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
-                Branch & Year Isolated
-              </span>
+    return (
+      <Card className="rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-xs mb-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+          {/* Left info */}
+          <div className="flex items-start sm:items-center space-x-3.5">
+            <div className="w-11 h-11 rounded-xl bg-sky-600 text-white flex items-center justify-center shadow-xs shrink-0">
+              <Building2 className="w-5 h-5"/>
             </div>
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 mt-0.5">
-              <span className="text-sky-900 font-bold">{selectedBranch ? selectedBranch.branch_name : 'Select Branch'}</span> 
-              <span className="text-slate-400 font-normal mx-2">/</span>
-              <span className="text-violet-800 font-bold">{selectedYear ? selectedYear.name : 'Select Year'}</span>
-            </h2>
+            <div>
+              <div className="flex items-center space-x-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  Scope Filter
+                </span>
+                <Badge variant="outline" className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border-sky-200">
+                  Branch & Year Isolated
+                </Badge>
+              </div>
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 mt-0.5">
+                <span className="text-sky-900 font-bold">{selectedBranch ? selectedBranch.branch_name : 'Select Branch'}</span> 
+                <span className="text-slate-400 font-normal mx-2">/</span>
+                <span className="text-indigo-800 font-bold">{selectedYear ? selectedYear.name : 'Select Year'}</span>
+              </h2>
+            </div>
           </div>
-        </div>
 
         {/* Right Selectors */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-[320px] lg:min-w-[480px]">
@@ -98,5 +101,5 @@ export const AcademicBranchYearSelector = ({ branches, selectedBranchId, onSelec
             </span>
           </div>)}
       </div>
-    </div>);
+    </Card>);
 };

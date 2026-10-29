@@ -5,6 +5,8 @@ import { Sidebar } from './Sidebar';
 import { Breadcrumb } from './Breadcrumb';
 import { HistoricalYearBanner } from '../academic/HistoricalYearBanner';
 import { ToastContainer } from '../common/Toast';
+import { Sheet } from '../ui/sheet';
+import { Badge } from '../ui/badge';
 import { useErp } from '../../context/ErpContext';
 import { getOrganization } from '../../services/api';
 
@@ -178,8 +180,8 @@ export const AppLayout = ({ toasts, showToast, dismissToast }) => {
   const safeActiveNav = typeof activeNav === 'string' ? activeNav : 'dashboard';
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col selection:bg-emerald-100 selection:text-emerald-900">
-      {/* Top Navbar with Organization context and Mobile Sidebar Toggle */}
+    <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-accent/20 selection:text-accent-foreground font-sans">
+      {/* Top Navbar with Organization context, Branch & Year switchers, User Profile & Mobile Toggle */}
       <NavigationHeader
         organization={organization}
         onToggleMobileMenu={() => setIsMobileMenuOpen((prev) => !prev)}
@@ -194,8 +196,9 @@ export const AppLayout = ({ toasts, showToast, dismissToast }) => {
       <HistoricalYearBanner />
 
       {/* Main Layout Container: Sidebar + Content Area */}
-      <div className="flex-1 flex w-full">
+      <div className="flex-1 flex w-full relative">
         {/* Left ERP Sidebar (Hidden on Student Update to give full-width spreadsheet) */}
+        {/* Mobile drawer is encapsulated via shadcn Sheet inside Sidebar */}
         {!isStudentUpdatePage && (
           <Sidebar
             activeNav={safeActiveNav}
@@ -262,7 +265,7 @@ export const AppLayout = ({ toasts, showToast, dismissToast }) => {
 
         {/* Right Main Content Body */}
         <main
-          className={`flex-1 min-w-0 ${
+          className={`flex-1 min-w-0 transition-all duration-200 ${
             isStudentUpdatePage ? 'w-full px-4 sm:px-6 py-4 max-w-none' : 'px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto w-full'
           }`}
         >
@@ -287,12 +290,14 @@ export const AppLayout = ({ toasts, showToast, dismissToast }) => {
       </div>
 
       {/* Footer */}
-      <footer className="mt-auto border-t border-slate-200/80 bg-white py-4 text-center text-xs text-slate-500 font-medium">
+      <footer className="mt-auto border-t border-border bg-card/60 backdrop-blur-xs py-3.5 text-center text-xs text-muted-foreground font-medium">
         <div className="w-full px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div>
-            <span>EduCampus ERP • Enterprise Architecture</span>
-            <span className="mx-2 text-slate-300">|</span>
-            <span className="text-emerald-800 font-semibold">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-foreground">EduCampus ERP</span>
+            <span className="text-border">•</span>
+            <span>Enterprise Architecture</span>
+            <span className="text-border hidden sm:inline">|</span>
+            <span className="text-primary font-semibold hidden sm:inline">
               {safeActiveNav === 'branch-settings'
                 ? 'Settings → Branch Settings'
                 : safeActiveNav === 'academic-settings'
@@ -300,8 +305,14 @@ export const AppLayout = ({ toasts, showToast, dismissToast }) => {
                 : safeActiveNav.charAt(0).toUpperCase() + safeActiveNav.slice(1)}
             </span>
           </div>
-          <div>
-            <span>Version 2.4.0 • Real-Time Synchronization</span>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-[10px] py-0 px-2 font-mono border-border text-muted-foreground">
+              v2.4.0
+            </Badge>
+            <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              Real-Time Sync
+            </span>
           </div>
         </div>
       </footer>

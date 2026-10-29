@@ -4,6 +4,9 @@ import {
   AlertCircle, ChevronLeft, ChevronRight, RefreshCw,
   Sun, Sunset, CalendarDays, TrendingUp
 } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '../../ui/card';
+import { Badge } from '../../ui/badge';
+import { Button } from '../../ui/button';
 import { attendanceApi } from '../../../services/attendanceApi';
 import { useErp } from '../../../context/ErpContext';
 
@@ -316,100 +319,100 @@ export const StudentAttendancePortal = ({ student: propStudent, academicYearId, 
       {/* ── 2. SUMMARY METRICS ────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {/* Attendance Rate */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+        <Card className="p-4 shadow-2xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Attendance</span>
-            <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Attendance</span>
+            <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 flex items-center justify-center">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
-            <div className="text-xl sm:text-2xl font-black text-slate-900">
+            <div className="text-xl sm:text-2xl font-black text-foreground">
               {summary.attendance_percentage}%
             </div>
-            <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Overall Percentage</p>
+            <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">Overall Percentage</p>
           </div>
-        </div>
+        </Card>
 
         {/* Total Working Days */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+        <Card className="p-4 shadow-2xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Total Days</span>
-            <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Total Days</span>
+            <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400 flex items-center justify-center">
               <Calendar className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
-            <div className="text-xl sm:text-2xl font-black text-slate-900">
+            <div className="text-xl sm:text-2xl font-black text-foreground">
               {summary.total_days}
             </div>
-            <p className="text-[10px] text-slate-400 font-semibold mt-0.5">School Working Days</p>
+            <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">School Working Days</p>
           </div>
-        </div>
+        </Card>
 
         {/* Present Days */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+        <Card className="p-4 shadow-2xs flex flex-col justify-between bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600">Present</span>
-            <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Present</span>
+            <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 flex items-center justify-center">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
-            <div className="text-xl sm:text-2xl font-black text-emerald-700">
+            <div className="text-xl sm:text-2xl font-black text-emerald-700 dark:text-emerald-400">
               {summary.present}
             </div>
-            <p className="text-[10px] text-emerald-600/70 font-semibold mt-0.5">Days Attended</p>
+            <p className="text-[10px] text-emerald-600/70 dark:text-emerald-400/70 font-semibold mt-0.5">Days Attended</p>
           </div>
-        </div>
+        </Card>
 
         {/* Absent Days */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+        <Card className="p-4 shadow-2xs flex flex-col justify-between bg-destructive/10 border-destructive/20">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase tracking-wider text-rose-500">Absent</span>
-            <div className="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+            <span className="text-[10px] font-black uppercase tracking-wider text-destructive">Absent</span>
+            <div className="w-7 h-7 rounded-lg bg-destructive/20 text-destructive flex items-center justify-center">
               <XCircle className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
-            <div className="text-xl sm:text-2xl font-black text-rose-700">
+            <div className="text-xl sm:text-2xl font-black text-destructive">
               {summary.absent}
             </div>
-            <p className="text-[10px] text-rose-600/70 font-semibold mt-0.5">Days Not In School</p>
+            <p className="text-[10px] text-destructive/70 font-semibold mt-0.5">Days Not In School</p>
           </div>
-        </div>
+        </Card>
 
         {/* Leave Days */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+        <Card className="p-4 shadow-2xs flex flex-col justify-between bg-amber-50/40 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/40">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase tracking-wider text-amber-500">Leave</span>
-            <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+            <span className="text-[10px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-400">Leave</span>
+            <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 flex items-center justify-center">
               <AlertCircle className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
-            <div className="text-xl sm:text-2xl font-black text-amber-700">
+            <div className="text-xl sm:text-2xl font-black text-amber-700 dark:text-amber-400">
               {summary.leave}
             </div>
-            <p className="text-[10px] text-amber-600/70 font-semibold mt-0.5">Approved Leaves</p>
+            <p className="text-[10px] text-amber-600/70 dark:text-amber-400/70 font-semibold mt-0.5">Approved Leaves</p>
           </div>
-        </div>
+        </Card>
 
         {/* Late Days */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+        <Card className="p-4 shadow-2xs flex flex-col justify-between bg-sky-50/40 dark:bg-sky-950/20 border-sky-200 dark:border-sky-900/40">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase tracking-wider text-orange-500">Late</span>
-            <div className="w-7 h-7 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
+            <span className="text-[10px] font-black uppercase tracking-wider text-sky-700 dark:text-sky-400">Late</span>
+            <div className="w-7 h-7 rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300 flex items-center justify-center">
               <Clock className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
-            <div className="text-xl sm:text-2xl font-black text-orange-700">
+            <div className="text-xl sm:text-2xl font-black text-sky-700 dark:text-sky-400">
               {summary.late}
             </div>
-            <p className="text-[10px] text-orange-600/70 font-semibold mt-0.5">Tardy Check-ins</p>
+            <p className="text-[10px] text-sky-600/70 dark:text-sky-400/70 font-semibold mt-0.5">Tardy Check-ins</p>
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* ── 3. INTERACTIVE MONTHLY CALENDAR WITH MORNING & AFTERNOON ─────── */}

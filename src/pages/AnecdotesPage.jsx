@@ -5,6 +5,10 @@ import {
   CheckCircle2, RefreshCw, X, ChevronRight, Award, MessageSquare,
   Users, Layers, BarChart3
 } from 'lucide-react';
+import { Card } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 import { useErp } from '../context/ErpContext';
 import { useParams, useNavigate } from 'react-router-dom';
 import { anecdoteService } from '../services/anecdoteService';
@@ -262,24 +266,24 @@ export const AnecdotesPage = () => {
     switch (sentiment) {
       case 'Positive':
         return (
-          <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+          <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-200 font-bold space-x-1 shadow-2xs">
             <Star className="w-3 h-3 fill-emerald-600 text-emerald-600" />
             <span>Praise / Positive</span>
-          </span>
+          </Badge>
         );
       case 'Needs Improvement':
         return (
-          <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
+          <Badge className="bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-200 font-bold space-x-1 shadow-2xs">
             <AlertCircle className="w-3 h-3 text-amber-600" />
             <span>Needs Guidance</span>
-          </span>
+          </Badge>
         );
       default:
         return (
-          <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200">
+          <Badge className="bg-sky-100 text-sky-800 border-sky-200 hover:bg-sky-200 font-bold space-x-1 shadow-2xs">
             <MessageSquare className="w-3 h-3 text-sky-600" />
             <span>General Note</span>
-          </span>
+          </Badge>
         );
     }
   };
@@ -494,9 +498,9 @@ export const AnecdotesPage = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {anecdotes.map((item) => (
-            <div
+            <Card
               key={item.id}
-              className="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all p-5 flex flex-col justify-between group relative overflow-hidden"
+              className="border-slate-200/90 shadow-xs hover:shadow-md transition-all p-5 flex flex-col justify-between group relative overflow-hidden"
             >
               {/* Category highlight bar */}
               <div 
@@ -590,7 +594,7 @@ export const AnecdotesPage = () => {
                   </button>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}

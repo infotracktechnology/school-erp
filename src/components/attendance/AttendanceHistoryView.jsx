@@ -22,6 +22,13 @@ import {
 import { attendanceApi } from '../../services/attendanceApi';
 import { getClasses, getSectionsByClass, getSections } from '../../services/api';
 import { useErp } from '../../context/ErpContext';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '../ui/dialog';
 
 export const AttendanceHistoryView = ({ branchId, academicYearId }) => {
   const { branches, academicYears, showToast, userRole } = useErp();
@@ -613,21 +620,21 @@ export const AttendanceHistoryView = ({ branchId, academicYearId }) => {
       )}
 
       {/* Session Details & Audit History Modal */}
-      {selectedSession && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl max-w-4xl w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700 space-y-4 max-h-[90vh] flex flex-col">
-            {/* Modal Header */}
-            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-700 pb-3 shrink-0">
-              <div>
+      <Dialog open={Boolean(selectedSession)} onOpenChange={(open) => !open && setSelectedSession(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col overflow-y-auto">
+          {selectedSession && (
+            <>
+              {/* Modal Header */}
+              <DialogHeader className="border-b border-slate-100 dark:border-slate-700 pb-3 shrink-0">
                 <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                  <DialogTitle className="text-lg font-black text-slate-900 dark:text-white">
                     {selectedSession.class_name} - Section {selectedSession.section_name}
-                  </h3>
+                  </DialogTitle>
                   <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
                     {selectedSession.timing_name || 'Regular Timing'}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <DialogDescription className="text-xs text-slate-500 mt-0.5">
                   Session Date:{' '}
                   <span className="font-bold text-slate-800 dark:text-slate-200">
                     {selectedSession.attendance_date} ({formatDate(selectedSession.attendance_date)})
@@ -636,16 +643,8 @@ export const AttendanceHistoryView = ({ branchId, academicYearId }) => {
                   <span className="font-mono text-emerald-700 dark:text-emerald-400">
                     {selectedSession.start_time} - {selectedSession.end_time}
                   </span>
-                </p>
-              </div>
-
-              <button
-                onClick={() => setSelectedSession(null)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+                </DialogDescription>
+              </DialogHeader>
 
             {/* Session Stats Bar */}
             {sessionDetails?.summary && (
@@ -932,9 +931,10 @@ export const AttendanceHistoryView = ({ branchId, academicYearId }) => {
                 )}
               </div>
             )}
-          </div>
-        </div>
-      )}
+          </>
+        )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

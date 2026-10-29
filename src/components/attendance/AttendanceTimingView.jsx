@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Clock, Plus, Search, Edit3, AlertCircle, RefreshCw, X, Sun, Sunset, ShieldCheck } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '../ui/dialog';
 import { attendanceApi } from '../../services/attendanceApi';
 import { useErp } from '../../context/ErpContext';
 
@@ -379,68 +386,125 @@ export const AttendanceTimingView = ({ branchId, academicYearId }) => {
                 </div>
             )}
 
-            {/* Add / Edit Timing Modal (Session names, optional Session 2, No Grace Period, No Description) */}
-            {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in">
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-200 dark:border-slate-700 space-y-4">
-                        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-3">
-                            <div>
-                                <h3 className="text-lg font-black text-slate-900 dark:text-white">
-                                    {editingTiming ? 'Edit Attendance Timing' : 'Create Attendance Timing'}
-                                </h3>
-                                <p className="text-xs text-slate-500 mt-0.5">
-                                    Scoped to Branch: <span className="font-bold text-slate-700 dark:text-slate-300">{currentBranch?.branch_name}</span>
-                                </p>
-                            </div>
-                            <button
-                                onClick={() => setIsModalOpen(false)}
-                                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
+            {/* Add / Edit Timing Modal */}
+            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="text-lg font-black text-slate-900 dark:text-white">
+                            {editingTiming ? 'Edit Attendance Timing' : 'Create Attendance Timing'}
+                        </DialogTitle>
+                        <DialogDescription className="text-xs text-slate-500">
+                            Scoped to Branch: <span className="font-bold text-slate-700 dark:text-slate-300">{currentBranch?.branch_name}</span>
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {formError && (
+                        <div className="p-3 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 rounded-lg flex items-center gap-2 text-xs text-rose-700 dark:text-rose-300 font-medium">
+                            <AlertCircle className="w-4 h-4 shrink-0" />
+                            <span>{formError}</span>
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSave} className="space-y-4">
+                        {/* Timing Name */}
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                                Timing Name <span className="text-rose-500">*</span>
+                            </label>
+                            <input
+                                id="timing-name-input"
+                                type="text"
+                                required
+                                placeholder="e.g. Regular Shift, Morning & Afternoon Timing"
+                                value={formData.name}
+                                onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+                            />
                         </div>
 
-                        {formError && (
-                            <div className="p-3 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 rounded-lg flex items-center gap-2 text-xs text-rose-700 dark:text-rose-300 font-medium">
-                                <AlertCircle className="w-4 h-4 shrink-0" />
-                                <span>{formError}</span>
+                        {/* Session 1 */}
+                        <div className="p-3.5 bg-amber-50/50 dark:bg-amber-950/20 rounded-xl border border-amber-200/70 dark:border-amber-900/40 space-y-2.5">
+                            <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900 dark:text-amber-300">
+                                <Sun className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                                <span>Session 1 Details</span>
                             </div>
-                        )}
-
-                        <form onSubmit={handleSave} className="space-y-4">
-                            {/* Timing Name */}
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                                    Timing Name <span className="text-rose-500">*</span>
+                                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                    Session 1 Name <span className="text-rose-500">*</span>
                                 </label>
                                 <input
-                                    id="timing-name-input"
+                                    id="timing-session-1-name-input"
                                     type="text"
                                     required
-                                    placeholder="e.g. Regular Shift, Morning & Afternoon Timing"
-                                    value={formData.name}
-                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                    placeholder="e.g. Morning Session, Shift 1"
+                                    value={formData.session_1_name}
+                                    onChange={e => setFormData({ ...formData, session_1_name: e.target.value })}
                                     className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
                                 />
                             </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                        Start Time <span className="text-rose-500">*</span>
+                                    </label>
+                                    <input
+                                        id="timing-morning-start-input"
+                                        type="time"
+                                        required
+                                        value={formData.morning_start_time}
+                                        onChange={e => setFormData({ ...formData, morning_start_time: e.target.value })}
+                                        className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+                                    />
+                                </div>
 
-                            {/* Session 1 */}
-                            <div className="p-3.5 bg-amber-50/50 dark:bg-amber-950/20 rounded-xl border border-amber-200/70 dark:border-amber-900/40 space-y-2.5">
-                                <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900 dark:text-amber-300">
-                                    <Sun className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                                    <span>Session 1 Details</span>
+                                <div>
+                                    <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                        End Time <span className="text-rose-500">*</span>
+                                    </label>
+                                    <input
+                                        id="timing-morning-end-input"
+                                        type="time"
+                                        required
+                                        value={formData.morning_end_time}
+                                        onChange={e => setFormData({ ...formData, morning_end_time: e.target.value })}
+                                        className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Session 2 Checkbox Toggle */}
+                        <div className="flex items-center space-x-2.5 p-3 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <input
+                                id="timing-is-second-session-checkbox"
+                                type="checkbox"
+                                checked={formData.is_second_session}
+                                onChange={e => setFormData({ ...formData, is_second_session: e.target.checked })}
+                                className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300 dark:border-slate-600 cursor-pointer"
+                            />
+                            <label htmlFor="timing-is-second-session-checkbox" className="text-xs font-bold text-slate-800 dark:text-slate-200 cursor-pointer select-none">
+                                Enable Second Session (e.g. Afternoon Session)
+                            </label>
+                        </div>
+
+                        {/* Session 2 (Only shown if is_second_session is checked) */}
+                        {formData.is_second_session && (
+                            <div className="p-3.5 bg-orange-50/50 dark:bg-orange-950/20 rounded-xl border border-orange-200/70 dark:border-orange-900/40 space-y-2.5 animate-in fade-in">
+                                <div className="flex items-center gap-1.5 text-xs font-bold text-orange-900 dark:text-orange-300">
+                                    <Sunset className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                                    <span>Session 2 Details</span>
                                 </div>
                                 <div>
                                     <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                                        Session 1 Name <span className="text-rose-500">*</span>
+                                        Session 2 Name <span className="text-rose-500">*</span>
                                     </label>
                                     <input
-                                        id="timing-session-1-name-input"
+                                        id="timing-session-2-name-input"
                                         type="text"
-                                        required
-                                        placeholder="e.g. Morning Session, Shift 1"
-                                        value={formData.session_1_name}
-                                        onChange={e => setFormData({ ...formData, session_1_name: e.target.value })}
+                                        required={formData.is_second_session}
+                                        placeholder="e.g. Afternoon Session, Shift 2"
+                                        value={formData.session_2_name}
+                                        onChange={e => setFormData({ ...formData, session_2_name: e.target.value })}
                                         className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
                                     />
                                 </div>
@@ -450,11 +514,11 @@ export const AttendanceTimingView = ({ branchId, academicYearId }) => {
                                             Start Time <span className="text-rose-500">*</span>
                                         </label>
                                         <input
-                                            id="timing-morning-start-input"
+                                            id="timing-afternoon-start-input"
                                             type="time"
-                                            required
-                                            value={formData.morning_start_time}
-                                            onChange={e => setFormData({ ...formData, morning_start_time: e.target.value })}
+                                            required={formData.is_second_session}
+                                            value={formData.afternoon_start_time}
+                                            onChange={e => setFormData({ ...formData, afternoon_start_time: e.target.value })}
                                             className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
                                         />
                                     </div>
@@ -464,121 +528,54 @@ export const AttendanceTimingView = ({ branchId, academicYearId }) => {
                                             End Time <span className="text-rose-500">*</span>
                                         </label>
                                         <input
-                                            id="timing-morning-end-input"
+                                            id="timing-afternoon-end-input"
                                             type="time"
-                                            required
-                                            value={formData.morning_end_time}
-                                            onChange={e => setFormData({ ...formData, morning_end_time: e.target.value })}
+                                            required={formData.is_second_session}
+                                            value={formData.afternoon_end_time}
+                                            onChange={e => setFormData({ ...formData, afternoon_end_time: e.target.value })}
                                             className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
                                         />
                                     </div>
                                 </div>
                             </div>
+                        )}
 
-                            {/* Session 2 Checkbox Toggle */}
-                            <div className="flex items-center space-x-2.5 p-3 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-700">
-                                <input
-                                    id="timing-is-second-session-checkbox"
-                                    type="checkbox"
-                                    checked={formData.is_second_session}
-                                    onChange={e => setFormData({ ...formData, is_second_session: e.target.checked })}
-                                    className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300 dark:border-slate-600 cursor-pointer"
-                                />
-                                <label htmlFor="timing-is-second-session-checkbox" className="text-xs font-bold text-slate-800 dark:text-slate-200 cursor-pointer select-none">
-                                    Enable Second Session (e.g. Afternoon Session)
-                                </label>
-                            </div>
+                        {/* Status */}
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                                Status
+                            </label>
+                            <select
+                                id="timing-status-select"
+                                value={formData.status}
+                                onChange={e => setFormData({ ...formData, status: e.target.value })}
+                                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+                            >
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
 
-                            {/* Session 2 (Only shown if is_second_session is checked) */}
-                            {formData.is_second_session && (
-                                <div className="p-3.5 bg-orange-50/50 dark:bg-orange-950/20 rounded-xl border border-orange-200/70 dark:border-orange-900/40 space-y-2.5 animate-in fade-in">
-                                    <div className="flex items-center gap-1.5 text-xs font-bold text-orange-900 dark:text-orange-300">
-                                        <Sunset className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-                                        <span>Session 2 Details</span>
-                                    </div>
-                                    <div>
-                                        <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                                            Session 2 Name <span className="text-rose-500">*</span>
-                                        </label>
-                                        <input
-                                            id="timing-session-2-name-input"
-                                            type="text"
-                                            required={formData.is_second_session}
-                                            placeholder="e.g. Afternoon Session, Shift 2"
-                                            value={formData.session_2_name}
-                                            onChange={e => setFormData({ ...formData, session_2_name: e.target.value })}
-                                            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div>
-                                            <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                                                Start Time <span className="text-rose-500">*</span>
-                                            </label>
-                                            <input
-                                                id="timing-afternoon-start-input"
-                                                type="time"
-                                                required={formData.is_second_session}
-                                                value={formData.afternoon_start_time}
-                                                onChange={e => setFormData({ ...formData, afternoon_start_time: e.target.value })}
-                                                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                                                End Time <span className="text-rose-500">*</span>
-                                            </label>
-                                            <input
-                                                id="timing-afternoon-end-input"
-                                                type="time"
-                                                required={formData.is_second_session}
-                                                value={formData.afternoon_end_time}
-                                                onChange={e => setFormData({ ...formData, afternoon_end_time: e.target.value })}
-                                                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Status */}
-                            <div>
-                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                                    Status
-                                </label>
-                                <select
-                                    id="timing-status-select"
-                                    value={formData.status}
-                                    onChange={e => setFormData({ ...formData, status: e.target.value })}
-                                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
-                                >
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
-                                </select>
-                            </div>
-
-                            <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100 dark:border-slate-700">
-                                <button
-                                    type="button"
-                                    onClick={() => setIsModalOpen(false)}
-                                    className="px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    id="timing-submit-btn"
-                                    disabled={isSaving}
-                                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors disabled:opacity-50 cursor-pointer"
-                                >
-                                    {isSaving ? 'Saving...' : editingTiming ? 'Update Timing' : 'Create Timing'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
+                        <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100 dark:border-slate-700">
+                            <button
+                                type="button"
+                                onClick={() => setIsModalOpen(false)}
+                                className="px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                id="timing-submit-btn"
+                                disabled={isSaving}
+                                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors disabled:opacity-50 cursor-pointer"
+                            >
+                                {isSaving ? 'Saving...' : editingTiming ? 'Update Timing' : 'Create Timing'}
+                            </button>
+                        </div>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };

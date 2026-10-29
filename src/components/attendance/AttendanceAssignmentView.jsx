@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Layers, Plus, Search, AlertCircle, RefreshCw, X, ShieldCheck } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '../ui/dialog';
 import { attendanceApi } from '../../services/attendanceApi';
 import { getClasses, getSectionsByClass } from '../../services/api';
 import { useErp } from '../../context/ErpContext';
@@ -353,113 +360,110 @@ export const AttendanceAssignmentView = ({
         </div>)}
 
       {/* Assign Modal */}
-      {isModalOpen && (<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-200 dark:border-slate-700 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-3">
-              <div>
-                <h3 className="text-lg font-black text-slate-900 dark:text-white">
-                  {editingAssignment ? 'Edit Timing Assignment' : 'Assign Attendance Timing'}
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Branch: <span className="font-bold text-slate-700 dark:text-slate-300">{currentBranch?.branch_name}</span>
-                </p>
-              </div>
-              <button onClick={() => setIsModalOpen(false)} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">
-                <X className="w-5 h-5"/>
-              </button>
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-black text-slate-900 dark:text-white">
+              {editingAssignment ? 'Edit Timing Assignment' : 'Assign Attendance Timing'}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-500">
+              Branch: <span className="font-bold text-slate-700 dark:text-slate-300">{currentBranch?.branch_name}</span>
+            </DialogDescription>
+          </DialogHeader>
+
+          {formError && (
+            <div className="p-3 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 rounded-lg flex items-center gap-2 text-xs text-rose-700 dark:text-rose-300 font-medium">
+              <AlertCircle className="w-4 h-4 shrink-0"/>
+              <span>{formError}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSave} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                Class <span className="text-rose-500">*</span>
+              </label>
+              <select id="assign-class-select" required value={selectedClassId} onChange={e => {
+                setSelectedClassId(Number(e.target.value));
+                setSelectedSectionId('all');
+              }} className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-medium focus:outline-hidden focus:ring-2 focus:ring-emerald-500 cursor-pointer">
+                <option value="">Select Class...</option>
+                {classes.map(c => (<option key={c.id} value={c.id}>{c.class_name || c.name || `Class ${c.id}`}</option>))}
+              </select>
             </div>
 
-            {formError && (<div className="p-3 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 rounded-lg flex items-center gap-2 text-xs text-rose-700 dark:text-rose-300 font-medium">
-                <AlertCircle className="w-4 h-4 shrink-0"/>
-                <span>{formError}</span>
-              </div>)}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                Section Assignment Scope
+              </label>
+              <select id="assign-section-select" value={selectedSectionId} onChange={e => setSelectedSectionId(e.target.value === 'all' ? 'all' : Number(e.target.value))} className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-medium focus:outline-hidden focus:ring-2 focus:ring-emerald-500 cursor-pointer">
+                <option value="all">Option 1: Entire Class (All Sections)</option>
+                {availableSections.map(s => (<option key={s.id} value={s.id}>Option 2: Section {s.section_name || s.name || s.id} Only (Section Override)</option>))}
+              </select>
+              <p className="text-[11px] text-slate-500 mt-1">
+                Choosing a specific section creates a high-priority override for students in that section.
+              </p>
+            </div>
 
-            <form onSubmit={handleSave} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                Attendance Timing <span className="text-rose-500">*</span>
+              </label>
+              <select id="assign-timing-select" required value={selectedTimingId} onChange={e => setSelectedTimingId(Number(e.target.value))} className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-medium focus:outline-hidden focus:ring-2 focus:ring-emerald-500 cursor-pointer">
+                <option value="">Select Timing Period...</option>
+                {timings.map(t => {
+                  const isSecond = Boolean(t.is_second_session === 1 || t.is_second_session === true);
+                  const mS = t.morning_start_time || t.start_time || '08:30';
+                  const mE = t.morning_end_time || '12:30';
+                  const aS = t.afternoon_start_time || '13:30';
+                  const aE = t.afternoon_end_time || t.end_time || '16:00';
+                  const s1Label = t.session_1_name || 'Session 1';
+                  const s2Label = t.session_2_name || 'Session 2';
+                  return (
+                    <option key={t.id} value={t.id}>
+                      {t.name} ({s1Label}: {mS}-{mE}{isSecond ? `, ${s2Label}: ${aS}-${aE}` : ''})
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Class <span className="text-rose-500">*</span>
+                  Effective From <span className="text-rose-500">*</span>
                 </label>
-                <select id="assign-class-select" required value={selectedClassId} onChange={e => {
-                  setSelectedClassId(Number(e.target.value));
-                  setSelectedSectionId('all');
-                }} className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-medium focus:outline-hidden focus:ring-2 focus:ring-emerald-500">
-                  <option value="">Select Class...</option>
-                  {classes.map(c => (<option key={c.id} value={c.id}>{c.class_name || c.name || `Class ${c.id}`}</option>))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Section Assignment Scope
-                </label>
-                <select id="assign-section-select" value={selectedSectionId} onChange={e => setSelectedSectionId(e.target.value === 'all' ? 'all' : Number(e.target.value))} className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-medium focus:outline-hidden focus:ring-2 focus:ring-emerald-500">
-                  <option value="all">Option 1: Entire Class (All Sections)</option>
-                  {availableSections.map(s => (<option key={s.id} value={s.id}>Option 2: Section {s.section_name || s.name || s.id} Only (Section Override)</option>))}
-                </select>
-                <p className="text-[11px] text-slate-500 mt-1">
-                  Choosing a specific section creates a high-priority override for students in that section.
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Attendance Timing <span className="text-rose-500">*</span>
-                </label>
-                <select id="assign-timing-select" required value={selectedTimingId} onChange={e => setSelectedTimingId(Number(e.target.value))} className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-medium focus:outline-hidden focus:ring-2 focus:ring-emerald-500">
-                  <option value="">Select Timing Period...</option>
-                  {timings.map(t => {
-                    const isSecond = Boolean(t.is_second_session === 1 || t.is_second_session === true);
-                    const mS = t.morning_start_time || t.start_time || '08:30';
-                    const mE = t.morning_end_time || '12:30';
-                    const aS = t.afternoon_start_time || '13:30';
-                    const aE = t.afternoon_end_time || t.end_time || '16:00';
-                    const s1Label = t.session_1_name || 'Session 1';
-                    const s2Label = t.session_2_name || 'Session 2';
-                    return (
-                      <option key={t.id} value={t.id}>
-                        {t.name} ({s1Label}: {mS}-{mE}{isSecond ? `, ${s2Label}: ${aS}-${aE}` : ''})
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Effective From <span className="text-rose-500">*</span>
-                  </label>
-                  <input id="assign-from-date" type="date" required value={effectiveFrom} onChange={e => setEffectiveFrom(e.target.value)} className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"/>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Effective To (Optional)
-                  </label>
-                  <input id="assign-to-date" type="date" value={effectiveTo} onChange={e => setEffectiveTo(e.target.value)} className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"/>
-                </div>
+                <input id="assign-from-date" type="date" required value={effectiveFrom} onChange={e => setEffectiveFrom(e.target.value)} className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"/>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Status
+                  Effective To (Optional)
                 </label>
-                <select id="assign-status-select" value={status} onChange={e => setStatus(e.target.value)} className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500">
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
+                <input id="assign-to-date" type="date" value={effectiveTo} onChange={e => setEffectiveTo(e.target.value)} className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"/>
               </div>
+            </div>
 
-              <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100 dark:border-slate-700">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-700">
-                  Cancel
-                </button>
-                <button type="submit" id="assign-submit-btn" disabled={isSaving} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors disabled:opacity-50">
-                  {isSaving ? 'Saving...' : 'Save Assignment'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>)}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                Status
+              </label>
+              <select id="assign-status-select" value={status} onChange={e => setStatus(e.target.value)} className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500 cursor-pointer">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+
+            <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100 dark:border-slate-700">
+              <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer">
+                Cancel
+              </button>
+              <button type="submit" id="assign-submit-btn" disabled={isSaving} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors disabled:opacity-50 cursor-pointer">
+                {isSaving ? 'Saving...' : 'Save Assignment'}
+              </button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>);
 };

@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../ui
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Input } from '../ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { useErp } from '../../context/ErpContext';
 import { timetableService } from '../../services/timetableService';
 import { SearchableSubjectSelect } from './SearchableSubjectSelect';
@@ -431,28 +432,23 @@ export const TimetableSlotAllocationView = ({ showToast }) => {
       </Card>
 
       {/* Modal: Assign / Edit Period Slot */}
-      {editingSlot && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-zinc-200 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
-              <div>
-                <h3 className="text-sm font-bold text-zinc-950">Assign Slot: {editingSlot.period_name}</h3>
-                <p className="text-[11px] text-zinc-500">{editingSlot.day_of_week} ({editingSlot.start_time} - {editingSlot.end_time})</p>
-              </div>
-              <button onClick={() => setEditingSlot(null)} className="text-zinc-400 hover:text-zinc-600 p-1">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+      <Dialog open={Boolean(editingSlot)} onOpenChange={(open) => { if (!open) setEditingSlot(null); }}>
+        {editingSlot && (
+          <DialogContent className="max-w-md p-6 border border-slate-200">
+            <DialogHeader className="pb-2 border-b border-slate-100">
+              <DialogTitle className="text-sm font-bold text-slate-900">Assign Slot: {editingSlot.period_name}</DialogTitle>
+              <p className="text-[11px] text-slate-500">{editingSlot.day_of_week} ({editingSlot.start_time} - {editingSlot.end_time})</p>
+            </DialogHeader>
 
             <form onSubmit={handleSaveSlot} className="space-y-4 text-xs">
               {/* Subject */}
               <div>
-                <label className="block font-semibold text-zinc-700 mb-1">Subject <span className="text-red-500">*</span></label>
+                <label className="block font-semibold text-slate-700 mb-1">Subject <span className="text-red-500">*</span></label>
                 <select
                   required
                   value={editingSlot.subject_id}
                   onChange={e => handleSubjectChangeInSlot(e.target.value)}
-                  className="flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-1 text-sm font-semibold text-zinc-900 shadow-xs outline-none focus:ring-1 focus:ring-zinc-900"
+                  className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm font-semibold text-slate-900 shadow-xs outline-none focus:ring-1 focus:ring-sky-500 cursor-pointer"
                 >
                   <option value="">-- Choose Subject --</option>
                   {subjects.map(s => (
@@ -463,7 +459,7 @@ export const TimetableSlotAllocationView = ({ showToast }) => {
                 </select>
               </div>
 
-              <div className="pt-3 border-t border-zinc-100 flex items-center justify-between">
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
                 <Button
                   type="button"
                   variant="destructive"
@@ -486,6 +482,7 @@ export const TimetableSlotAllocationView = ({ showToast }) => {
                   <Button
                     type="submit"
                     size="sm"
+                    className="bg-sky-600 hover:bg-sky-700 text-white"
                     disabled={isSavingSlot}
                   >
                     {isSavingSlot ? 'Saving...' : 'Save Slot'}
@@ -493,9 +490,9 @@ export const TimetableSlotAllocationView = ({ showToast }) => {
                 </div>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+          </DialogContent>
+        )}
+      </Dialog>
     </div>
   );
 };

@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { BookOpen, FileCheck2, Bell, Image, Loader2 } from 'lucide-react';
 import { communicationService } from '../../services/communicationService';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
+
 export const CommunicationDashboardView = ({ branchId, academicYearId, showToast, onNavigateSubmenu }) => {
     const [summary, setSummary] = useState(null);
     const [hwMonitoring, setHwMonitoring] = useState([]);
@@ -30,7 +34,7 @@ export const CommunicationDashboardView = ({ branchId, academicYearId, showToast
     }, [loadDashboard]);
     if (isLoading) {
         return (<div className="bg-white border border-slate-200/80 rounded-2xl p-12 text-center shadow-xs flex flex-col items-center justify-center space-y-3">
-        <Loader2 className="w-7 h-7 text-cyan-700 animate-spin"/>
+        <Loader2 className="w-7 h-7 text-sky-700 animate-spin"/>
         <p className="text-xs font-semibold text-slate-600">Loading branch communication metrics...</p>
       </div>);
     }
@@ -38,14 +42,14 @@ export const CommunicationDashboardView = ({ branchId, academicYearId, showToast
       {/* 4 Core Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Homework Metric */}
-        <div onClick={() => onNavigateSubmenu('homework')} className="bg-white rounded-2xl p-5 border border-slate-200/80 hover:border-cyan-400 hover:shadow-md transition-all cursor-pointer group">
+        <Card onClick={() => onNavigateSubmenu('homework')} className="rounded-xl border border-slate-200/80 hover:border-sky-400 hover:shadow-md transition-all cursor-pointer group p-5">
           <div className="flex items-center justify-between">
-            <span className="p-2.5 rounded-xl bg-cyan-50 text-cyan-700 group-hover:scale-105 transition-transform">
+            <span className="p-2.5 rounded-xl bg-sky-50 text-sky-700 group-hover:scale-105 transition-transform">
               <BookOpen className="w-5 h-5"/>
             </span>
-            <span className="text-[11px] font-bold text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded-full">
+            <Badge variant="secondary" className="text-[11px] font-bold text-sky-700 bg-sky-50">
               Postings
-            </span>
+            </Badge>
           </div>
           <div className="mt-3">
             <h3 className="text-2xl font-bold text-slate-900">{summary?.homework?.total || 0}</h3>
@@ -55,17 +59,17 @@ export const CommunicationDashboardView = ({ branchId, academicYearId, showToast
             <span>Published: {summary?.homework?.published || 0}</span>
             <span>Draft: {summary?.homework?.draft || 0}</span>
           </div>
-        </div>
+        </Card>
 
         {/* Assignment Metric */}
-        <div onClick={() => onNavigateSubmenu('assignment')} className="bg-white rounded-2xl p-5 border border-slate-200/80 hover:border-purple-400 hover:shadow-md transition-all cursor-pointer group">
+        <Card onClick={() => onNavigateSubmenu('assignment')} className="rounded-xl border border-slate-200/80 hover:border-purple-400 hover:shadow-md transition-all cursor-pointer group p-5">
           <div className="flex items-center justify-between">
             <span className="p-2.5 rounded-xl bg-purple-50 text-purple-700 group-hover:scale-105 transition-transform">
               <FileCheck2 className="w-5 h-5"/>
             </span>
-            <span className="text-[11px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full">
+            <Badge variant="secondary" className="text-[11px] font-bold text-purple-700 bg-purple-50">
               Evaluated
-            </span>
+            </Badge>
           </div>
           <div className="mt-3">
             <h3 className="text-2xl font-bold text-slate-900">{summary?.assignment?.total || 0}</h3>
@@ -75,17 +79,17 @@ export const CommunicationDashboardView = ({ branchId, academicYearId, showToast
             <span>Online: {summary?.assignment?.online || 0}</span>
             <span>Offline: {summary?.assignment?.offline || 0}</span>
           </div>
-        </div>
+        </Card>
 
         {/* Announcement Metric */}
-        <div onClick={() => onNavigateSubmenu('announcement')} className="bg-white rounded-2xl p-5 border border-slate-200/80 hover:border-amber-400 hover:shadow-md transition-all cursor-pointer group">
+        <Card onClick={() => onNavigateSubmenu('announcement')} className="rounded-xl border border-slate-200/80 hover:border-amber-400 hover:shadow-md transition-all cursor-pointer group p-5">
           <div className="flex items-center justify-between">
             <span className="p-2.5 rounded-xl bg-amber-50 text-amber-700 group-hover:scale-105 transition-transform">
               <Bell className="w-5 h-5"/>
             </span>
-            <span className="text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
+            <Badge variant="secondary" className="text-[11px] font-bold text-amber-700 bg-amber-50">
               {summary?.announcement?.scheduled || 0} Scheduled
-            </span>
+            </Badge>
           </div>
           <div className="mt-3">
             <h3 className="text-2xl font-bold text-slate-900">{summary?.announcement?.total || 0}</h3>
@@ -95,17 +99,17 @@ export const CommunicationDashboardView = ({ branchId, academicYearId, showToast
             <span>Published: {summary?.announcement?.published || 0}</span>
             <span>Scheduled: {summary?.announcement?.scheduled || 0}</span>
           </div>
-        </div>
+        </Card>
 
         {/* Gallery Metric */}
-        <div onClick={() => onNavigateSubmenu('gallery')} className="bg-white rounded-2xl p-5 border border-slate-200/80 hover:border-rose-400 hover:shadow-md transition-all cursor-pointer group">
+        <Card onClick={() => onNavigateSubmenu('gallery')} className="rounded-xl border border-slate-200/80 hover:border-rose-400 hover:shadow-md transition-all cursor-pointer group p-5">
           <div className="flex items-center justify-between">
             <span className="p-2.5 rounded-xl bg-rose-50 text-rose-700 group-hover:scale-105 transition-transform">
               <Image className="w-5 h-5"/>
             </span>
-            <span className="text-[11px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full">
+            <Badge variant="secondary" className="text-[11px] font-bold text-rose-700 bg-rose-50">
               {summary?.gallery?.scheduled || 0} Scheduled
-            </span>
+            </Badge>
           </div>
           <div className="mt-3">
             <h3 className="text-2xl font-bold text-slate-900">{summary?.gallery?.total_albums || 0}</h3>
@@ -115,55 +119,55 @@ export const CommunicationDashboardView = ({ branchId, academicYearId, showToast
             <span>Published: {summary?.gallery?.published || 0}</span>
             <span>Scheduled: {summary?.gallery?.scheduled || 0}</span>
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* Monitoring Grids */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Homework Monitoring Table */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-4">
+        <Card className="rounded-xl border border-slate-200/80 p-5 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <BookOpen className="w-4 h-4 text-cyan-700"/>
+              <BookOpen className="w-4 h-4 text-sky-700"/>
               <h3 className="text-sm font-bold text-slate-900">Homework Subject Coverage</h3>
             </div>
             <span className="text-[11px] text-slate-400">Class-wise audit</span>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
-                <tr>
-                  <th className="py-2.5 px-3">Class & Section</th>
-                  <th className="py-2.5 px-3">Homework Given</th>
-                  <th className="py-2.5 px-3">Active Subjects</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {hwMonitoring.length === 0 ? (<tr>
-                    <td colSpan={3} className="py-8 text-center text-slate-400 text-xs">
+          <div className="overflow-x-auto rounded-lg border border-slate-200/70">
+            <Table>
+              <TableHeader className="bg-slate-50 text-slate-600 font-bold">
+                <TableRow>
+                  <TableHead className="py-2.5 px-3">Class & Section</TableHead>
+                  <TableHead className="py-2.5 px-3">Homework Given</TableHead>
+                  <TableHead className="py-2.5 px-3">Active Subjects</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody className="divide-y divide-slate-100">
+                {hwMonitoring.length === 0 ? (<TableRow>
+                    <TableCell colSpan={3} className="py-8 text-center text-slate-400 text-xs">
                       No homework posted yet for this branch
-                    </td>
-                  </tr>) : (hwMonitoring.map((row, idx) => (<tr key={idx} className="hover:bg-slate-50/50">
-                      <td className="py-2.5 px-3 font-bold text-slate-800">
+                    </TableCell>
+                  </TableRow>) : (hwMonitoring.map((row, idx) => (<TableRow key={idx} className="hover:bg-slate-50/50">
+                      <TableCell className="py-2.5 px-3 font-bold text-slate-800">
                         {row.class_name} • {row.section_name}
-                      </td>
-                      <td className="py-2.5 px-3">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-50 text-cyan-800">
+                      </TableCell>
+                      <TableCell className="py-2.5 px-3">
+                        <Badge variant="secondary" className="text-[10px] font-bold bg-sky-50 text-sky-800 border-sky-200">
                           {row.homework_count} Tasks
-                        </span>
-                      </td>
-                      <td className="py-2.5 px-3 text-slate-600 truncate max-w-[200px]">
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="py-2.5 px-3 text-slate-600 truncate max-w-[200px]">
                         {row.subjects_covered}
-                      </td>
-                    </tr>)))}
-              </tbody>
-            </table>
+                      </TableCell>
+                    </TableRow>)))}
+              </TableBody>
+            </Table>
           </div>
-        </div>
+        </Card>
 
         {/* Assignment Submission Monitoring */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-4">
+        <Card className="rounded-xl border border-slate-200/80 p-5 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <FileCheck2 className="w-4 h-4 text-purple-700"/>
@@ -203,7 +207,7 @@ export const CommunicationDashboardView = ({ branchId, academicYearId, showToast
                   </div>);
         }))}
           </div>
-        </div>
+        </Card>
       </div>
     </div>);
 };

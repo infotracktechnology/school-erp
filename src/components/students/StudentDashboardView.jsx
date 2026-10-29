@@ -1,12 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  User, BookOpen, Clock, ChevronRight, Layers,
-  Bell, FileCheck2, Image as ImageIcon, CalendarCheck, Calendar
+  User, 
+  BookOpen, 
+  Clock, 
+  ChevronRight, 
+  Layers,
+  Bell, 
+  FileCheck2, 
+  Image as ImageIcon, 
+  CalendarCheck, 
+  Calendar,
+  CheckCircle2,
+  Sparkles
 } from 'lucide-react';
 import { useErp } from '../../context/ErpContext';
 import { useNavigate } from 'react-router-dom';
 import { communicationService } from '../../services/communicationService';
 import { attendanceApi } from '../../services/attendanceApi';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 export const StudentDashboardView = () => {
   const { currentUser, activeAcademicYearId } = useErp();
@@ -30,7 +43,7 @@ export const StudentDashboardView = () => {
         if (isMounted) setIsLoadingFeed(false);
       });
 
-    // Also load individual attendance stats for student dashboard
+    // Load individual attendance stats
     attendanceApi.getStudentIndividualReport(currentUser?.branch_id || 1, activeAcademicYearId || 2, student.id)
       .then(res => {
         if (isMounted && res) {
@@ -53,55 +66,62 @@ export const StudentDashboardView = () => {
   const pendingAssignments = assignmentsList.filter(a => (a.submission_status || 'Pending').toLowerCase() === 'pending');
   const gradedAssignments = assignmentsList.filter(a => ['reviewed', 'completed'].includes((a.submission_status || '').toLowerCase()));
 
+  const currentDateStr = new Date().toLocaleDateString('en-GB', { 
+    weekday: 'long', 
+    day: 'numeric', 
+    month: 'long', 
+    year: 'numeric' 
+  });
+
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-16">
-      {/* ── Homeroom Hero Greeting + Circular Attendance Ring ── */}
+    <div className="space-y-6 max-w-7xl mx-auto pb-16 animate-in fade-in duration-200">
+      {/* ── Top Hero Greeting + Circular Attendance Ring ── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left 8 Cols: Warm Friendly Greeting Card */}
-        <div className="lg:col-span-8 bg-white rounded-3xl p-6 sm:p-7 border border-[#ece7f0] shadow-sm relative overflow-hidden flex flex-col justify-between">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#fff0eb] to-transparent rounded-full blur-2xl pointer-events-none" />
-          <div className="absolute -bottom-10 right-20 w-48 h-48 bg-[#eeedff]/60 rounded-full blur-xl pointer-events-none" />
+        {/* Left 8 Cols: Friendly Greeting Card */}
+        <Card className="lg:col-span-8 p-6 sm:p-7 border-border shadow-sm relative overflow-hidden flex flex-col justify-between">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-sky-500/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute -bottom-10 right-20 w-48 h-48 bg-emerald-500/10 rounded-full blur-xl pointer-events-none" />
 
           <div className="relative z-10 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center space-x-2 text-xs font-bold text-[#ff7a5c]">
-                <span className="w-2 h-2 rounded-full bg-[#ff7a5c] animate-pulse" />
-                <span>
-                  {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-                </span>
+              <div className="flex items-center space-x-2 text-xs font-bold text-sky-600 dark:text-sky-400">
+                <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
+                <span>{currentDateStr}</span>
               </div>
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => navigate('/student/profile')}
-                className="px-3 py-1.5 bg-[#f5f2fa] hover:bg-[#eeedff] border border-[#ece7f0] text-[#4f46e5] font-bold text-xs rounded-xl transition-all flex items-center space-x-1.5 cursor-pointer shadow-2xs"
+                className="gap-1.5 text-xs font-bold"
               >
-                <User className="w-3.5 h-3.5" />
+                <User className="w-3.5 h-3.5 text-primary" />
                 <span>Student Profile</span>
-              </button>
+              </Button>
             </div>
 
             <div>
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#1e1b3a]">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
                 Good {new Date().getHours() < 12 ? 'morning' : (new Date().getHours() < 17 ? 'afternoon' : 'evening')}, {student.first_name || currentUser?.name || 'Student'} 👋
               </h1>
-              <p className="text-xs sm:text-sm text-[#625e7d] mt-1 max-w-xl leading-relaxed">
-                Welcome back to your school portal! You are enrolled in <strong className="text-[#1e1b3a]">{student.class_name || 'Class'} {student.section_name ? `(${student.section_name})` : ''}</strong> with <strong className="text-[#1e1b3a]">{homeworkList.length} active assignments</strong> to explore.
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-xl leading-relaxed">
+                Welcome back to your school portal! You are enrolled in <strong className="text-foreground">{student.class_name || 'Class'} {student.section_name ? `(${student.section_name})` : ''}</strong> with <strong className="text-foreground">{homeworkList.length} active assignments</strong> to explore.
               </p>
             </div>
           </div>
 
           {/* Quick Glances Row */}
-          <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-3 pt-5 mt-5 border-t border-[#ece7f0]">
+          <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-3 pt-5 mt-5 border-t border-border">
             {/* Stat 1: Morning Session */}
             <div 
               onClick={() => navigate('/student/attendance')}
-              className="p-3.5 rounded-2xl bg-[#faf7f2] border border-[#ece7f0] flex flex-col justify-between cursor-pointer hover:border-[#4f46e5]/40 transition-colors"
+              className="p-3.5 rounded-xl bg-muted/40 border border-border flex flex-col justify-between cursor-pointer hover:border-primary/40 transition-colors"
             >
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#625e7d] flex items-center space-x-1.5">
-                <Clock className="w-3.5 h-3.5 text-[#4f46e5]" />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground flex items-center space-x-1.5">
+                <Clock className="w-3.5 h-3.5 text-primary" />
                 <span>Morning Session</span>
               </span>
               <div className="mt-2 flex items-center justify-between">
-                <span className="text-sm font-extrabold text-[#1e1b3a]">
+                <span className="text-sm font-extrabold text-foreground">
                   {attendanceData?.records?.[0]?.morning_status || 'Marked Present'}
                 </span>
                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
@@ -111,14 +131,14 @@ export const StudentDashboardView = () => {
             {/* Stat 2: Afternoon Session */}
             <div 
               onClick={() => navigate('/student/attendance')}
-              className="p-3.5 rounded-2xl bg-[#faf7f2] border border-[#ece7f0] flex flex-col justify-between cursor-pointer hover:border-[#4f46e5]/40 transition-colors"
+              className="p-3.5 rounded-xl bg-muted/40 border border-border flex flex-col justify-between cursor-pointer hover:border-primary/40 transition-colors"
             >
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#625e7d] flex items-center space-x-1.5">
-                <Clock className="w-3.5 h-3.5 text-[#4f46e5]" />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground flex items-center space-x-1.5">
+                <Clock className="w-3.5 h-3.5 text-primary" />
                 <span>Afternoon Session</span>
               </span>
               <div className="mt-2 flex items-center justify-between">
-                <span className="text-sm font-extrabold text-[#1e1b3a]">
+                <span className="text-sm font-extrabold text-foreground">
                   {attendanceData?.records?.[0]?.afternoon_status || 'Marked Present'}
                 </span>
                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
@@ -128,33 +148,33 @@ export const StudentDashboardView = () => {
             {/* Stat 3: Homework Due */}
             <div 
               onClick={() => navigate('/student/homework')}
-              className="p-3.5 rounded-2xl bg-[#fff0eb] border border-[#ffd5cc] flex flex-col justify-between cursor-pointer hover:border-[#ff7a5c] transition-colors"
+              className="p-3.5 rounded-xl bg-sky-50/50 dark:bg-sky-950/20 border border-sky-200 dark:border-sky-900 flex flex-col justify-between cursor-pointer hover:border-sky-400 transition-colors"
             >
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#b1361b] flex items-center space-x-1.5">
-                <BookOpen className="w-3.5 h-3.5 text-[#ff7a5c]" />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-sky-800 dark:text-sky-300 flex items-center space-x-1.5">
+                <BookOpen className="w-3.5 h-3.5 text-sky-600" />
                 <span>Tasks Due</span>
               </span>
               <div className="mt-2 flex items-center justify-between">
-                <span className="text-sm font-extrabold text-[#1e1b3a]">{homeworkList.length} Active Tasks</span>
-                <span className="text-[10px] font-bold text-[#b1361b] bg-white px-2 py-0.5 rounded-md">View</span>
+                <span className="text-sm font-extrabold text-foreground">{homeworkList.length} Active Tasks</span>
+                <Badge variant="default" className="text-[10px] font-bold py-0">View</Badge>
               </div>
             </div>
           </div>
-        </div>
+        </Card>
 
-        {/* Right 4 Cols: Homeroom Circular SVG Attendance Ring */}
-        <div 
+        {/* Right 4 Cols: Circular Attendance Ring Card */}
+        <Card 
           onClick={() => navigate('/student/attendance')}
-          className="lg:col-span-4 bg-white rounded-3xl p-6 sm:p-7 border border-[#ece7f0] shadow-sm flex flex-col justify-between cursor-pointer hover:border-[#4f46e5]/40 transition-colors group"
+          className="lg:col-span-4 p-6 sm:p-7 border-border shadow-sm flex flex-col justify-between cursor-pointer hover:border-primary/40 transition-colors group"
         >
-          <div className="flex items-center justify-between pb-3 border-b border-[#ece7f0]">
+          <div className="flex items-center justify-between pb-3 border-b border-border">
             <div>
-              <h2 className="text-base font-black text-[#1e1b3a]">Attendance Record</h2>
-              <p className="text-[11px] text-[#625e7d]">Academic Year Performance</p>
+              <CardTitle className="text-base font-black text-foreground">Attendance Record</CardTitle>
+              <CardDescription className="text-[11px]">Academic Year Performance</CardDescription>
             </div>
-            <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#e4f5eb] text-[#177245] border border-[#bfe7cd]">
+            <Badge variant="emerald" className="font-bold text-[11px]">
               ✓ Good Standing
-            </span>
+            </Badge>
           </div>
 
           {/* SVG Circular Ring */}
@@ -170,7 +190,7 @@ export const StudentDashboardView = () => {
                       cx="60"
                       cy="60"
                       r="50"
-                      className="stroke-[#f5f2fa]"
+                      className="stroke-muted"
                       strokeWidth="10"
                       fill="none"
                     />
@@ -178,7 +198,7 @@ export const StudentDashboardView = () => {
                       cx="60"
                       cy="60"
                       r="50"
-                      className="stroke-[#4f46e5] transition-all duration-1000 ease-out"
+                      className="stroke-primary transition-all duration-1000 ease-out"
                       strokeWidth="10"
                       strokeDasharray={circumference}
                       strokeDashoffset={strokeOffset}
@@ -187,8 +207,8 @@ export const StudentDashboardView = () => {
                     />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                    <span className="text-2xl font-black text-[#1e1b3a] tracking-tight">{pct}%</span>
-                    <span className="text-[10px] font-bold text-[#625e7d] uppercase tracking-wider">Attendance</span>
+                    <span className="text-2xl font-black text-foreground tracking-tight">{pct}%</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Attendance</span>
                   </div>
                 </div>
               );
@@ -196,207 +216,203 @@ export const StudentDashboardView = () => {
 
             {/* Attendance Legends */}
             <div className="w-full mt-4 space-y-2">
-              <div className="flex items-center justify-between text-xs py-1 border-b border-[#ece7f0]/60">
+              <div className="flex items-center justify-between text-xs py-1 border-b border-border/60">
                 <div className="flex items-center space-x-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#4f46e5]" />
-                  <span className="text-[#625e7d]">Present Days</span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-primary" />
+                  <span className="text-muted-foreground">Present Days</span>
                 </div>
-                <strong className="text-[#1e1b3a]">{attendanceSummary?.present || 24} days</strong>
+                <strong className="text-foreground">{attendanceSummary?.present || 24} days</strong>
               </div>
               <div className="flex items-center justify-between text-xs py-1">
                 <div className="flex items-center space-x-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#ff7a5c]" />
-                  <span className="text-[#625e7d]">Absent / Leave</span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                  <span className="text-muted-foreground">Absent / Leave</span>
                 </div>
-                <strong className="text-[#1e1b3a]">{attendanceSummary?.absent || 0} days</strong>
+                <strong className="text-foreground">{attendanceSummary?.absent || 0} days</strong>
               </div>
             </div>
           </div>
 
-          <div className="text-[11px] text-[#4f46e5] font-bold flex items-center justify-between pt-2 border-t border-[#ece7f0]">
+          <div className="text-[11px] text-primary font-bold flex items-center justify-between pt-2 border-t border-border">
             <span>Click to view detailed calendar log</span>
             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </div>
-        </div>
+        </Card>
       </div>
 
-      {/* Live Modules Overview Cards */}
+      {/* ── Live Module Navigation Cards (6 Modules) ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {/* Timetable Card */}
-        <div 
+        <Card 
           onClick={() => navigate('/student/timetable')}
-          className="bg-white border border-slate-200/80 hover:border-indigo-400 p-5 rounded-2xl shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+          className="p-5 hover:border-primary/50 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div>
             <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Calendar className="w-6 h-6" />
+              <div className="w-11 h-11 rounded-xl bg-sky-50 text-sky-600 dark:bg-sky-950/50 dark:text-sky-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Calendar className="w-5 h-5" />
               </div>
-              <span className="text-xs font-bold text-indigo-600 group-hover:translate-x-1 transition-transform flex items-center space-x-1">
+              <span className="text-xs font-bold text-primary group-hover:translate-x-1 transition-transform flex items-center space-x-1">
                 <span>View</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </span>
             </div>
-            <h3 className="text-base font-bold text-slate-900 mt-3">Class Timetable</h3>
-            <p className="text-xs text-slate-500 mt-0.5">Periods, timing & weekly schedule</p>
+            <h3 className="text-sm font-bold text-foreground mt-3">Class Timetable</h3>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Periods & schedule</p>
           </div>
-          <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-xs">
-            <span className="font-semibold text-slate-500">Class: <strong className="text-indigo-700">{student.class_name || 'Class 1'} {student.section_name ? `(${student.section_name})` : ''}</strong></span>
-            <span className="font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md">
-              Weekly
-            </span>
+          <div className="pt-3 border-t border-border mt-3 flex items-center justify-between text-xs">
+            <span className="font-semibold text-muted-foreground text-[11px]">Class: {student.class_name || '10-A'}</span>
+            <Badge variant="outline" className="text-[10px]">Weekly</Badge>
           </div>
-        </div>
+        </Card>
 
         {/* Attendance Card */}
-        <div 
+        <Card 
           onClick={() => navigate('/student/attendance')}
-          className="bg-white border border-slate-200/80 hover:border-emerald-400 p-5 rounded-2xl shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+          className="p-5 hover:border-emerald-500 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div>
             <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <CalendarCheck className="w-6 h-6" />
+              <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <CalendarCheck className="w-5 h-5" />
               </div>
               <span className="text-xs font-bold text-emerald-600 group-hover:translate-x-1 transition-transform flex items-center space-x-1">
                 <span>View</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </span>
             </div>
-            <h3 className="text-base font-bold text-slate-900 mt-3">Attendance</h3>
-            <p className="text-xs text-slate-500 mt-0.5">Sessions, calendar & percentage</p>
+            <h3 className="text-sm font-bold text-foreground mt-3">Attendance</h3>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Sessions & calendar</p>
           </div>
-          <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-xs">
-            <span className="font-semibold text-slate-500">
-              Rate: <strong className="text-emerald-700">{attendanceSummary ? `${attendanceSummary.attendance_percentage}%` : '100%'}</strong>
+          <div className="pt-3 border-t border-border mt-3 flex items-center justify-between text-xs">
+            <span className="font-semibold text-muted-foreground text-[11px]">
+              Rate: <strong className="text-emerald-600">{attendanceSummary ? `${attendanceSummary.attendance_percentage}%` : '100%'}</strong>
             </span>
-            <span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
-              {attendanceSummary ? `${attendanceSummary.present || 0} Present` : 'Good'}
-            </span>
+            <Badge variant="emerald" className="text-[10px]">
+              {attendanceSummary ? `${attendanceSummary.present || 0} Days` : 'Good'}
+            </Badge>
           </div>
-        </div>
+        </Card>
 
         {/* Homework Card */}
-        <div 
+        <Card 
           onClick={() => navigate('/student/homework')}
-          className="bg-white border border-slate-200/80 hover:border-cyan-400 p-5 rounded-2xl shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+          className="p-5 hover:border-sky-500 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div>
             <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <BookOpen className="w-6 h-6" />
+              <div className="w-11 h-11 rounded-xl bg-sky-50 text-sky-600 dark:bg-sky-950/50 dark:text-sky-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <BookOpen className="w-5 h-5" />
               </div>
-              <span className="text-xs font-bold text-cyan-600 group-hover:translate-x-1 transition-transform flex items-center space-x-1">
+              <span className="text-xs font-bold text-sky-600 group-hover:translate-x-1 transition-transform flex items-center space-x-1">
                 <span>View</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </span>
             </div>
-            <h3 className="text-base font-bold text-slate-900 mt-3">Homework</h3>
-            <p className="text-xs text-slate-500 mt-0.5">Assigned practice & notebook tasks</p>
+            <h3 className="text-sm font-bold text-foreground mt-3">Homework</h3>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Assigned daily tasks</p>
           </div>
-          <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-xs">
-            <span className="font-semibold text-slate-500">Total: <strong className="text-slate-900">{homeworkList.length}</strong></span>
-            <span className="font-bold text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded-md">
-              Active
-            </span>
+          <div className="pt-3 border-t border-border mt-3 flex items-center justify-between text-xs">
+            <span className="font-semibold text-muted-foreground text-[11px]">Total: <strong className="text-foreground">{homeworkList.length}</strong></span>
+            <Badge variant="default" className="text-[10px]">Active</Badge>
           </div>
-        </div>
+        </Card>
 
         {/* Assignments Card */}
-        <div 
+        <Card 
           onClick={() => navigate('/student/assignment')}
-          className="bg-white border border-slate-200/80 hover:border-purple-400 p-5 rounded-2xl shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+          className="p-5 hover:border-indigo-500 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div>
             <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <FileCheck2 className="w-6 h-6" />
+              <div className="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <FileCheck2 className="w-5 h-5" />
               </div>
-              <span className="text-xs font-bold text-purple-600 group-hover:translate-x-1 transition-transform flex items-center space-x-1">
+              <span className="text-xs font-bold text-indigo-600 group-hover:translate-x-1 transition-transform flex items-center space-x-1">
                 <span>View</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </span>
             </div>
-            <h3 className="text-base font-bold text-slate-900 mt-3">Assignments</h3>
-            <p className="text-xs text-slate-500 mt-0.5">Projects, submissions & feedback</p>
+            <h3 className="text-sm font-bold text-foreground mt-3">Assignments</h3>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Projects & submissions</p>
           </div>
-          <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-xs">
-            <span className="font-semibold text-slate-500">Total: <strong className="text-slate-900">{assignmentsList.length}</strong></span>
-            <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
-              {gradedAssignments.length} Graded
-            </span>
+          <div className="pt-3 border-t border-border mt-3 flex items-center justify-between text-xs">
+            <span className="font-semibold text-muted-foreground text-[11px]">Total: <strong className="text-foreground">{assignmentsList.length}</strong></span>
+            <Badge variant="secondary" className="text-[10px]">{gradedAssignments.length} Graded</Badge>
           </div>
-        </div>
+        </Card>
 
         {/* Announcements Card */}
-        <div 
+        <Card 
           onClick={() => navigate('/student/announcement')}
-          className="bg-white border border-slate-200/80 hover:border-amber-400 p-5 rounded-2xl shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+          className="p-5 hover:border-amber-500 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div>
             <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Bell className="w-6 h-6" />
+              <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Bell className="w-5 h-5" />
               </div>
               <span className="text-xs font-bold text-amber-600 group-hover:translate-x-1 transition-transform flex items-center space-x-1">
                 <span>View</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </span>
             </div>
-            <h3 className="text-base font-bold text-slate-900 mt-3">Announcements</h3>
-            <p className="text-xs text-slate-500 mt-0.5">Official school circulars & notices</p>
+            <h3 className="text-sm font-bold text-foreground mt-3">Announcements</h3>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Official school circulars</p>
           </div>
-          <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-xs">
-            <span className="font-semibold text-slate-500">Total Notices: <strong className="text-slate-900">{announcementsList.length}</strong></span>
-            <span className="font-bold text-amber-700 bg-amber-100/70 px-2 py-0.5 rounded-md">Active</span>
+          <div className="pt-3 border-t border-border mt-3 flex items-center justify-between text-xs">
+            <span className="font-semibold text-muted-foreground text-[11px]">Notices: <strong className="text-foreground">{announcementsList.length}</strong></span>
+            <Badge variant="outline" className="text-[10px] text-amber-800 bg-amber-50 border-amber-300">Active</Badge>
           </div>
-        </div>
+        </Card>
 
         {/* Gallery Card */}
-        <div 
+        <Card 
           onClick={() => navigate('/student/gallery')}
-          className="bg-white border border-slate-200/80 hover:border-rose-400 p-5 rounded-2xl shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+          className="p-5 hover:border-rose-400 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div>
             <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <ImageIcon className="w-6 h-6" />
+              <div className="w-11 h-11 rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <ImageIcon className="w-5 h-5" />
               </div>
               <span className="text-xs font-bold text-rose-600 group-hover:translate-x-1 transition-transform flex items-center space-x-1">
                 <span>View</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </span>
             </div>
-            <h3 className="text-base font-bold text-slate-900 mt-3">Event Gallery</h3>
-            <p className="text-xs text-slate-500 mt-0.5">School celebrations & photo albums</p>
+            <h3 className="text-sm font-bold text-foreground mt-3">Event Gallery</h3>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Photo albums</p>
           </div>
-          <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-xs">
-            <span className="font-semibold text-slate-500">Albums: <strong className="text-slate-900">{albumsList.length}</strong></span>
-            <span className="font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md">Moments</span>
+          <div className="pt-3 border-t border-border mt-3 flex items-center justify-between text-xs">
+            <span className="font-semibold text-muted-foreground text-[11px]">Albums: <strong className="text-foreground">{albumsList.length}</strong></span>
+            <Badge variant="outline" className="text-[10px] text-rose-700 bg-rose-50 border-rose-200">Moments</Badge>
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* Assigned Subjects Overview */}
       {assignedSubjects.length > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-3">
+        <Card className="p-5 shadow-xs space-y-3 border-border">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="p-2 rounded-xl bg-cyan-50 text-cyan-700">
+              <div className="p-2 rounded-xl bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300">
                 <Layers className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-900">Enrolled Subjects & Curriculum</h3>
-                <p className="text-[11px] text-slate-400">Class {student.class_name || ''} Assigned Subjects</p>
+                <CardTitle className="text-sm font-bold text-foreground">Enrolled Subjects & Curriculum</CardTitle>
+                <CardDescription className="text-[11px]">Class {student.class_name || ''} Assigned Subjects</CardDescription>
               </div>
             </div>
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => navigate('/student/homework')}
-              className="text-xs font-bold text-cyan-600 hover:text-cyan-700 flex items-center space-x-1 cursor-pointer"
+              className="text-xs font-bold text-primary hover:text-primary/80 flex items-center space-x-1"
             >
               <span>View Homework by Subject</span>
               <ChevronRight className="w-3.5 h-3.5" />
-            </button>
+            </Button>
           </div>
 
           <div className="flex flex-wrap gap-2 pt-1">
@@ -406,51 +422,53 @@ export const StudentDashboardView = () => {
                 <div
                   key={sub.id}
                   onClick={() => navigate('/student/homework')}
-                  className="px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-cyan-50/60 border border-slate-200/70 hover:border-cyan-300 transition-all cursor-pointer flex items-center space-x-2 text-xs"
+                  className="px-3.5 py-2 rounded-xl bg-muted/40 hover:bg-sky-50/60 border border-border hover:border-sky-300 transition-all cursor-pointer flex items-center space-x-2 text-xs"
                 >
-                  <span className="font-bold text-slate-800">{sub.subject_name}</span>
+                  <span className="font-bold text-foreground">{sub.subject_name}</span>
                   {sub.subject_code && (
-                    <span className="text-[10px] text-slate-400 uppercase">({sub.subject_code})</span>
+                    <span className="text-[10px] text-muted-foreground uppercase">({sub.subject_code})</span>
                   )}
                   {count > 0 && (
-                    <span className="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold bg-cyan-100 text-cyan-800">
+                    <Badge variant="default" className="text-[10px] font-extrabold py-0 px-1.5">
                       {count} HW
-                    </span>
+                    </Badge>
                   )}
                 </div>
               );
             })}
           </div>
-        </div>
+        </Card>
       )}
 
       {/* Two Column Grid: Recent Homework & Latest Circulars */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Homework Feed */}
-        <div className="bg-white rounded-3xl border border-[#ece7f0] p-6 shadow-sm flex flex-col justify-between space-y-4">
+        <Card className="p-6 shadow-sm flex flex-col justify-between space-y-4 border-border">
           <div className="space-y-3">
-            <div className="flex items-center justify-between pb-3 border-b border-[#ece7f0]">
+            <div className="flex items-center justify-between pb-3 border-b border-border">
               <div className="flex items-center space-x-2">
-                <div className="p-2 rounded-xl bg-[#eeedff] text-[#4f46e5]">
+                <div className="p-2 rounded-xl bg-sky-50 text-sky-600 dark:bg-sky-950 dark:text-sky-300">
                   <BookOpen className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-black text-[#1e1b3a]">Due This Week</h3>
-                  <p className="text-[11px] text-[#625e7d]">{homeworkList.length} tasks assigned</p>
+                  <CardTitle className="text-sm font-black text-foreground">Due This Week</CardTitle>
+                  <CardDescription className="text-[11px]">{homeworkList.length} tasks assigned</CardDescription>
                 </div>
               </div>
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => navigate('/student/homework')}
-                className="text-xs font-bold text-[#4f46e5] hover:underline cursor-pointer"
+                className="text-xs font-bold text-primary hover:underline p-0 h-auto"
               >
                 All Assignments →
-              </button>
+              </Button>
             </div>
 
             {homeworkList.length === 0 ? (
-              <div className="py-8 text-center text-xs text-[#625e7d] space-y-1">
-                <BookOpen className="w-8 h-8 text-slate-300 mx-auto mb-1" />
-                <p className="font-bold text-[#1e1b3a]">No Pending Homework</p>
+              <div className="py-8 text-center text-xs text-muted-foreground space-y-1">
+                <BookOpen className="w-8 h-8 text-muted-foreground/40 mx-auto mb-1" />
+                <p className="font-bold text-foreground">No Pending Homework</p>
                 <p>You have no homework tasks due right now.</p>
               </div>
             ) : (
@@ -459,21 +477,21 @@ export const StudentDashboardView = () => {
                   <div
                     key={hw.id}
                     onClick={() => navigate('/student/homework')}
-                    className="p-4 rounded-2xl border border-[#ece7f0] hover:border-[#4f46e5]/40 transition-colors bg-white flex items-start justify-between gap-4 relative overflow-hidden cursor-pointer"
+                    className="p-4 rounded-2xl border border-border hover:border-primary/40 transition-colors bg-card flex items-start justify-between gap-4 relative overflow-hidden cursor-pointer"
                   >
-                    <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#4f46e5]" />
+                    <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary" />
                     <div className="pl-1 space-y-1">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#4f46e5]">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
                         {hw.subject_name || 'Subject'}
                       </span>
-                      <h4 className="text-xs font-extrabold text-[#1e1b3a] line-clamp-1">{hw.title}</h4>
-                      <p className="text-[11px] text-[#625e7d] line-clamp-2">{hw.description}</p>
+                      <h4 className="text-xs font-extrabold text-foreground line-clamp-1">{hw.title}</h4>
+                      <p className="text-[11px] text-muted-foreground line-clamp-2">{hw.description}</p>
                     </div>
                     <div className="text-right shrink-0">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#fff0eb] text-[#b1361b] border border-[#ffd5cc]">
+                      <Badge variant="outline" className="text-[10px] font-bold text-amber-800 bg-amber-50 border-amber-300">
                         Due: {hw.due_date || 'Schedule'}
-                      </span>
-                      <span className="block text-[11px] text-[#625e7d] mt-1 font-medium">{hw.status || 'Active'}</span>
+                      </Badge>
+                      <span className="block text-[11px] text-muted-foreground mt-1 font-medium">{hw.status || 'Active'}</span>
                     </div>
                   </div>
                 ))}
@@ -481,39 +499,42 @@ export const StudentDashboardView = () => {
             )}
           </div>
 
-          <button
+          <Button
+            variant="outline"
             onClick={() => navigate('/student/homework')}
-            className="w-full py-2.5 bg-[#f5f2fa] hover:bg-[#eeedff] border border-[#ece7f0] text-[#4f46e5] rounded-xl text-xs font-bold transition-all cursor-pointer text-center"
+            className="w-full text-xs font-bold"
           >
             Open Homework Workspace &rarr;
-          </button>
-        </div>
+          </Button>
+        </Card>
 
         {/* Recent Announcements Feed */}
-        <div className="bg-white rounded-3xl border border-[#ece7f0] p-6 shadow-sm flex flex-col justify-between space-y-4">
+        <Card className="p-6 shadow-sm flex flex-col justify-between space-y-4 border-border">
           <div className="space-y-3">
-            <div className="flex items-center justify-between pb-3 border-b border-[#ece7f0]">
+            <div className="flex items-center justify-between pb-3 border-b border-border">
               <div className="flex items-center space-x-2">
-                <div className="p-2 rounded-xl bg-[#fff0eb] text-[#ff7a5c]">
+                <div className="p-2 rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-950 dark:text-amber-300">
                   <Bell className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-black text-[#1e1b3a]">School Circulars</h3>
-                  <p className="text-[11px] text-[#625e7d]">{announcementsList.length} updates posted</p>
+                  <CardTitle className="text-sm font-black text-foreground">School Circulars</CardTitle>
+                  <CardDescription className="text-[11px]">{announcementsList.length} updates posted</CardDescription>
                 </div>
               </div>
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => navigate('/student/announcement')}
-                className="text-xs font-bold text-[#ff7a5c] hover:underline cursor-pointer"
+                className="text-xs font-bold text-amber-600 hover:underline p-0 h-auto"
               >
                 View All Notices →
-              </button>
+              </Button>
             </div>
 
             {announcementsList.length === 0 ? (
-              <div className="py-8 text-center text-xs text-[#625e7d] space-y-1">
-                <Bell className="w-8 h-8 text-slate-300 mx-auto mb-1" />
-                <p className="font-bold text-[#1e1b3a]">No New Circulars</p>
+              <div className="py-8 text-center text-xs text-muted-foreground space-y-1">
+                <Bell className="w-8 h-8 text-muted-foreground/40 mx-auto mb-1" />
+                <p className="font-bold text-foreground">No New Circulars</p>
                 <p>No circulars or notices posted recently.</p>
               </div>
             ) : (
@@ -524,20 +545,21 @@ export const StudentDashboardView = () => {
                     <div
                       key={ann.id}
                       onClick={() => navigate('/student/announcement')}
-                      className="p-4 rounded-2xl border border-[#ece7f0] hover:border-[#ff7a5c]/40 transition-colors bg-white flex items-start justify-between gap-4 relative overflow-hidden cursor-pointer"
+                      className="p-4 rounded-2xl border border-border hover:border-amber-400 transition-colors bg-card flex items-start justify-between gap-4 relative overflow-hidden cursor-pointer"
                     >
-                      <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${isUrgent ? 'bg-[#ff7a5c]' : 'bg-[#4f46e5]'}`} />
+                      <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${isUrgent ? 'bg-destructive' : 'bg-primary'}`} />
                       <div className="pl-1 space-y-1">
-                        <span className={`px-2 py-0.5 rounded font-bold uppercase text-[10px] ${
-                          isUrgent ? 'bg-[#fff0eb] text-[#b1361b]' : 'bg-[#eeedff] text-[#4f46e5]'
-                        }`}>
+                        <Badge 
+                          variant={isUrgent ? 'destructive' : 'secondary'} 
+                          className="font-bold uppercase text-[10px]"
+                        >
                           {ann.target_audience === 'All' ? 'Campus Notice' : ann.target_audience}
-                        </span>
-                        <h4 className="text-xs font-extrabold text-[#1e1b3a] line-clamp-1">{ann.title}</h4>
-                        <p className="text-[11px] text-[#625e7d] line-clamp-2">{ann.message}</p>
+                        </Badge>
+                        <h4 className="text-xs font-extrabold text-foreground line-clamp-1">{ann.title}</h4>
+                        <p className="text-[11px] text-muted-foreground line-clamp-2">{ann.message}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <span className="text-[11px] text-[#625e7d] block">{ann.publish_date || 'Recent'}</span>
+                        <span className="text-[11px] text-muted-foreground block">{ann.publish_date || 'Recent'}</span>
                       </div>
                     </div>
                   );
@@ -546,13 +568,14 @@ export const StudentDashboardView = () => {
             )}
           </div>
 
-          <button
+          <Button
+            variant="outline"
             onClick={() => navigate('/student/announcement')}
-            className="w-full py-2.5 bg-[#f5f2fa] hover:bg-[#eeedff] border border-[#ece7f0] text-[#4f46e5] rounded-xl text-xs font-bold transition-all cursor-pointer text-center"
+            className="w-full text-xs font-bold"
           >
             Open Announcements Hub &rarr;
-          </button>
-        </div>
+          </Button>
+        </Card>
       </div>
     </div>
   );

@@ -7,6 +7,10 @@ import {
 } from 'lucide-react';
 import { communicationService } from '../../services/communicationService';
 import { getAcademicGroups } from '../../services/api';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 
 export const AnnouncementView = ({ branchId, academicYearId, classes, sections, showToast }) => {
     const [announcements, setAnnouncements] = useState([]);
@@ -476,41 +480,43 @@ export const AnnouncementView = ({ branchId, academicYearId, classes, sections, 
     return (
         <div className="space-y-5">
             {/* Header Banner */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-                <div className="flex items-center space-x-2">
-                    <span className="p-2 rounded-xl bg-amber-50 text-amber-700">
-                        <Bell className="w-5 h-5"/>
-                    </span>
-                    <div>
-                        <h2 className="text-base sm:text-lg font-bold text-slate-900">Announcements & Notices</h2>
-                        <p className="text-xs text-slate-500 font-medium">
-                            Broadcast targeted school announcements to classes, academic groups, or multi-selected students
-                        </p>
+            <Card className="p-4 sm:p-5 shadow-xs">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="flex items-center space-x-2">
+                        <span className="p-2 rounded-xl bg-amber-50 text-amber-700">
+                            <Bell className="w-5 h-5"/>
+                        </span>
+                        <div>
+                            <h2 className="text-base sm:text-lg font-bold text-slate-900">Announcements & Notices</h2>
+                            <p className="text-xs text-muted-foreground font-medium">
+                                Broadcast targeted school announcements to classes, academic groups, or multi-selected students
+                            </p>
+                        </div>
                     </div>
+                    <Button 
+                        id="btn-post-new-announcement" 
+                        type="button" 
+                        onClick={handleOpenCreate} 
+                        className="w-full sm:w-auto shadow-xs active:scale-95 cursor-pointer"
+                    >
+                        <Plus className="w-4 h-4 mr-1.5"/>
+                        <span>New Announcement</span>
+                    </Button>
                 </div>
-                <button 
-                    id="btn-post-new-announcement" 
-                    type="button" 
-                    onClick={handleOpenCreate} 
-                    className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-amber-600 text-white font-semibold text-xs hover:bg-amber-700 transition-all shadow-xs cursor-pointer active:scale-95"
-                >
-                    <Plus className="w-4 h-4"/>
-                    <span>New Announcement</span>
-                </button>
-            </div>
+            </Card>
 
             {/* Filter Bar */}
-            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs space-y-3">
+            <Card className="p-4 shadow-xs space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     {/* Search */}
                     <div className="relative">
-                        <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400"/>
-                        <input 
+                        <Search className="w-4 h-4 absolute left-3 top-2.5 text-muted-foreground z-10"/>
+                        <Input 
                             type="text" 
                             placeholder="Search announcement..." 
                             value={searchQuery} 
                             onChange={(e) => setSearchQuery(e.target.value)} 
-                            className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                            className="pl-9 h-9 text-xs"
                         />
                     </div>
 
@@ -519,7 +525,7 @@ export const AnnouncementView = ({ branchId, academicYearId, classes, sections, 
                         <select 
                             value={selectedUserType} 
                             onChange={(e) => setSelectedUserType(e.target.value)} 
-                            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-white font-medium text-slate-700 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                            className="w-full h-9 px-3 text-xs rounded-md border border-input bg-transparent font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-ring"
                         >
                             <option value="all">All User Types</option>
                             <option value="Students">Students Only</option>
@@ -533,7 +539,7 @@ export const AnnouncementView = ({ branchId, academicYearId, classes, sections, 
                         <select 
                             value={selectedStatus} 
                             onChange={(e) => setSelectedStatus(e.target.value)} 
-                            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-white font-medium text-slate-700 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                            className="w-full h-9 px-3 text-xs rounded-md border border-input bg-transparent font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-ring"
                         >
                             <option value="all">All Statuses</option>
                             <option value="Published">Published</option>
@@ -543,20 +549,22 @@ export const AnnouncementView = ({ branchId, academicYearId, classes, sections, 
                     </div>
 
                     <div>
-                        <button 
+                        <Button 
+                            variant="outline"
+                            size="sm"
                             type="button" 
                             onClick={() => {
                                 setSelectedUserType('all');
                                 setSelectedStatus('all');
                                 setSearchQuery('');
                             }} 
-                            className="w-full py-2 px-3 text-xs font-semibold text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer text-center"
+                            className="w-full h-9 text-xs"
                         >
                             Clear Filters
-                        </button>
+                        </Button>
                     </div>
                 </div>
-            </div>
+            </Card>
 
             {/* Announcements List */}
             {isLoading ? (
@@ -631,47 +639,54 @@ export const AnnouncementView = ({ branchId, academicYearId, classes, sections, 
                         }
 
                         return (
-                            <div 
+                            <Card 
                                 key={item.id} 
-                                className="bg-white rounded-2xl border border-slate-200/80 hover:border-slate-300 transition-all p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                                className="hover:border-primary/50 transition-all p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs"
                             >
                                 <div className="flex-1 space-y-2">
                                     <div className="flex flex-wrap items-center gap-2">
                                         {/* Target Audience Badge */}
-                                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                                        <Badge variant="secondary" className="px-2.5 py-0.5 text-[10px] font-semibold">
                                             {item.user_type} • {audienceDisplay}
-                                        </span>
+                                        </Badge>
+
+                                        {/* Priority badge */}
+                                        {item.priority && (
+                                            <Badge variant={item.priority === 'Urgent' || item.priority === 'High' ? 'destructive' : 'secondary'} className="text-[10px] font-bold uppercase">
+                                                {item.priority}
+                                            </Badge>
+                                        )}
 
                                         {/* Scheduled notice */}
                                         {item.is_scheduled ? (
-                                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-indigo-50 text-indigo-700 border border-indigo-200/60">
+                                            <Badge variant="default" className="text-[10px] font-bold tracking-wide uppercase">
                                                 Scheduled
-                                            </span>
+                                            </Badge>
                                         ) : null}
 
                                         {/* Status */}
-                                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">
+                                        <Badge variant={item.status === 'Published' ? 'emerald' : 'outline'} className="text-[10px] font-bold">
                                             {item.is_scheduled ? 'Scheduled' : item.status}
-                                        </span>
+                                        </Badge>
                                     </div>
 
                                     <h3 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
                                         {item.title}
                                     </h3>
 
-                                    <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                                    <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                                         {item.message}
                                     </p>
 
                                     {/* Meta & Attachments */}
-                                    <div className="flex flex-wrap items-center gap-4 text-[11px] text-slate-400 pt-1">
+                                    <div className="flex flex-wrap items-center gap-4 text-[11px] text-muted-foreground pt-1">
                                         <div className="flex items-center space-x-1">
-                                            <Calendar className="w-3.5 h-3.5"/>
+                                            <Calendar className="w-3.5 h-3.5 text-muted-foreground/70"/>
                                             <span>Posted: {item.publish_date}</span>
                                         </div>
 
                                         {item.is_scheduled && item.start_at && (
-                                            <div className="text-[10px] text-indigo-600 font-semibold bg-indigo-50 px-2 py-0.5 rounded">
+                                            <div className="text-[10px] text-primary font-semibold bg-primary/10 px-2 py-0.5 rounded">
                                                 Releases: {new Date(item.start_at).toLocaleString()}
                                             </div>
                                         )}
@@ -728,7 +743,7 @@ export const AnnouncementView = ({ branchId, academicYearId, classes, sections, 
                                                         href={singleAttUrl} 
                                                         target="_blank" 
                                                         rel="noopener noreferrer" 
-                                                        className="inline-flex items-center space-x-1 text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md hover:bg-amber-100 transition-colors"
+                                                        className="inline-flex items-center space-x-1 text-[10px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-md hover:bg-primary/20 transition-colors"
                                                     >
                                                         <Paperclip className="w-3 h-3" />
                                                         <span className="truncate max-w-[110px]">{item.attachment_name || 'Attachment'}</span>
@@ -741,17 +756,19 @@ export const AnnouncementView = ({ branchId, academicYearId, classes, sections, 
 
                                 {/* Actions */}
                                 <div className="flex sm:flex-col items-center sm:items-end justify-end gap-2 w-full sm:w-auto shrink-0 border-t sm:border-t-0 pt-3 sm:pt-0">
-                                    <button 
+                                    <Button 
+                                        variant="outline"
+                                        size="sm"
                                         type="button" 
                                         onClick={() => {
                                             setSelectedAnnouncement(item);
                                             setIsDetailModalOpen(true);
                                         }} 
-                                        className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-colors flex items-center space-x-1 cursor-pointer"
+                                        className="h-8 text-xs font-semibold"
                                     >
-                                        <Eye className="w-3.5 h-3.5"/>
+                                        <Eye className="w-3.5 h-3.5 mr-1"/>
                                         <span>View Notice</span>
-                                    </button>
+                                    </Button>
 
                                     <div className="flex items-center space-x-1">
                                         <button 
@@ -766,13 +783,13 @@ export const AnnouncementView = ({ branchId, academicYearId, classes, sections, 
                                             type="button" 
                                             onClick={() => handleDelete(item.id)} 
                                             title="Delete Announcement" 
-                                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
+                                            className="p-1.5 rounded-lg text-slate-400 hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
                                         >
                                             <Trash2 className="w-4 h-4"/>
                                         </button>
                                     </div>
                                 </div>
-                            </div>
+                            </Card>
                         );
                     })}
                 </div>

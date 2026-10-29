@@ -5,6 +5,10 @@ import {
   Upload, X, Loader2, CheckCheck, CalendarDays
 } from 'lucide-react';
 import { communicationService } from '../../../services/communicationService';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 // ─── Date Helpers ────────────────────────────────────────────────────────────
 const getMonthKey = (d) => {
@@ -148,7 +152,7 @@ export const StudentAssignmentPortal = ({ assignments = [], student, onRefresh, 
           { label: 'Submitted', val: submittedCount, color: 'blue', Icon: CheckCheck },
           { label: 'Reviewed & Graded', val: reviewedCount, color: 'emerald', Icon: Award },
         ].map(({ label, val, color, Icon }) => (
-          <div key={label} className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex items-center justify-between">
+          <Card key={label} className="p-4 shadow-xs flex items-center justify-between">
             <div>
               <p className={`text-xs font-semibold text-${color}-600`}>{label}</p>
               <p className={`text-2xl font-black text-${color}-700 mt-1`}>{val}</p>
@@ -156,7 +160,7 @@ export const StudentAssignmentPortal = ({ assignments = [], student, onRefresh, 
             <div className={`w-12 h-12 rounded-xl bg-${color}-50 text-${color}-600 flex items-center justify-center`}>
               <Icon className="w-6 h-6" />
             </div>
-          </div>
+          </Card>
         ))}
       </div>
 
@@ -281,19 +285,19 @@ export const StudentAssignmentPortal = ({ assignments = [], student, onRefresh, 
             const isReviewed  = ['reviewed', 'completed'].includes(status.toLowerCase());
             const atts = asgn.attachments;
             return (
-              <div key={asgn.id}
-                className="bg-white rounded-2xl border border-slate-200/80 hover:border-purple-300 transition-all p-5 shadow-xs flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
+              <Card key={asgn.id}
+                className="hover:border-primary/50 transition-all p-5 shadow-xs flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
                 <div className="space-y-2 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-extrabold uppercase bg-purple-50 text-purple-800 tracking-wider">{asgn.subject_name || 'Subject'}</span>
-                    <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-700">{asgn.submission_type || 'Online'} Submission</span>
-                    <span className="text-xs font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md flex items-center space-x-1">
+                    <Badge variant="secondary" className="px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider">{asgn.subject_name || 'Subject'}</Badge>
+                    <Badge variant="outline" className="text-[10px] font-bold">{asgn.submission_type || 'Online'} Submission</Badge>
+                    <span className="text-xs font-semibold text-destructive bg-destructive/10 px-2 py-0.5 rounded-md flex items-center space-x-1">
                       <Clock className="w-3 h-3" /><span>Due: {asgn.due_date || 'N/A'}</span>
                     </span>
-                    <span className="text-xs font-semibold text-slate-600 bg-slate-50 px-2 py-0.5 rounded-md">Max Marks: {asgn.max_marks || 100}</span>
+                    <span className="text-xs font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-md">Max Marks: {asgn.max_marks || 100}</span>
                   </div>
                   <h3 className="text-base font-bold text-slate-900">{asgn.title}</h3>
-                  <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap">{asgn.description}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap">{asgn.description}</p>
                   {atts && (atts.doc?.url || atts.image?.url) && (
                     <div className="pt-2 flex flex-wrap gap-2">
                       {atts.doc?.url && (
@@ -313,30 +317,28 @@ export const StudentAssignmentPortal = ({ assignments = [], student, onRefresh, 
                 </div>
 
                 {/* Status Card */}
-                <div className="w-full lg:w-72 bg-slate-50 border border-slate-200/80 rounded-2xl p-4 flex flex-col justify-between space-y-3 shrink-0">
+                <div className="w-full lg:w-72 bg-muted/30 border border-border rounded-xl p-4 flex flex-col justify-between space-y-3 shrink-0">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-slate-500 font-semibold">Status:</span>
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-extrabold ${
-                      isReviewed ? 'bg-emerald-100 text-emerald-800' : isSubmitted ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'
-                    }`}>{status}</span>
+                    <span className="text-xs text-muted-foreground font-semibold">Status:</span>
+                    <Badge variant={isReviewed ? 'emerald' : isSubmitted ? 'default' : 'secondary'} className="text-xs font-extrabold">{status}</Badge>
                   </div>
                   {asgn.marks_obtained !== null && asgn.marks_obtained !== undefined ? (
-                    <div className="bg-white p-3 rounded-xl border border-slate-200 text-center space-y-1">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase">Score Secured</p>
+                    <div className="bg-card p-3 rounded-xl border border-border text-center space-y-1">
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase">Score Secured</p>
                       <p className="text-lg font-black text-emerald-700">
-                        {asgn.marks_obtained} <span className="text-xs font-semibold text-slate-400">/ {asgn.max_marks || 100}</span>
+                        {asgn.marks_obtained} <span className="text-xs font-semibold text-muted-foreground">/ {asgn.max_marks || 100}</span>
                       </p>
-                      {asgn.grade && <span className="inline-block text-[11px] font-extrabold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md">Grade {asgn.grade}</span>}
-                      {asgn.remarks && <p className="text-[11px] text-slate-600 italic pt-1 border-t border-slate-100">"{asgn.remarks}"</p>}
+                      {asgn.grade && <span className="inline-block text-[11px] font-extrabold text-primary bg-primary/10 px-2 py-0.5 rounded-md">Grade {asgn.grade}</span>}
+                      {asgn.remarks && <p className="text-[11px] text-muted-foreground italic pt-1 border-t border-border">"{asgn.remarks}"</p>}
                     </div>
                   ) : isSubmitted ? (
-                    <div className="bg-white p-3 rounded-xl border border-slate-200 text-center space-y-1">
-                      <CheckCircle2 className="w-5 h-5 text-blue-600 mx-auto" />
+                    <div className="bg-card p-3 rounded-xl border border-border text-center space-y-1">
+                      <CheckCircle2 className="w-5 h-5 text-primary mx-auto" />
                       <p className="text-xs font-bold text-slate-800">Submitted Online</p>
-                      <p className="text-[10px] text-slate-500">Awaiting teacher evaluation.</p>
+                      <p className="text-[10px] text-muted-foreground">Awaiting teacher evaluation.</p>
                       {asgn.submission_file_url && (
                         <a href={asgn.submission_file_url} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center space-x-1 text-[11px] font-bold text-blue-600 hover:underline pt-1">
+                          className="inline-flex items-center space-x-1 text-[11px] font-bold text-primary hover:underline pt-1">
                           <FileText className="w-3 h-3" /><span>View My Submitted File</span>
                         </a>
                       )}
@@ -344,21 +346,20 @@ export const StudentAssignmentPortal = ({ assignments = [], student, onRefresh, 
                   ) : null}
                   <div>
                     {asgn.submission_type === 'Physical' ? (
-                      <div className="text-center text-[11px] text-slate-500 bg-amber-50/60 p-2 rounded-xl border border-amber-200/50">
+                      <div className="text-center text-[11px] text-muted-foreground bg-amber-50/60 p-2 rounded-xl border border-amber-200/50">
                         Physical submission required. Submit your notebook or sheet in class.
                       </div>
                     ) : (
-                      <button type="button" onClick={() => handleOpenSubmit(asgn)}
-                        className={`w-full py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center space-x-2 shadow-xs active:scale-95 ${
-                          isPending ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'
-                        }`}>
-                        <Send className="w-3.5 h-3.5" />
+                      <Button type="button" onClick={() => handleOpenSubmit(asgn)}
+                        variant={isPending ? 'default' : 'outline'}
+                        className="w-full h-8 text-xs font-bold cursor-pointer">
+                        <Send className="w-3.5 h-3.5 mr-1.5" />
                         <span>{isPending ? 'Submit Work' : 'Resubmit Work'}</span>
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>

@@ -4,6 +4,10 @@ import {
   Image as ImageIcon, Link as LinkIcon, Video, ExternalLink, 
   Info, Eye, X, CalendarDays
 } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 // ─── Date Helpers ────────────────────────────────────────────────────────────
 const getMonthKey = (d) => {
@@ -88,37 +92,37 @@ export const StudentAnnouncementPortal = ({ announcements = [], student }) => {
     <div className="space-y-5">
       {/* Overview Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center justify-between">
+        <Card className="p-4 sm:p-5 shadow-xs flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-slate-500">Official Circulars</p>
+            <p className="text-xs font-semibold text-muted-foreground">Official Circulars</p>
             <p className="text-2xl font-black text-slate-900 mt-1">{announcements.length}</p>
           </div>
           <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
             <Megaphone className="w-6 h-6" />
           </div>
-        </div>
+        </Card>
 
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center justify-between">
+        <Card className="p-4 sm:p-5 shadow-xs flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-rose-600">Urgent Notices</p>
-            <p className="text-2xl font-black text-rose-700 mt-1">{urgentCount}</p>
+            <p className="text-xs font-semibold text-destructive">Urgent Notices</p>
+            <p className="text-2xl font-black text-destructive mt-1">{urgentCount}</p>
           </div>
           <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
             <AlertCircle className="w-6 h-6" />
           </div>
-        </div>
+        </Card>
 
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center justify-between">
+        <Card className="p-4 sm:p-5 shadow-xs flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-sky-600">Targeted For</p>
+            <p className="text-xs font-semibold text-primary">Targeted For</p>
             <p className="text-sm font-black text-slate-800 mt-1 truncate max-w-[180px]">
               {student?.class_name ? `Class ${student.class_name}` : 'My Campus'}
             </p>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
             <Info className="w-6 h-6" />
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* Month Input + All Days Horizontal Tabs */}
@@ -255,45 +259,41 @@ export const StudentAnnouncementPortal = ({ announcements = [], student }) => {
             const atts = ann.attachments;
 
             return (
-              <div
+              <Card
                 key={ann.id}
-                className={`bg-white rounded-2xl border transition-all p-5 shadow-xs flex flex-col justify-between space-y-3.5 ${
+                className={`transition-all p-5 shadow-xs flex flex-col justify-between space-y-3.5 ${
                   isUrgent 
-                    ? 'border-rose-200 bg-gradient-to-r from-rose-50/20 via-white to-white' 
-                    : 'border-slate-200/80 hover:border-amber-300'
+                    ? 'border-destructive/40 bg-gradient-to-r from-destructive/5 via-background to-background' 
+                    : 'hover:border-primary/50'
                 }`}
               >
                 <div className="space-y-2">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center space-x-2">
-                      <span className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] uppercase tracking-wider ${
-                        isUrgent 
-                          ? 'bg-rose-100 text-rose-800 font-extrabold' 
-                          : 'bg-amber-100 text-amber-900'
-                      }`}>
+                      <Badge variant={isUrgent ? 'destructive' : 'secondary'} className="px-2.5 py-0.5 text-[10px] uppercase font-bold tracking-wider">
                         {ann.target_audience === 'All' ? 'Campus Notice' : ann.target_audience || 'Circular'}
-                      </span>
+                      </Badge>
                       {isUrgent && (
-                        <span className="flex items-center space-x-1 text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">
+                        <span className="flex items-center space-x-1 text-[10px] font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-full">
                           <AlertCircle className="w-3 h-3" />
                           <span>URGENT</span>
                         </span>
                       )}
                     </div>
 
-                    <div className="flex items-center space-x-1.5 text-xs text-slate-400">
+                    <div className="flex items-center space-x-1.5 text-xs text-muted-foreground">
                       <span>Published: {ann.publish_date || (ann.created_at ? new Date(ann.created_at).toLocaleDateString('en-IN') : 'Recent')}</span>
                     </div>
                   </div>
 
                   <h3 className="text-base font-bold text-slate-900 leading-snug">{ann.title}</h3>
-                  <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap line-clamp-3">
+                  <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap line-clamp-3">
                     {ann.message}
                   </p>
                 </div>
 
                 {/* Attachments & Modal Trigger */}
-                <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                <div className="pt-3 border-t border-border flex flex-wrap items-center justify-between gap-2">
                   <div className="flex flex-wrap gap-2">
                     {atts?.doc?.url && (
                       <a
@@ -345,16 +345,18 @@ export const StudentAnnouncementPortal = ({ announcements = [], student }) => {
                     )}
                   </div>
 
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     type="button"
                     onClick={() => setSelectedNoticeModal(ann)}
-                    className="inline-flex items-center space-x-1.5 text-xs font-bold text-amber-700 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-xl cursor-pointer transition-colors ml-auto"
+                    className="h-8 text-xs font-bold ml-auto cursor-pointer"
                   >
-                    <Eye className="w-3.5 h-3.5" />
+                    <Eye className="w-3.5 h-3.5 mr-1" />
                     <span>Read Full Circular</span>
-                  </button>
+                  </Button>
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>

@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { X, Calendar, AlertCircle, CheckCircle2, Info } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+
 export const AcademicYearFormModal = ({ isOpen, onClose, onSubmit, selectedBranch, initialData, existingAcademicYears, currentAcademicYear }) => {
     const isEdit = Boolean(initialData);
     const [formData, setFormData] = useState({
@@ -137,27 +141,25 @@ export const AcademicYearFormModal = ({ isOpen, onClose, onSubmit, selectedBranc
     const willReplaceCurrent = formData.is_current &&
         currentAcademicYear &&
         (!isEdit || currentAcademicYear.id !== initialData?.id);
-    return (<div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-xl overflow-hidden border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
-        {/* Header */}
-        <div className="px-6 py-5 bg-gradient-to-r from-emerald-800 to-emerald-900 text-white flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white backdrop-blur-xs">
-              <Calendar className="w-5 h-5"/>
-            </div>
-            <div>
-              <h2 className="text-lg font-bold">
-                {isEdit ? 'Edit Academic Year' : 'Add New Academic Year'}
-              </h2>
-              <p className="text-xs text-emerald-100/90 font-medium">
-                {selectedBranch.branch_name} ({selectedBranch.branch_code})
-              </p>
+    return (
+      <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <DialogContent className="max-w-xl p-0 overflow-hidden border border-slate-200">
+          {/* Header */}
+          <div className="px-6 py-5 bg-gradient-to-r from-emerald-800 to-emerald-900 text-white flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white backdrop-blur-xs">
+                <Calendar className="w-5 h-5"/>
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-bold text-white">
+                  {isEdit ? 'Edit Academic Year' : 'Add New Academic Year'}
+                </DialogTitle>
+                <p className="text-xs text-emerald-100/90 font-medium">
+                  {selectedBranch.branch_name} ({selectedBranch.branch_code})
+                </p>
+              </div>
             </div>
           </div>
-          <button type="button" onClick={onClose} disabled={isSubmitting} className="p-1.5 rounded-lg text-emerald-100 hover:text-white hover:bg-white/10 transition-colors">
-            <X className="w-5 h-5"/>
-          </button>
-        </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
@@ -354,17 +356,18 @@ export const AcademicYearFormModal = ({ isOpen, onClose, onSubmit, selectedBranc
 
           {/* Footer Actions */}
           <div className="pt-3 border-t border-slate-200 flex items-center justify-end space-x-3">
-            <button type="button" onClick={onClose} disabled={isSubmitting} className="px-4 py-2 text-sm font-semibold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/80 rounded-lg transition-colors cursor-pointer">
+            <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
               Cancel
-            </button>
-            <button type="submit" disabled={isSubmitting} className="inline-flex items-center space-x-2 px-5 py-2 text-sm font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg transition-colors shadow-xs hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+            </Button>
+            <Button type="submit" disabled={isSubmitting} className="inline-flex items-center space-x-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold">
               {isSubmitting ? (<span>Saving...</span>) : (<>
-                  <CheckCircle2 className="w-4 h-4"/>
+                  <CheckCircle2 className="w-4 h-4 mr-1.5"/>
                   <span>{isEdit ? 'Update Academic Year' : 'Create Academic Year'}</span>
                 </>)}
-            </button>
+            </Button>
           </div>
         </form>
-      </div>
-    </div>);
+      </DialogContent>
+    </Dialog>
+  );
 };

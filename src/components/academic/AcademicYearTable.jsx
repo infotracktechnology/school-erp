@@ -1,5 +1,9 @@
 import React from 'react';
 import { Eye, Edit3, Star, Clock, Archive, Calendar, RefreshCw, EyeOff, Check, ArrowRight, Layers, Building } from 'lucide-react';
+import { Card } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '../ui/table';
 
 export const AcademicYearTable = ({ academicYears, onView, onEdit, onConfigureClasses, onSetCurrent, onSetNext, onChangeStatus, onToggleEnabled, isLoading = false }) => {
     // Format date helper (e.g., "01 Jun 2026")
@@ -40,62 +44,65 @@ export const AcademicYearTable = ({ academicYears, onView, onEdit, onConfigureCl
 
         if (isCurrent) {
             return (
-                <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs">
+                <Badge className="bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100 font-bold shadow-2xs">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 mr-1.5 animate-pulse"></span>
                     Current / Default
-                </span>
+                </Badge>
             );
         }
         if (isNext && isEnabled) {
             return (
-                <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200 shadow-2xs">
+                <Badge className="bg-blue-50 text-blue-800 border-blue-200 hover:bg-blue-100 font-bold shadow-2xs">
                     <Clock className="w-3 h-3 mr-1 text-blue-600"/>
                     Next Year / Enabled
-                </span>
+                </Badge>
             );
         }
         if (!isEnabled) {
             return (
-                <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200 shadow-2xs">
+                <Badge variant="outline" className="bg-slate-100 text-slate-500 border-slate-200 font-bold shadow-2xs">
                     <EyeOff className="w-3 h-3 mr-1 text-slate-400"/>
                     Disabled
-                </span>
+                </Badge>
             );
         }
         return (
-            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-50/70 text-emerald-700 border border-emerald-200 shadow-2xs">
+            <Badge className="bg-emerald-50/70 text-emerald-700 border-emerald-200 hover:bg-emerald-100 font-bold shadow-2xs">
                 <Check className="w-3 h-3 mr-1 text-emerald-600"/>
                 Enabled
-            </span>
+            </Badge>
         );
     };
 
     if (isLoading) {
-        return (<div className="bg-white border border-slate-200/90 rounded-xl p-8 shadow-xs">
-        <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-slate-200 rounded w-1/4"></div>
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (<div key={i} className="h-16 bg-slate-100 rounded-lg"></div>))}
-          </div>
-        </div>
-      </div>);
+        return (
+          <Card className="p-8 shadow-xs">
+            <div className="animate-pulse space-y-4">
+              <div className="h-6 bg-slate-200 rounded w-1/4"></div>
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (<div key={i} className="h-16 bg-slate-100 rounded-lg"></div>))}
+              </div>
+            </div>
+          </Card>
+        );
     }
 
-    return (<div className="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm text-slate-600">
-          <thead className="bg-slate-50/80 text-xs font-bold text-slate-700 uppercase tracking-wider border-b border-slate-200">
-            <tr>
-              <th scope="col" className="px-5 py-4">Academic Year</th>
-              <th scope="col" className="px-5 py-4">Campus Timeline (Branch-Wise)</th>
-              <th scope="col" className="px-5 py-4">Status</th>
-              <th scope="col" className="px-5 py-4">Current Session</th>
-              <th scope="col" className="px-5 py-4">Global Selector</th>
-              <th scope="col" className="px-5 py-4">Created Date</th>
-              <th scope="col" className="px-5 py-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-200/80">
+    return (
+      <Card className="shadow-xs overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table className="w-full text-left text-sm text-slate-600">
+            <TableHeader className="bg-slate-50/80 text-xs font-bold text-slate-700 uppercase tracking-wider border-b border-slate-200">
+              <TableRow>
+                <TableHead className="px-5 py-4">Academic Year</TableHead>
+                <TableHead className="px-5 py-4">Campus Timeline (Branch-Wise)</TableHead>
+                <TableHead className="px-5 py-4">Status</TableHead>
+                <TableHead className="px-5 py-4">Current Session</TableHead>
+                <TableHead className="px-5 py-4">Global Selector</TableHead>
+                <TableHead className="px-5 py-4">Created Date</TableHead>
+                <TableHead className="px-5 py-4 text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="divide-y divide-slate-200/80">
             {academicYears.map((ay) => {
             const isEnabled = ay.is_enabled !== false;
             const branchDates = getBranchDates(ay);
@@ -252,11 +259,12 @@ export const AcademicYearTable = ({ academicYears, onView, onEdit, onConfigureCl
                     </div>
                   </td>
                 </tr>);
-        })}
-          </tbody>
-        </table>
-      </div>
-    </div>);
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      </Card>
+    );
 };
 
 export default AcademicYearTable;

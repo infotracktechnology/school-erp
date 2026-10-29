@@ -6,6 +6,11 @@ import {
 } from 'lucide-react';
 import { communicationService } from '../../services/communicationService';
 import { getClassSubjects } from '../../services/api';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
 
 export const AssignmentView = ({ branchId, academicYearId, classes, sections, showToast }) => {
     const [assignments, setAssignments] = useState([]);
@@ -420,41 +425,43 @@ export const AssignmentView = ({ branchId, academicYearId, classes, sections, sh
     return (
         <div className="space-y-5">
             {/* Top Banner */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-                <div className="flex items-center space-x-2">
-                    <span className="p-2 rounded-xl bg-purple-50 text-purple-700">
-                        <FileCheck2 className="w-5 h-5"/>
-                    </span>
-                    <div>
-                        <h2 className="text-base sm:text-lg font-bold text-slate-900">Assignment Management</h2>
-                        <p className="text-xs text-slate-500 font-medium">
-                            Create and manage branch-wise academic assignments with online submissions and offline classroom completion tracking
-                        </p>
+            <Card className="p-4 sm:p-5 shadow-xs">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="flex items-center space-x-2">
+                        <span className="p-2 rounded-xl bg-purple-50 text-purple-700">
+                            <FileCheck2 className="w-5 h-5"/>
+                        </span>
+                        <div>
+                            <h2 className="text-base sm:text-lg font-bold text-slate-900">Assignment Management</h2>
+                            <p className="text-xs text-muted-foreground font-medium">
+                                Create and manage branch-wise academic assignments with online submissions and offline classroom completion tracking
+                            </p>
+                        </div>
                     </div>
+                    <Button 
+                        id="btn-post-new-assignment" 
+                        type="button" 
+                        onClick={handleOpenCreate} 
+                        className="w-full sm:w-auto shadow-xs active:scale-95 cursor-pointer"
+                    >
+                        <Plus className="w-4 h-4 mr-1.5"/>
+                        <span>Create New Assignment</span>
+                    </Button>
                 </div>
-                <button 
-                    id="btn-post-new-assignment" 
-                    type="button" 
-                    onClick={handleOpenCreate} 
-                    className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-purple-700 text-white font-semibold text-xs hover:bg-purple-800 transition-all shadow-xs cursor-pointer active:scale-95"
-                >
-                    <Plus className="w-4 h-4"/>
-                    <span>Create New Assignment</span>
-                </button>
-            </div>
+            </Card>
 
             {/* Filter Bar */}
-            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs space-y-3">
+            <Card className="p-4 shadow-xs space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                     {/* Search */}
                     <div className="relative">
-                        <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400"/>
-                        <input 
+                        <Search className="w-4 h-4 absolute left-3 top-2.5 text-muted-foreground z-10"/>
+                        <Input 
                             type="text" 
                             placeholder="Search assignment title or subject..." 
                             value={searchQuery} 
                             onChange={(e) => setSearchQuery(e.target.value)} 
-                            className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+                            className="pl-9 h-9 text-xs"
                         />
                     </div>
 
@@ -466,7 +473,7 @@ export const AssignmentView = ({ branchId, academicYearId, classes, sections, sh
                                 setSelectedClassId(e.target.value);
                                 setSelectedSectionId('all');
                             }} 
-                            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-white font-medium text-slate-700 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+                            className="w-full h-9 px-3 text-xs rounded-md border border-input bg-transparent font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-ring"
                         >
                             <option value="all">All Classes</option>
                             {classes.map((c) => (
@@ -482,7 +489,7 @@ export const AssignmentView = ({ branchId, academicYearId, classes, sections, sh
                         <select 
                             value={selectedSectionId} 
                             onChange={(e) => setSelectedSectionId(e.target.value)} 
-                            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-white font-medium text-slate-700 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+                            className="w-full h-9 px-3 text-xs rounded-md border border-input bg-transparent font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-ring"
                         >
                             <option value="all">All Sections</option>
                             {filterAvailableSections.map((s) => (
@@ -498,7 +505,7 @@ export const AssignmentView = ({ branchId, academicYearId, classes, sections, sh
                         <select 
                             value={selectedType} 
                             onChange={(e) => setSelectedType(e.target.value)} 
-                            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-white font-medium text-slate-700 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+                            className="w-full h-9 px-3 text-xs rounded-md border border-input bg-transparent font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-ring"
                         >
                             <option value="all">All Submission Types</option>
                             <option value="Online Submission">Online Submission</option>
@@ -508,7 +515,9 @@ export const AssignmentView = ({ branchId, academicYearId, classes, sections, sh
 
                     {/* Clear Filter */}
                     <div>
-                        <button 
+                        <Button 
+                            variant="outline"
+                            size="sm"
                             type="button" 
                             onClick={() => {
                                 setSelectedClassId('all');
@@ -517,13 +526,13 @@ export const AssignmentView = ({ branchId, academicYearId, classes, sections, sh
                                 setSelectedStatus('all');
                                 setSearchQuery('');
                             }} 
-                            className="w-full py-2 px-3 text-xs font-semibold text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer text-center"
+                            className="w-full h-9 text-xs"
                         >
                             Clear Filters
-                        </button>
+                        </Button>
                     </div>
                 </div>
-            </div>
+            </Card>
 
             {/* Assignment List */}
             {isLoading ? (
@@ -566,39 +575,35 @@ export const AssignmentView = ({ branchId, academicYearId, classes, sections, sh
                         const singleAttUrl = asgn.attachment_url;
 
                         return (
-                            <div key={asgn.id} className="bg-white rounded-2xl border border-slate-200/80 hover:border-purple-300/80 hover:shadow-md transition-all p-4 flex flex-col justify-between space-y-3">
+                            <Card key={asgn.id} className="hover:border-primary/50 hover:shadow-md transition-all p-4 flex flex-col justify-between space-y-3">
                                 <div>
                                     {/* Top Badges */}
                                     <div className="flex items-center justify-between gap-2 mb-2">
-                                        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200/60">
+                                        <Badge variant="secondary" className="font-semibold text-[11px] gap-1 px-2.5 py-0.5">
                                             <span>{asgn.class_name || `Class ${asgn.class_id}`}</span>
-                                            <span className="text-slate-400">•</span>
+                                            <span className="text-muted-foreground">•</span>
                                             <span>{asgn.section_name ? `Sec ${asgn.section_name}` : 'All Sections'}</span>
-                                        </span>
+                                        </Badge>
 
                                         <div className="flex items-center space-x-1.5">
                                             {asgn.is_scheduled ? (
-                                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-indigo-50 text-indigo-700 border border-indigo-200/60">
+                                                <Badge variant="default" className="text-[10px] uppercase font-bold tracking-wide">
                                                     Scheduled
-                                                </span>
+                                                </Badge>
                                             ) : null}
 
-                                            <span className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase ${
-                                                isOnline
-                                                    ? 'bg-purple-50 text-purple-700 border border-purple-200/60'
-                                                    : 'bg-amber-50 text-amber-700 border border-amber-200/60'
-                                            }`}>
+                                            <Badge variant={isOnline ? 'default' : 'secondary'} className="text-[10px] uppercase font-bold tracking-wide gap-1">
                                                 {isOnline ? <UploadCloud className="w-3 h-3"/> : <CheckSquare className="w-3 h-3"/>}
                                                 <span>{asgn.submission_type}</span>
-                                            </span>
+                                            </Badge>
                                         </div>
                                     </div>
 
                                     <div className="flex items-center justify-between">
-                                        <span className="text-[11px] font-bold text-purple-800 tracking-wide uppercase">
+                                        <span className="text-[11px] font-bold text-primary tracking-wide uppercase">
                                             {asgn.subject_name}
                                         </span>
-                                        <span className="text-[11px] font-bold text-slate-500">
+                                        <span className="text-[11px] font-bold text-muted-foreground">
                                             Max: {asgn.max_marks || 50} pts
                                         </span>
                                     </div>
@@ -607,7 +612,7 @@ export const AssignmentView = ({ branchId, academicYearId, classes, sections, sh
                                         {asgn.title}
                                     </h3>
 
-                                    <p className="text-xs text-slate-600 mt-1.5 line-clamp-2 leading-relaxed">
+                                    <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed">
                                         {asgn.description || 'No description provided.'}
                                     </p>
 
@@ -623,7 +628,7 @@ export const AssignmentView = ({ branchId, academicYearId, classes, sections, sh
                                         </div>
                                         <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
                                             <div 
-                                                className={`h-full rounded-full ${submissionPercent >= 80 ? 'bg-emerald-500' : submissionPercent >= 40 ? 'bg-purple-500' : 'bg-amber-500'}`} 
+                                                className={`h-full rounded-full ${submissionPercent >= 80 ? 'bg-emerald-500' : submissionPercent >= 40 ? 'bg-primary' : 'bg-amber-500'}`} 
                                                 style={{ width: `${Math.min(submissionPercent, 100)}%` }}
                                             />
                                         </div>
@@ -631,13 +636,13 @@ export const AssignmentView = ({ branchId, academicYearId, classes, sections, sh
                                 </div>
 
                                 {/* Bottom Details & Action */}
-                                <div className="pt-2 border-t border-slate-100 space-y-2">
-                                    <div className="flex items-center justify-between text-[11px] text-slate-500 font-medium">
+                                <div className="pt-2 border-t border-border space-y-2">
+                                    <div className="flex items-center justify-between text-[11px] text-muted-foreground font-medium">
                                         <div className="flex items-center space-x-1">
-                                            <Calendar className="w-3.5 h-3.5 text-slate-400"/>
+                                            <Calendar className="w-3.5 h-3.5 text-muted-foreground/70"/>
                                             <span>Start: {asgn.start_date || asgn.assigned_date}</span>
                                         </div>
-                                        <div className="flex items-center space-x-1 font-semibold text-rose-600">
+                                        <div className="flex items-center space-x-1 font-semibold text-destructive">
                                             <Clock className="w-3.5 h-3.5"/>
                                             <span>Due: {asgn.due_date}</span>
                                         </div>
@@ -645,7 +650,7 @@ export const AssignmentView = ({ branchId, academicYearId, classes, sections, sh
 
                                     {/* Scheduled Notice */}
                                     {asgn.is_scheduled && asgn.start_at && (
-                                        <div className="text-[10px] text-indigo-600 bg-indigo-50/70 px-2 py-1 rounded-md font-medium">
+                                        <div className="text-[10px] text-primary bg-primary/10 px-2 py-1 rounded-md font-medium">
                                             Scheduled for: {new Date(asgn.start_at).toLocaleString()}
                                         </div>
                                     )}
@@ -680,7 +685,7 @@ export const AssignmentView = ({ branchId, academicYearId, classes, sections, sh
                                                     href={singleAttUrl} 
                                                     target="_blank" 
                                                     rel="noopener noreferrer" 
-                                                    className="inline-flex items-center space-x-1 text-[10px] font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md hover:bg-purple-100 transition-colors"
+                                                    className="inline-flex items-center space-x-1 text-[10px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-md hover:bg-primary/20 transition-colors"
                                                 >
                                                     <Paperclip className="w-3 h-3" />
                                                     <span className="truncate max-w-[120px]">{asgn.attachment_name || 'Attachment'}</span>
@@ -691,14 +696,16 @@ export const AssignmentView = ({ branchId, academicYearId, classes, sections, sh
 
                                     {/* Review Submissions Button */}
                                     <div className="flex items-center gap-2 pt-1">
-                                        <button 
+                                        <Button 
+                                            variant="secondary"
+                                            size="sm"
                                             type="button" 
                                             onClick={() => handleOpenSubmissions(asgn)} 
-                                            className="flex-1 py-1.5 px-3 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 font-semibold text-xs transition-colors flex items-center justify-center space-x-1.5 cursor-pointer border border-purple-200/60"
+                                            className="flex-1 h-8 text-xs font-semibold"
                                         >
-                                            <Users className="w-3.5 h-3.5"/>
+                                            <Users className="w-3.5 h-3.5 mr-1.5"/>
                                             <span>Review Submissions ({submittedCount})</span>
-                                        </button>
+                                        </Button>
 
                                         <div className="flex items-center space-x-1">
                                             <button 
@@ -713,14 +720,14 @@ export const AssignmentView = ({ branchId, academicYearId, classes, sections, sh
                                                 type="button" 
                                                 onClick={() => handleDelete(asgn.id)} 
                                                 title="Delete Assignment" 
-                                                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
+                                                className="p-1.5 rounded-lg text-slate-400 hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
                                             >
                                                 <Trash2 className="w-4 h-4"/>
                                             </button>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </Card>
                         );
                     })}
                 </div>
@@ -769,47 +776,41 @@ export const AssignmentView = ({ branchId, academicYearId, classes, sections, sh
                                     No active students enrolled in this class/section.
                                 </div>
                             ) : (
-                                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                                    <table className="w-full text-left text-xs border-collapse">
-                                        <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
-                                            <tr>
-                                                <th className="py-3 px-3">Roll & Student</th>
-                                                <th className="py-3 px-3">Section</th>
-                                                <th className="py-3 px-3">Status</th>
-                                                <th className="py-3 px-3">Work / Evidence</th>
-                                                <th className="py-3 px-3">Grade & Marks</th>
-                                                <th className="py-3 px-3 text-right">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-slate-100">
+                                <div className="rounded-xl border border-border overflow-hidden">
+                                    <Table>
+                                        <TableHeader className="bg-muted/50">
+                                            <TableRow>
+                                                <TableHead className="py-3 px-3">Roll & Student</TableHead>
+                                                <TableHead className="py-3 px-3">Section</TableHead>
+                                                <TableHead className="py-3 px-3">Status</TableHead>
+                                                <TableHead className="py-3 px-3">Work / Evidence</TableHead>
+                                                <TableHead className="py-3 px-3">Grade & Marks</TableHead>
+                                                <TableHead className="py-3 px-3 text-right">Action</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
                                             {submissionsList.map((sub) => {
                                                 const isSubmitted = sub.submission_status === 'Submitted' || sub.submission_status === 'Late Submitted';
                                                 const isReviewed = sub.submission_status === 'Reviewed' || sub.submission_status === 'Completed';
                                                 return (
-                                                    <tr key={sub.student_id} className="hover:bg-slate-50/70 transition-colors">
-                                                        <td className="py-3 px-3">
+                                                    <TableRow key={sub.student_id}>
+                                                        <TableCell className="py-3 px-3">
                                                             <div className="font-bold text-slate-800">{sub.student_name}</div>
-                                                            <div className="text-[11px] text-slate-400">
+                                                            <div className="text-[11px] text-muted-foreground">
                                                                 {sub.admission_number} {sub.roll_number ? `• Roll #${sub.roll_number}` : ''}
                                                             </div>
-                                                        </td>
-                                                        <td className="py-3 px-3 text-slate-600 font-medium">
+                                                        </TableCell>
+                                                        <TableCell className="py-3 px-3 text-muted-foreground font-medium">
                                                             Section {sub.section_name}
-                                                        </td>
-                                                        <td className="py-3 px-3">
-                                                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                                                                isReviewed
-                                                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                                    : isSubmitted
-                                                                        ? 'bg-purple-50 text-purple-700 border border-purple-200'
-                                                                        : 'bg-amber-50 text-amber-700 border border-amber-200'
-                                                            }`}>
+                                                        </TableCell>
+                                                        <TableCell className="py-3 px-3">
+                                                            <Badge variant={isReviewed ? 'emerald' : isSubmitted ? 'default' : 'secondary'} className="text-[10px] font-bold">
                                                                 {sub.submission_status}
-                                                            </span>
-                                                        </td>
-                                                        <td className="py-3 px-3">
+                                                            </Badge>
+                                                        </TableCell>
+                                                        <TableCell className="py-3 px-3">
                                                             {sub.submission_file_url ? (
-                                                                <a href={sub.submission_file_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center space-x-1 text-purple-700 font-semibold hover:underline">
+                                                                <a href={sub.submission_file_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center space-x-1 text-primary font-semibold hover:underline">
                                                                     <Paperclip className="w-3 h-3"/>
                                                                     <span className="truncate max-w-[120px]">
                                                                         {sub.submission_file_name || 'Uploaded File'}
@@ -821,43 +822,41 @@ export const AssignmentView = ({ branchId, academicYearId, classes, sections, sh
                                                                     Verified {sub.offline_completion_date}
                                                                 </span>
                                                             ) : (
-                                                                <span className="text-slate-400 text-[11px] italic">Not submitted</span>
+                                                                <span className="text-muted-foreground text-[11px] italic">Not submitted</span>
                                                             )}
-                                                        </td>
-                                                        <td className="py-3 px-3">
+                                                        </TableCell>
+                                                        <TableCell className="py-3 px-3">
                                                             {sub.marks_obtained !== null && sub.marks_obtained !== undefined ? (
                                                                 <div className="flex items-center space-x-1.5">
                                                                     <span className="font-bold text-slate-800">
                                                                         {sub.marks_obtained}/{activeAssignmentForReview.max_marks || 50}
                                                                     </span>
                                                                     {sub.grade && (
-                                                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-800">
+                                                                        <Badge variant="outline" className="text-[10px] font-bold">
                                                                             {sub.grade}
-                                                                        </span>
+                                                                        </Badge>
                                                                     )}
                                                                 </div>
                                                             ) : (
-                                                                <span className="text-slate-400 text-[11px]">—</span>
+                                                                <span className="text-muted-foreground text-[11px]">—</span>
                                                             )}
-                                                        </td>
-                                                        <td className="py-3 px-3 text-right">
-                                                            <button 
+                                                        </TableCell>
+                                                        <TableCell className="py-3 px-3 text-right">
+                                                            <Button 
+                                                                variant={isReviewed ? 'outline' : 'default'}
+                                                                size="sm"
                                                                 type="button" 
                                                                 onClick={() => handleOpenGradeModal(sub)} 
-                                                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
-                                                                    isReviewed
-                                                                        ? 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                                                                        : 'bg-purple-700 text-white hover:bg-purple-800 shadow-xs'
-                                                                }`}
+                                                                className="h-7 text-xs font-semibold"
                                                             >
                                                                 {isReviewed ? 'Edit Grade' : activeAssignmentForReview.submission_type === 'Online Submission' ? 'Review & Grade' : 'Mark Completed'}
-                                                            </button>
-                                                        </td>
-                                                    </tr>
+                                                            </Button>
+                                                        </TableCell>
+                                                    </TableRow>
                                                 );
                                             })}
-                                        </tbody>
-                                    </table>
+                                        </TableBody>
+                                    </Table>
                                 </div>
                             )}
                         </div>

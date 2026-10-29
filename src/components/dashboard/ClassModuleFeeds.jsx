@@ -6,20 +6,20 @@ import {
   GraduationCap, 
   Bell, 
   FileText, 
-  Filter, 
   RefreshCw, 
-  ExternalLink, 
   Search,
-  CheckCircle2,
-  Clock,
   Sparkles,
   ChevronRight,
-  TrendingUp,
+  Clock,
   Layers
 } from 'lucide-react';
 import { communicationService } from '../../services/communicationService';
 import { useErp } from '../../context/ErpContext';
 import { useNavigate } from 'react-router-dom';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 export const ClassModuleFeeds = ({ 
   branchId, 
@@ -42,12 +42,12 @@ export const ClassModuleFeeds = ({
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const modulesList = [
-    { key: 'all', label: 'All Feeds', icon: Layers, countColor: 'bg-slate-100 text-slate-700' },
-    { key: 'attendance', label: 'Attendance', icon: CalendarCheck, countColor: 'bg-emerald-100 text-emerald-800' },
-    { key: 'homework', label: 'Homework', icon: BookOpen, countColor: 'bg-indigo-100 text-indigo-800' },
-    { key: 'examinations', label: 'Examinations', icon: GraduationCap, countColor: 'bg-purple-100 text-purple-800' },
-    { key: 'announcements', label: 'Notices', icon: Bell, countColor: 'bg-amber-100 text-amber-800' },
-    { key: 'assignments', label: 'Assignments', icon: FileText, countColor: 'bg-sky-100 text-sky-800' }
+    { key: 'all', label: 'All Feeds', icon: Layers },
+    { key: 'attendance', label: 'Attendance', icon: CalendarCheck },
+    { key: 'homework', label: 'Homework', icon: BookOpen },
+    { key: 'examinations', label: 'Examinations', icon: GraduationCap },
+    { key: 'announcements', label: 'Notices', icon: Bell },
+    { key: 'assignments', label: 'Assignments', icon: FileText }
   ];
 
   const fetchFeeds = async (showRefreshing = false) => {
@@ -93,38 +93,32 @@ export const ClassModuleFeeds = ({
       case 'Attendance':
         return {
           icon: CalendarCheck,
-          bg: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-          dot: 'bg-emerald-500'
+          badgeVariant: 'emerald'
         };
       case 'Homework':
         return {
           icon: BookOpen,
-          bg: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-          dot: 'bg-indigo-500'
+          badgeVariant: 'default'
         };
       case 'Examinations':
         return {
           icon: GraduationCap,
-          bg: 'bg-purple-50 text-purple-700 border-purple-200',
-          dot: 'bg-purple-500'
+          badgeVariant: 'secondary'
         };
       case 'Announcements':
         return {
           icon: Bell,
-          bg: 'bg-amber-50 text-amber-700 border-amber-200',
-          dot: 'bg-amber-500'
+          badgeVariant: 'outline'
         };
       case 'Assignments':
         return {
           icon: FileText,
-          bg: 'bg-sky-50 text-sky-700 border-sky-200',
-          dot: 'bg-sky-500'
+          badgeVariant: 'secondary'
         };
       default:
         return {
           icon: Activity,
-          bg: 'bg-slate-50 text-slate-700 border-slate-200',
-          dot: 'bg-slate-400'
+          badgeVariant: 'outline'
         };
     }
   };
@@ -146,104 +140,100 @@ export const ClassModuleFeeds = ({
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-[#ece7f0] shadow-sm overflow-hidden transition-all duration-200">
+    <Card className="border-border overflow-hidden">
       {/* Header Bar */}
-      <div className="p-5 sm:p-6 border-b border-[#ece7f0] bg-gradient-to-b from-[#faf7f2]/50 to-white">
+      <CardHeader className="p-5 sm:p-6 border-b border-border bg-gradient-to-b from-muted/30 to-card">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-start space-x-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-[#4f46e5] text-white flex items-center justify-center shadow-md shadow-[#4f46e5]/20 shrink-0">
-              <Sparkles className="w-5 h-5 text-indigo-100" />
+            <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-xs shrink-0">
+              <Sparkles className="w-5 h-5 text-sky-100" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h3 className="text-base sm:text-lg font-black text-[#1e1b3a] tracking-tight">
+                <CardTitle className="text-base sm:text-lg font-black text-foreground tracking-tight">
                   {title}
-                </h3>
-                <span className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#eeedff] text-[#4f46e5] border border-[#d8d5ff]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#4f46e5] animate-pulse"></span>
+                </CardTitle>
+                <Badge variant="emerald" className="gap-1 font-bold text-[11px]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span>{filteredFeeds.length} Updates</span>
-                </span>
+                </Badge>
               </div>
-              <p className="text-xs text-[#625e7d] mt-0.5 font-medium">
+              <CardDescription className="text-xs text-muted-foreground mt-0.5 font-medium">
                 {subtitle}
-              </p>
+              </CardDescription>
             </div>
           </div>
 
           {/* Quick controls: Class filter + Refresh */}
           <div className="flex items-center space-x-2.5">
-            {/* Class Dropdown */}
-            <div className="relative">
-              <select
-                aria-label="Filter by Class"
-                value={classFilter}
-                onChange={(e) => setClassFilter(e.target.value)}
-                className="text-xs font-semibold bg-white border border-[#ece7f0] rounded-xl px-3 py-2 text-[#1e1b3a] hover:border-[#4f46e5]/40 focus:outline-hidden focus:ring-2 focus:ring-[#4f46e5]/20 pr-8 cursor-pointer shadow-2xs"
-              >
-                <option value="all">🎓 All Classes</option>
-                {classes && classes.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.class_name || `Class ${c.id}`}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <select
+              aria-label="Filter by Class"
+              value={classFilter}
+              onChange={(e) => setClassFilter(e.target.value)}
+              className="text-xs font-semibold bg-background border border-input rounded-xl px-3 py-2 text-foreground hover:border-primary/40 focus:outline-hidden focus:ring-2 focus:ring-ring cursor-pointer"
+            >
+              <option value="all">🎓 All Classes</option>
+              {classes && classes.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.class_name || `Class ${c.id}`}
+                </option>
+              ))}
+            </select>
 
-            {/* Refresh Button */}
-            <button
+            <Button
+              variant="outline"
+              size="icon"
               onClick={() => fetchFeeds(true)}
               disabled={isRefreshing || loading}
               title="Refresh Feeds"
-              className="p-2 text-[#625e7d] hover:text-[#4f46e5] hover:bg-[#eeedff] rounded-xl border border-[#ece7f0] transition-colors cursor-pointer"
+              className="h-8 w-8"
             >
-              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#4f46e5]' : ''}`} />
-            </button>
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-primary' : ''}`} />
+            </Button>
           </div>
         </div>
 
         {/* Module Category Filter Pills & Search */}
-        <div className="mt-4 pt-4 border-t border-[#ece7f0]/80 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="mt-4 pt-4 border-t border-border flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
             {modulesList.map((m) => {
               const Icon = m.icon;
               const isActive = activeModule === m.key;
               return (
-                <button
+                <Button
                   key={m.key}
+                  size="sm"
+                  variant={isActive ? 'default' : 'outline'}
                   onClick={() => setActiveModule(m.key)}
-                  className={`inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
-                    isActive
-                      ? 'bg-[#1e1b3a] text-white shadow-xs'
-                      : 'bg-[#f5f2fa] text-[#625e7d] hover:bg-[#eeedff] hover:text-[#4f46e5]'
-                  }`}
+                  className="text-xs font-bold gap-1.5 rounded-xl h-8"
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-[#625e7d]'}`} />
+                  <Icon className="w-3.5 h-3.5" />
                   <span>{m.label}</span>
-                </button>
+                </Button>
               );
             })}
           </div>
 
-          {/* Search box */}
+          {/* Search box using shadcn Input */}
           <div className="relative min-w-[200px]">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-[#625e7d]" />
-            <input
+            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-muted-foreground" />
+            <Input
               type="text"
               placeholder="Search feed activities..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#faf7f2] border border-[#ece7f0] rounded-xl text-[#1e1b3a] placeholder-[#625e7d] focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#4f46e5]/20"
+              className="pl-8 h-8 text-xs"
             />
           </div>
         </div>
-      </div>
+      </CardHeader>
 
       {/* Feeds List Body */}
-      <div className={`divide-y divide-slate-100 overflow-y-auto ${compact ? 'max-h-[380px]' : 'max-h-[520px]'}`}>
+      <CardContent className={`p-0 divide-y divide-border overflow-y-auto ${compact ? 'max-h-[380px]' : 'max-h-[520px]'}`}>
         {loading ? (
           <div className="p-12 text-center">
-            <RefreshCw className="w-6 h-6 animate-spin text-indigo-600 mx-auto mb-2" />
-            <p className="text-xs font-semibold text-slate-500">Loading module activities...</p>
+            <RefreshCw className="w-6 h-6 animate-spin text-primary mx-auto mb-2" />
+            <p className="text-xs font-semibold text-muted-foreground">Loading module activities...</p>
           </div>
         ) : error ? (
           <div className="p-8 text-center text-rose-500 text-xs font-medium">
@@ -251,96 +241,86 @@ export const ClassModuleFeeds = ({
           </div>
         ) : filteredFeeds.length === 0 ? (
           <div className="p-12 text-center">
-            <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-2 text-slate-400">
+            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-2 text-muted-foreground">
               <Activity className="w-5 h-5" />
             </div>
-            <p className="text-sm font-bold text-slate-700">No activity feeds found</p>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Try selecting "All Classes" or clear your module search filter.
+            <p className="text-sm font-bold text-foreground">No activity feeds found</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Try selecting "All Classes" or clear your module search filter for an empty feed overview.
             </p>
           </div>
         ) : (
-          filteredFeeds.map((item) => {
-            const badge = getModuleBadge(item.module);
-            const BadgeIcon = badge.icon;
-
+          filteredFeeds.map((item, idx) => {
+            const badgeInfo = getModuleBadge(item.module);
+            const Icon = badgeInfo.icon;
             return (
-              <div
-                key={item.id}
+              <div 
+                key={item.id || idx}
                 onClick={() => item.link && navigate(item.link)}
-                className="p-4 sm:p-4.5 hover:bg-slate-50/80 transition-colors group cursor-pointer flex items-start justify-between gap-4"
+                className="p-4 sm:p-4.5 hover:bg-muted/40 transition-colors flex items-start justify-between gap-4 group cursor-pointer"
               >
                 <div className="flex items-start space-x-3.5">
-                  {/* Module Icon Capsule */}
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 mt-0.5 transition-transform group-hover:scale-105 ${badge.bg}`}>
-                    <BadgeIcon className="w-4 h-4" />
+                  <div className="w-9 h-9 rounded-xl bg-muted text-foreground flex items-center justify-center shrink-0 mt-0.5">
+                    <Icon className="w-4 h-4 text-primary" />
                   </div>
-
-                  {/* Content details */}
                   <div className="space-y-1">
                     <div className="flex flex-wrap items-center gap-1.5">
-                      <span className="text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
-                        {item.title}
-                      </span>
+                      <Badge variant={badgeInfo.badgeVariant} className="text-[10px] font-bold">
+                        {item.module || 'Activity'}
+                      </Badge>
                       {item.class_name && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                          {item.class_name} {item.section_name && item.section_name !== 'All' ? `• Sec ${item.section_name}` : ''}
+                        <span className="text-[11px] font-semibold text-muted-foreground">
+                          {item.class_name} {item.section_name && item.section_name !== 'All' ? `(${item.section_name})` : ''}
                         </span>
                       )}
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${
-                        item.badge_color === 'emerald' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                        item.badge_color === 'rose' ? 'bg-rose-50 text-rose-700 border-rose-200' :
-                        item.badge_color === 'amber' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                        item.badge_color === 'purple' ? 'bg-purple-50 text-purple-700 border-purple-200' :
-                        item.badge_color === 'sky' ? 'bg-sky-50 text-sky-700 border-sky-200' :
-                        'bg-indigo-50 text-indigo-700 border-indigo-200'
-                      }`}>
-                        {item.status}
-                      </span>
-                    </div>
-
-                    <p className="text-xs text-slate-600 font-normal leading-relaxed line-clamp-2">
-                      {item.description}
-                    </p>
-
-                    <div className="flex items-center space-x-3 text-[11px] text-slate-400 font-medium pt-0.5">
-                      <span className="flex items-center space-x-1">
-                        <Clock className="w-3 h-3 text-slate-400" />
-                        <span>{formatTimestamp(item.timestamp)}</span>
+                      <span className="text-muted-foreground text-[10px]">•</span>
+                      <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {formatTimestamp(item.created_at || item.timestamp || item.date)}
                       </span>
                       {item.due_date && (
-                        <>
-                          <span>•</span>
-                          <span className="text-indigo-600 font-medium">Due: {item.due_date}</span>
-                        </>
+                        <Badge variant="outline" className="text-[10px] text-primary border-primary/30">
+                          Due: {item.due_date}
+                        </Badge>
                       )}
                     </div>
+
+                    <h4 className="text-xs font-bold text-foreground group-hover:text-primary transition-colors">
+                      {item.title}
+                    </h4>
+                    <p className="text-[11px] text-muted-foreground line-clamp-2">
+                      {item.description || item.message || item.details}
+                    </p>
                   </div>
                 </div>
 
-                {/* Right Arrow / Action button */}
-                <div className="shrink-0 flex items-center pt-1 text-slate-400 group-hover:text-indigo-600 transition-colors">
-                  <div className="w-7 h-7 rounded-lg bg-slate-50 group-hover:bg-indigo-50 flex items-center justify-center transition-all">
-                    <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
+                <div className="shrink-0 flex items-center space-x-2 pt-1">
+                  <span className="text-[10px] text-muted-foreground font-mono">
+                    {item.author || item.teacher_name || 'Staff'}
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </div>
             );
           })
         )}
-      </div>
+      </CardContent>
 
       {/* Footer summary */}
-      <div className="px-5 py-3 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between text-xs text-slate-500 font-medium">
+      <CardFooter className="px-5 py-3 border-t border-border bg-muted/30 flex items-center justify-between text-xs text-muted-foreground font-medium">
         <span>Displaying latest activities across curriculum & campus life</span>
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => navigate('/communication/overview')}
-          className="text-indigo-600 hover:text-indigo-800 font-semibold inline-flex items-center space-x-1 cursor-pointer"
+          className="text-primary hover:text-primary/80 font-semibold inline-flex items-center space-x-1 p-0 h-auto"
         >
           <span>Communication Hub</span>
           <ChevronRight className="w-3.5 h-3.5" />
-        </button>
-      </div>
-    </div>
+        </Button>
+      </CardFooter>
+    </Card>
   );
 };
+
+export default ClassModuleFeeds;

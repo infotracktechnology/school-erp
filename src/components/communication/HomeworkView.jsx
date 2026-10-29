@@ -6,6 +6,10 @@ import {
 } from 'lucide-react';
 import { communicationService } from '../../services/communicationService';
 import { getClassSubjects } from '../../services/api';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 
 export const HomeworkView = ({ branchId, academicYearId, classes, sections, showToast }) => {
     const [homeworkList, setHomeworkList] = useState([]);
@@ -340,43 +344,45 @@ export const HomeworkView = ({ branchId, academicYearId, classes, sections, show
     return (
         <div className="space-y-5">
             {/* Top Banner & Action */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-                <div>
-                    <div className="flex items-center space-x-2">
-                        <span className="p-2 rounded-xl bg-cyan-50 text-cyan-700">
-                            <BookOpen className="w-5 h-5" />
-                        </span>
-                        <div>
-                            <h2 className="text-base sm:text-lg font-bold text-slate-900">Homework Management</h2>
-                            <p className="text-xs text-slate-500 font-medium">
-                                Branch-wise daily homework postings for classes and sections (Posting only, no submission tracking)
-                            </p>
+            <Card className="p-4 sm:p-5 shadow-xs">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div>
+                        <div className="flex items-center space-x-2">
+                            <span className="p-2 rounded-xl bg-cyan-50 text-cyan-700">
+                                <BookOpen className="w-5 h-5" />
+                            </span>
+                            <div>
+                                <h2 className="text-base sm:text-lg font-bold text-slate-900">Homework Management</h2>
+                                <p className="text-xs text-slate-500 font-medium">
+                                    Branch-wise daily homework postings for classes and sections (Posting only, no submission tracking)
+                                </p>
+                            </div>
                         </div>
                     </div>
+                    <Button 
+                        id="btn-post-new-homework" 
+                        type="button" 
+                        onClick={handleOpenCreate} 
+                        className="w-full sm:w-auto shadow-xs active:scale-95 cursor-pointer"
+                    >
+                        <Plus className="w-4 h-4 mr-1.5" />
+                        <span>Post New Homework</span>
+                    </Button>
                 </div>
-                <button 
-                    id="btn-post-new-homework" 
-                    type="button" 
-                    onClick={handleOpenCreate} 
-                    className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-cyan-700 text-white font-semibold text-xs hover:bg-cyan-800 transition-all shadow-xs cursor-pointer active:scale-95"
-                >
-                    <Plus className="w-4 h-4" />
-                    <span>Post New Homework</span>
-                </button>
-            </div>
+            </Card>
 
             {/* Filter Bar */}
-            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs space-y-3">
+            <Card className="p-4 shadow-xs space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                     {/* Search */}
                     <div className="relative">
-                        <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-                        <input 
+                        <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400 z-10" />
+                        <Input 
                             type="text" 
                             placeholder="Search homework title or subject..." 
                             value={searchQuery} 
                             onChange={(e) => setSearchQuery(e.target.value)} 
-                            className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500" 
+                            className="pl-9 h-9 text-xs" 
                         />
                     </div>
 
@@ -388,7 +394,7 @@ export const HomeworkView = ({ branchId, academicYearId, classes, sections, show
                                 setSelectedClassId(e.target.value);
                                 setSelectedSectionId('all');
                             }} 
-                            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-white font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500"
+                            className="w-full h-9 px-3 text-xs rounded-md border border-input bg-transparent font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-ring"
                         >
                             <option value="all">All Classes</option>
                             {classes.map((c) => (
@@ -404,7 +410,7 @@ export const HomeworkView = ({ branchId, academicYearId, classes, sections, show
                         <select 
                             value={selectedSectionId} 
                             onChange={(e) => setSelectedSectionId(e.target.value)} 
-                            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-white font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500"
+                            className="w-full h-9 px-3 text-xs rounded-md border border-input bg-transparent font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-ring"
                         >
                             <option value="all">All Sections</option>
                             {filterAvailableSections.map((s) => (
@@ -420,7 +426,7 @@ export const HomeworkView = ({ branchId, academicYearId, classes, sections, show
                         <select 
                             value={selectedStatus} 
                             onChange={(e) => setSelectedStatus(e.target.value)} 
-                            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-white font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500"
+                            className="w-full h-9 px-3 text-xs rounded-md border border-input bg-transparent font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-ring"
                         >
                             <option value="all">All Statuses</option>
                             <option value="Published">Published</option>
@@ -431,7 +437,9 @@ export const HomeworkView = ({ branchId, academicYearId, classes, sections, show
 
                     {/* Reset Filters */}
                     <div className="flex items-center space-x-2">
-                        <button 
+                        <Button 
+                            variant="outline"
+                            size="sm"
                             type="button" 
                             onClick={() => {
                                 setSelectedClassId('all');
@@ -439,13 +447,13 @@ export const HomeworkView = ({ branchId, academicYearId, classes, sections, show
                                 setSelectedStatus('all');
                                 setSearchQuery('');
                             }} 
-                            className="w-full py-2 px-3 text-xs font-semibold text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer text-center"
+                            className="w-full h-9 text-xs"
                         >
                             Clear Filters
-                        </button>
+                        </Button>
                     </div>
                 </div>
-            </div>
+            </Card>
 
             {/* Homework List Cards */}
             {isLoading ? (
@@ -486,30 +494,33 @@ export const HomeworkView = ({ branchId, academicYearId, classes, sections, show
                         const hasVideo = atts?.video;
                         const singleAttUrl = hw.attachment_url;
 
+                        const isOverdue = hw.due_date && new Date(hw.due_date) < new Date();
+
                         return (
-                            <div key={hw.id} className="bg-white rounded-2xl border border-slate-200/80 hover:border-cyan-300/80 hover:shadow-md transition-all p-4 flex flex-col justify-between space-y-3">
+                            <Card key={hw.id} className="hover:border-primary/50 hover:shadow-md transition-all p-4 flex flex-col justify-between space-y-3">
                                 <div>
                                     {/* Top Badges */}
                                     <div className="flex items-center justify-between gap-2 mb-2">
-                                        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200/60">
+                                        <Badge variant="secondary" className="font-semibold text-[11px] gap-1 px-2.5 py-0.5">
                                             <span>{hw.class_name || `Class ${hw.class_id}`}</span>
-                                            <span className="text-slate-400">•</span>
+                                            <span className="text-muted-foreground">•</span>
                                             <span>{hw.section_name ? `Sec ${hw.section_name}` : 'All Sections'}</span>
-                                        </span>
+                                        </Badge>
 
-                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase ${
-                                            hw.status === 'Published'
-                                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
-                                                : hw.status === 'Draft'
-                                                    ? 'bg-amber-50 text-amber-700 border border-amber-200/60'
-                                                    : 'bg-indigo-50 text-indigo-700 border border-indigo-200/60'
-                                        }`}>
-                                            {hw.is_scheduled ? 'Scheduled' : hw.status}
-                                        </span>
+                                        <div className="flex items-center gap-1.5">
+                                            {isOverdue && (
+                                                <Badge variant="destructive" className="text-[10px] px-1.5 py-0 font-bold uppercase tracking-wider">
+                                                    Overdue
+                                                </Badge>
+                                            )}
+                                            <Badge variant={hw.status === 'Published' ? 'emerald' : hw.status === 'Draft' ? 'secondary' : 'default'} className="text-[10px] uppercase font-bold tracking-wide">
+                                                {hw.is_scheduled ? 'Scheduled' : hw.status}
+                                            </Badge>
+                                        </div>
                                     </div>
 
                                     {/* Subject & Title */}
-                                    <div className="text-[11px] font-bold text-cyan-800 tracking-wide uppercase">
+                                    <div className="text-[11px] font-bold text-primary tracking-wide uppercase">
                                         {hw.subject_name || 'Subject'}
                                     </div>
                                     <h3 className="text-sm font-bold text-slate-900 mt-0.5 line-clamp-2 leading-snug">
@@ -517,19 +528,19 @@ export const HomeworkView = ({ branchId, academicYearId, classes, sections, show
                                     </h3>
 
                                     {/* Description preview */}
-                                    <p className="text-xs text-slate-600 mt-1.5 line-clamp-2 leading-relaxed">
+                                    <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed">
                                         {hw.description || 'No detailed description provided.'}
                                     </p>
                                 </div>
 
                                 {/* Meta details & Dates */}
-                                <div className="pt-3 border-t border-slate-100 space-y-2">
-                                    <div className="flex items-center justify-between text-[11px] text-slate-500 font-medium">
+                                <div className="pt-3 border-t border-border space-y-2">
+                                    <div className="flex items-center justify-between text-[11px] text-muted-foreground font-medium">
                                         <div className="flex items-center space-x-1">
-                                            <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                                            <Calendar className="w-3.5 h-3.5 text-muted-foreground/70" />
                                             <span>Assigned: {hw.assigned_date}</span>
                                         </div>
-                                        <div className={`flex items-center space-x-1 font-semibold ${isDueSoon ? 'text-rose-600' : 'text-slate-600'}`}>
+                                        <div className={`flex items-center space-x-1 font-semibold ${isDueSoon ? 'text-destructive' : 'text-slate-600'}`}>
                                             <Clock className="w-3.5 h-3.5" />
                                             <span>Due: {hw.due_date}</span>
                                         </div>
@@ -537,7 +548,7 @@ export const HomeworkView = ({ branchId, academicYearId, classes, sections, show
 
                                     {/* Scheduled notice */}
                                     {hw.is_scheduled && hw.start_at && (
-                                        <div className="text-[10px] text-indigo-600 bg-indigo-50/70 px-2 py-1 rounded-md font-medium">
+                                        <div className="text-[10px] text-primary bg-primary/10 px-2 py-1 rounded-md font-medium">
                                             Scheduled for: {new Date(hw.start_at).toLocaleString()}
                                         </div>
                                     )}
@@ -605,7 +616,7 @@ export const HomeworkView = ({ branchId, academicYearId, classes, sections, show
 
                                     {/* Actions */}
                                     <div className="flex items-center justify-between pt-1">
-                                        <span className="text-[10px] text-slate-400">By {hw.teacher_name}</span>
+                                        <span className="text-[10px] text-muted-foreground">By {hw.teacher_name}</span>
                                         <div className="flex items-center space-x-1">
                                             <button 
                                                 type="button" 
@@ -614,7 +625,7 @@ export const HomeworkView = ({ branchId, academicYearId, classes, sections, show
                                                     setIsDetailModalOpen(true);
                                                 }} 
                                                 title="View Homework Details" 
-                                                className="p-1.5 rounded-lg text-slate-500 hover:text-cyan-700 hover:bg-cyan-50 transition-colors cursor-pointer"
+                                                className="p-1.5 rounded-lg text-slate-500 hover:text-primary hover:bg-primary/10 transition-colors cursor-pointer"
                                             >
                                                 <Eye className="w-4 h-4" />
                                             </button>
@@ -630,14 +641,14 @@ export const HomeworkView = ({ branchId, academicYearId, classes, sections, show
                                                 type="button" 
                                                 onClick={() => handleDelete(hw.id)} 
                                                 title="Delete Homework" 
-                                                className="p-1.5 rounded-lg text-slate-500 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
+                                                className="p-1.5 rounded-lg text-slate-500 hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </Card>
                         );
                     })}
                 </div>

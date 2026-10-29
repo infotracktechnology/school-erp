@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
 import { Eye, Edit, Settings, Power, MapPin, Calendar, User } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
+
 export const BranchTable = ({ branches, onView, onEdit, onSettings, onToggleStatus }) => {
     const [activeDropdown, setActiveDropdown] = useState(null);
     const formatDate = (dateStr) => {
@@ -48,39 +53,39 @@ export const BranchTable = ({ branches, onView, onEdit, onSettings, onToggleStat
                 return 'bg-slate-100 text-slate-700 border-slate-200';
         }
     };
-    return (<div className="bg-white border border-slate-200/80 rounded-xl shadow-xs overflow-hidden">
+    return (<Card className="rounded-xl border border-slate-200/80 shadow-xs overflow-hidden">
       <div className="overflow-x-auto min-h-[350px]">
-        <table className="w-full text-left border-collapse" id="branches-data-table">
-          <thead>
-            <tr className="bg-slate-50/80 border-b border-slate-200 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
-              <th className="py-3.5 px-4 sm:px-6">Branch Code</th>
-              <th className="py-3.5 px-4">Branch Name</th>
-              <th className="py-3.5 px-4">Branch Type</th>
-              <th className="py-3.5 px-4">Board</th>
-              <th className="py-3.5 px-4">City</th>
-              <th className="py-3.5 px-4">Branch Head</th>
-              <th className="py-3.5 px-4">Status</th>
-              <th className="py-3.5 px-4">Created Date</th>
-              <th className="py-3.5 px-4 sm:px-6 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100 text-xs sm:text-sm">
+        <Table id="branches-data-table">
+          <TableHeader>
+            <TableRow className="bg-slate-50/80 border-b border-slate-200 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+              <TableHead className="py-3.5 px-4 sm:px-6">Branch Code</TableHead>
+              <TableHead className="py-3.5 px-4">Branch Name</TableHead>
+              <TableHead className="py-3.5 px-4">Branch Type</TableHead>
+              <TableHead className="py-3.5 px-4">Board</TableHead>
+              <TableHead className="py-3.5 px-4">City</TableHead>
+              <TableHead className="py-3.5 px-4">Branch Head</TableHead>
+              <TableHead className="py-3.5 px-4">Status</TableHead>
+              <TableHead className="py-3.5 px-4">Created Date</TableHead>
+              <TableHead className="py-3.5 px-4 sm:px-6 text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody className="divide-y divide-slate-100 text-xs sm:text-sm">
             {branches.map((branch) => {
             const isInactive = branch.status === 'Inactive';
-            return (<tr key={branch.id} id={`branch-row-${branch.id}`} className={`hover:bg-slate-50/70 transition-colors group ${isInactive ? 'bg-slate-50/40 opacity-80' : ''}`}>
+            return (<TableRow key={branch.id} id={`branch-row-${branch.id}`} className={`hover:bg-slate-50/70 transition-colors group ${isInactive ? 'bg-slate-50/40 opacity-80' : ''}`}>
                   {/* Branch Code */}
-                  <td className="py-4 px-4 sm:px-6 whitespace-nowrap">
+                  <TableCell className="py-4 px-4 sm:px-6 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
-                      <span className="font-mono font-bold text-xs px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-200/80 group-hover:border-emerald-300 group-hover:bg-emerald-50/50 transition-colors">
+                      <span className="font-mono font-bold text-xs px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-200/80 group-hover:border-sky-300 group-hover:bg-sky-50/50 transition-colors">
                         {branch.branch_code}
                       </span>
                     </div>
-                  </td>
+                  </TableCell>
 
                   {/* Branch Name & Logo */}
-                  <td className="py-4 px-4">
+                  <TableCell className="py-4 px-4">
                     <div className="flex items-center space-x-3 min-w-[200px]">
-                      {branch.logo ? (<img src={branch.logo} alt={branch.branch_name} className="w-9 h-9 rounded-lg object-cover border border-slate-200 shrink-0 bg-white" referrerPolicy="no-referrer"/>) : (<div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center justify-center font-bold text-xs shrink-0">
+                      {branch.logo ? (<img src={branch.logo} alt={branch.branch_name} className="w-9 h-9 rounded-lg object-cover border border-slate-200 shrink-0 bg-white" referrerPolicy="no-referrer"/>) : (<div className="w-9 h-9 rounded-lg bg-sky-50 text-sky-800 border border-sky-200 flex items-center justify-center font-bold text-xs shrink-0">
                           {branch.branch_name.slice(0, 2).toUpperCase()}
                         </div>)}
                       <div>
@@ -92,33 +97,33 @@ export const BranchTable = ({ branches, onView, onEdit, onSettings, onToggleStat
                           </div>)}
                       </div>
                     </div>
-                  </td>
+                  </TableCell>
 
                   {/* Branch Type */}
-                  <td className="py-4 px-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium border ${getBranchTypeBadgeClass(branch.branch_type)}`}>
+                  <TableCell className="py-4 px-4 whitespace-nowrap">
+                    <Badge variant="outline" className={`inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium border ${getBranchTypeBadgeClass(branch.branch_type)}`}>
                       {branch.branch_type}
-                    </span>
-                  </td>
+                    </Badge>
+                  </TableCell>
 
                   {/* Board */}
-                  <td className="py-4 px-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${getBoardBadgeClass(branch.board)}`}>
+                  <TableCell className="py-4 px-4 whitespace-nowrap">
+                    <Badge variant="outline" className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${getBoardBadgeClass(branch.board)}`}>
                       {branch.board}
-                    </span>
-                  </td>
+                    </Badge>
+                  </TableCell>
 
                   {/* City & State */}
-                  <td className="py-4 px-4 whitespace-nowrap">
+                  <TableCell className="py-4 px-4 whitespace-nowrap">
                     <div className="flex items-center space-x-1 text-slate-700 font-medium">
                       <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0"/>
                       <span>{branch.city}</span>
                     </div>
                     <div className="text-[11px] text-slate-400 pl-4">{branch.state}</div>
-                  </td>
+                  </TableCell>
 
                   {/* Branch Head */}
-                  <td className="py-4 px-4 whitespace-nowrap">
+                  <TableCell className="py-4 px-4 whitespace-nowrap">
                     {branch.branch_head_name ? (<div>
                         <div className="font-semibold text-slate-800 flex items-center space-x-1">
                           <User className="w-3.5 h-3.5 text-slate-400 shrink-0"/>
@@ -128,32 +133,32 @@ export const BranchTable = ({ branches, onView, onEdit, onSettings, onToggleStat
                             {branch.branch_head_designation}
                           </div>)}
                       </div>) : (<span className="text-xs text-slate-400 italic">Not Assigned</span>)}
-                  </td>
+                  </TableCell>
 
                   {/* Status */}
-                  <td className="py-4 px-4 whitespace-nowrap">
-                    {branch.status === 'Active' ? (<span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                  <TableCell className="py-4 px-4 whitespace-nowrap">
+                    {branch.status === 'Active' ? (<Badge variant="outline" className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border-emerald-200">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 mr-1.5"></span>
                         <span>Active</span>
-                      </span>) : (<span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-300">
-                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                      </Badge>) : (<Badge variant="outline" className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border-slate-300">
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5"></span>
                         <span>Inactive</span>
-                      </span>)}
-                  </td>
+                      </Badge>)}
+                  </TableCell>
 
                   {/* Created Date */}
-                  <td className="py-4 px-4 whitespace-nowrap text-xs text-slate-500 font-medium">
+                  <TableCell className="py-4 px-4 whitespace-nowrap text-xs text-slate-500 font-medium">
                     <div className="flex items-center space-x-1.5">
                       <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0"/>
                       <span>{formatDate(branch.created_at)}</span>
                     </div>
-                  </td>
+                  </TableCell>
 
                   {/* Actions */}
-                  <td className="py-4 px-4 sm:px-6 whitespace-nowrap text-right">
+                  <TableCell className="py-4 px-4 sm:px-6 whitespace-nowrap text-right">
                     <div className="flex items-center justify-end space-x-1">
                       {/* View Action */}
-                      <button type="button" id={`btn-view-branch-${branch.id}`} onClick={() => onView(branch)} className="p-1.5 text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer" title="View Branch Profile">
+                      <button type="button" id={`btn-view-branch-${branch.id}`} onClick={() => onView(branch)} className="p-1.5 text-slate-600 hover:text-sky-700 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer" title="View Branch Profile">
                         <Eye className="w-4 h-4"/>
                       </button>
 
@@ -174,11 +179,11 @@ export const BranchTable = ({ branches, onView, onEdit, onSettings, onToggleStat
                         <Power className="w-4 h-4"/>
                       </button>
                     </div>
-                  </td>
-                </tr>);
+                  </TableCell>
+                </TableRow>);
         })}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       {/* Table Footer / Summary */}
@@ -190,5 +195,5 @@ export const BranchTable = ({ branches, onView, onEdit, onSettings, onToggleStat
           Data isolated under Organization ID #1
         </span>
       </div>
-    </div>);
+    </Card>);
 };

@@ -3,6 +3,10 @@ import {
   Image as ImageIcon, Calendar, Camera, Link as LinkIcon, 
   Search, ExternalLink, Sparkles, X, CalendarDays
 } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 // ─── Date Helpers ────────────────────────────────────────────────────────────
 const getMonthKey = (d) => {
@@ -80,17 +84,17 @@ export const StudentGalleryPortal = ({ albums = [], student }) => {
     <div className="space-y-5">
       {/* Overview Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center justify-between">
+        <Card className="rounded-xl border border-slate-200/80 shadow-xs flex items-center justify-between p-4 sm:p-5">
           <div>
             <p className="text-xs font-semibold text-slate-500">School Event Albums</p>
             <p className="text-2xl font-black text-slate-900 mt-1">{albums.length}</p>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
             <Camera className="w-6 h-6" />
           </div>
-        </div>
+        </Card>
 
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center justify-between">
+        <Card className="rounded-xl border border-slate-200/80 shadow-xs flex items-center justify-between p-4 sm:p-5">
           <div>
             <p className="text-xs font-semibold text-purple-600">Moments & Highlights</p>
             <p className="text-2xl font-black text-purple-700 mt-1">Campus Life</p>
@@ -98,9 +102,9 @@ export const StudentGalleryPortal = ({ albums = [], student }) => {
           <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
             <ImageIcon className="w-6 h-6" />
           </div>
-        </div>
+        </Card>
 
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center justify-between">
+        <Card className="rounded-xl border border-slate-200/80 shadow-xs flex items-center justify-between p-4 sm:p-5">
           <div>
             <p className="text-xs font-semibold text-emerald-600">Access Scope</p>
             <p className="text-sm font-black text-slate-800 mt-1">
@@ -110,7 +114,7 @@ export const StudentGalleryPortal = ({ albums = [], student }) => {
           <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
             <Sparkles className="w-6 h-6" />
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* Month Input + All Days Horizontal Tabs */}
@@ -214,10 +218,10 @@ export const StudentGalleryPortal = ({ albums = [], student }) => {
             const coverImage = alb.cover_image_url || 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800&auto=format&fit=crop&q=80';
 
             return (
-              <div
+              <Card
                 key={alb.id}
                 onClick={() => setActiveAlbumModal(alb)}
-                className="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs hover:shadow-md hover:border-rose-300 transition-all cursor-pointer group flex flex-col justify-between"
+                className="rounded-xl border border-slate-200/80 overflow-hidden shadow-xs hover:shadow-md hover:border-sky-300 transition-all cursor-pointer group flex flex-col justify-between"
               >
                 <div>
                   <div className="aspect-16/10 bg-slate-100 overflow-hidden relative">
@@ -227,16 +231,16 @@ export const StudentGalleryPortal = ({ albums = [], student }) => {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-full bg-slate-900/70 backdrop-blur-xs text-white text-[10px] font-bold flex items-center space-x-1">
-                      <Calendar className="w-3 h-3 text-rose-400" />
+                      <Calendar className="w-3 h-3 text-sky-400" />
                       <span>{alb.event_date || 'Event'}</span>
                     </div>
                   </div>
 
                   <div className="p-4 space-y-1.5">
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-rose-600">
+                    <Badge variant="outline" className="text-[10px] font-extrabold uppercase tracking-wider text-sky-600 bg-sky-50 border-sky-200">
                       {alb.event_name || 'School Function'}
-                    </span>
-                    <h4 className="text-sm font-bold text-slate-900 group-hover:text-rose-600 transition-colors">
+                    </Badge>
+                    <h4 className="text-sm font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
                       {alb.album_name}
                     </h4>
                     <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
@@ -245,11 +249,11 @@ export const StudentGalleryPortal = ({ albums = [], student }) => {
                   </div>
                 </div>
 
-                <div className="px-4 pb-4 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-rose-600 font-bold">
+                <div className="px-4 pb-4 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-sky-600 font-bold">
                   <span>View Photos</span>
                   <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>

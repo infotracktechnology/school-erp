@@ -6,6 +6,10 @@ import {
 } from 'lucide-react';
 import { communicationService } from '../../services/communicationService';
 import { getAcademicGroups } from '../../services/api';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 
 export const GalleryView = ({ branchId, academicYearId, classes = [], sections = [], showToast }) => {
     const [albums, setAlbums] = useState([]);
@@ -915,39 +919,41 @@ export const GalleryView = ({ branchId, academicYearId, classes = [], sections =
             ) : (
                 /* Albums Overview Mode */
                 <div className="space-y-4">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-                        <div className="flex items-center space-x-2">
-                            <span className="p-2 rounded-xl bg-rose-50 text-rose-700">
-                                <ImageIcon className="w-5 h-5"/>
-                            </span>
-                            <div>
-                                <h2 className="text-base sm:text-lg font-bold text-slate-900">Event & Activity Gallery</h2>
-                                <p className="text-xs text-slate-500 font-medium">
-                                    Branch-wise media archives, annual day captures, sports meets, and targeted event albums
-                                </p>
+                    <Card className="p-4 sm:p-5 shadow-xs">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                            <div className="flex items-center space-x-2">
+                                <span className="p-2 rounded-xl bg-rose-50 text-rose-700">
+                                    <ImageIcon className="w-5 h-5"/>
+                                </span>
+                                <div>
+                                    <h2 className="text-base sm:text-lg font-bold text-slate-900">Event & Activity Gallery</h2>
+                                    <p className="text-xs text-muted-foreground font-medium">
+                                        Branch-wise media archives, annual day captures, sports meets, and targeted event albums
+                                    </p>
+                                </div>
                             </div>
+                            <Button 
+                                id="btn-create-new-album" 
+                                type="button" 
+                                onClick={handleOpenCreateAlbum} 
+                                className="w-full sm:w-auto shadow-xs active:scale-95 cursor-pointer"
+                            >
+                                <Plus className="w-4 h-4 mr-1.5"/>
+                                <span>Create New Album</span>
+                            </Button>
                         </div>
-                        <button 
-                            id="btn-create-new-album" 
-                            type="button" 
-                            onClick={handleOpenCreateAlbum} 
-                            className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-rose-700 text-white font-semibold text-xs hover:bg-rose-800 transition-all shadow-xs cursor-pointer active:scale-95"
-                        >
-                            <Plus className="w-4 h-4"/>
-                            <span>Create New Album</span>
-                        </button>
-                    </div>
+                    </Card>
 
                     {/* Search & Filter */}
-                    <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs flex flex-wrap items-center justify-between gap-3">
+                    <Card className="p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
                         <div className="relative flex-1 min-w-[240px]">
-                            <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400"/>
-                            <input 
+                            <Search className="w-4 h-4 absolute left-3 top-2.5 text-muted-foreground z-10"/>
+                            <Input 
                                 type="text" 
                                 placeholder="Search event album name..." 
                                 value={searchQuery} 
                                 onChange={(e) => setSearchQuery(e.target.value)} 
-                                className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
+                                className="pl-9 h-9 text-xs"
                             />
                         </div>
 
@@ -955,7 +961,7 @@ export const GalleryView = ({ branchId, academicYearId, classes = [], sections =
                             <select 
                                 value={selectedStatus} 
                                 onChange={(e) => setSelectedStatus(e.target.value)} 
-                                className="px-3 py-2 text-xs rounded-lg border border-slate-200 bg-white font-medium text-slate-700"
+                                className="h-9 px-3 text-xs rounded-md border border-input bg-transparent font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-ring"
                             >
                                 <option value="all">All Statuses</option>
                                 <option value="Published">Published</option>
@@ -963,7 +969,7 @@ export const GalleryView = ({ branchId, academicYearId, classes = [], sections =
                                 <option value="Draft">Draft</option>
                             </select>
                         </div>
-                    </div>
+                    </Card>
 
                     {/* Album Grid */}
                     {isLoading ? (
@@ -1031,11 +1037,11 @@ export const GalleryView = ({ branchId, academicYearId, classes = [], sections =
                                 const isAlbScheduled = alb.is_scheduled || alb.status === 'Scheduled';
 
                                 return (
-                                    <div 
+                                    <Card 
                                         key={alb.id} 
-                                        className="group bg-white rounded-2xl border border-slate-200/80 hover:border-rose-300 hover:shadow-lg transition-all overflow-hidden flex flex-col justify-between"
+                                        className="group hover:border-primary/50 hover:shadow-lg transition-all overflow-hidden flex flex-col justify-between"
                                     >
-                                        <div onClick={() => handleOpenAlbumDetails(alb)} className="relative aspect-16/9 bg-slate-100 overflow-hidden cursor-pointer">
+                                        <div onClick={() => handleOpenAlbumDetails(alb)} className="relative aspect-16/9 bg-muted overflow-hidden cursor-pointer">
                                             <img 
                                                 src={alb.cover_image_url || 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&auto=format&fit=crop&q=80'} 
                                                 alt={alb.album_name} 
@@ -1047,31 +1053,31 @@ export const GalleryView = ({ branchId, academicYearId, classes = [], sections =
                                             </div>
 
                                             {isAlbScheduled ? (
-                                                <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full bg-indigo-600/90 text-white text-[10px] font-bold tracking-wide uppercase">
+                                                <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full bg-primary/90 text-primary-foreground text-[10px] font-bold tracking-wide uppercase">
                                                     Scheduled
                                                 </div>
                                             ) : null}
 
-                                            <div className="absolute bottom-2.5 left-2.5 px-2 py-0.5 rounded-full bg-white/90 backdrop-blur-xs text-slate-800 text-[10px] font-bold">
+                                            <div className="absolute bottom-2.5 left-2.5 px-2 py-0.5 rounded-full bg-background/90 backdrop-blur-xs text-foreground text-[10px] font-bold">
                                                 {alb.event_date}
                                             </div>
                                         </div>
 
                                         <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                                             <div>
-                                                <div className="flex items-center justify-between text-[11px] text-rose-700 font-bold tracking-wide uppercase">
+                                                <div className="flex items-center justify-between text-[11px] text-primary font-bold tracking-wide uppercase">
                                                     <span>{alb.event_name}</span>
-                                                    <span className="text-slate-500 font-medium normal-case bg-slate-100 px-2 py-0.5 rounded-md truncate max-w-[150px]">
+                                                    <Badge variant="secondary" className="font-medium normal-case truncate max-w-[150px]">
                                                         {scopeDisplay}
-                                                    </span>
+                                                    </Badge>
                                                 </div>
                                                 <h3 
                                                     onClick={() => handleOpenAlbumDetails(alb)} 
-                                                    className="text-sm font-bold text-slate-900 mt-1 hover:text-rose-700 cursor-pointer line-clamp-1"
+                                                    className="text-sm font-bold text-slate-900 mt-1 hover:text-primary cursor-pointer line-clamp-1"
                                                 >
                                                     {alb.album_name}
                                                 </h3>
-                                                <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                                                <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
                                                     {alb.description || 'No description provided for this album.'}
                                                 </p>
                                             </div>
@@ -1094,11 +1100,11 @@ export const GalleryView = ({ branchId, academicYearId, classes = [], sections =
                                                 </div>
                                             )}
 
-                                            <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                                            <div className="pt-3 border-t border-border flex items-center justify-between">
                                                 <button 
                                                     type="button" 
                                                     onClick={() => handleOpenAlbumDetails(alb)} 
-                                                    className="text-xs font-bold text-rose-700 hover:text-rose-800 flex items-center space-x-1 cursor-pointer"
+                                                    className="text-xs font-bold text-primary hover:text-primary/80 flex items-center space-x-1 cursor-pointer"
                                                 >
                                                     <span>Open Album</span>
                                                     <ChevronRight className="w-3.5 h-3.5"/>
@@ -1117,14 +1123,14 @@ export const GalleryView = ({ branchId, academicYearId, classes = [], sections =
                                                         type="button" 
                                                         onClick={() => handleDeleteAlbum(alb.id)} 
                                                         title="Delete Album" 
-                                                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
+                                                        className="p-1.5 rounded-lg text-slate-400 hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
                                                     >
                                                         <Trash2 className="w-3.5 h-3.5"/>
                                                     </button>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </Card>
                                 );
                             })}
                         </div>

@@ -3,6 +3,10 @@ import { CalendarCheck, Search, AlertCircle, RefreshCw, UserX, Check, Edit3, Eye
 import { attendanceApi } from '../../services/attendanceApi';
 import { getClasses, getSectionsByClass } from '../../services/api';
 import { useErp } from '../../context/ErpContext';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Input } from '../ui/input';
 import { AbsentNotificationModal } from './AbsentNotificationModal';
 
 export const TakeAttendanceView = ({ branchId, academicYearId, onNavigateToRemarks, onNavigateToMapping }) => {
@@ -438,158 +442,206 @@ export const TakeAttendanceView = ({ branchId, academicYearId, onNavigateToRemar
     const selectedSectionObj = sections.find(s => Number(s.id) === Number(selectedSectionId) || Number(s.section_id) === Number(selectedSectionId));
 
     return (<div className="space-y-6">
-      {/* 1. Primary Top Filter Bar: Homeroom Warm Card Design */}
-      <div className="bg-white p-5 rounded-3xl border border-[#ece7f0] shadow-sm">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
-          {/* Branch */}
-          <div>
-            <label className="block text-[11px] font-bold text-[#625e7d] uppercase tracking-wider mb-1.5">
-              Branch
-            </label>
-            <select id="attendance-branch-select" value={selectedBranchId} onChange={e => {
-              const newBranchId = Number(e.target.value);
-              setSelectedBranchId(newBranchId);
-              setSelectedClassId('');
-              setSelectedSectionId('');
-            }} disabled={userRole !== 'super_admin'} className="w-full px-3.5 py-2 text-xs rounded-xl border border-[#ece7f0] bg-[#faf7f2] text-[#1e1b3a] font-semibold focus:outline-hidden focus:ring-2 focus:ring-[#4f46e5]/20 disabled:opacity-75">
-              {branches.map(b => (<option key={b.id} value={b.id}>{b.branch_name}</option>))}
-            </select>
-          </div>
+      {/* 1. Primary Top Filter Bar */}
+      <Card className="border-border shadow-xs">
+        <CardContent className="p-4 sm:p-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+            {/* Branch */}
+            <div>
+              <label className="block text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
+                Branch
+              </label>
+              <select
+                id="attendance-branch-select"
+                value={selectedBranchId}
+                onChange={(e) => {
+                  const newBranchId = Number(e.target.value);
+                  setSelectedBranchId(newBranchId);
+                  setSelectedClassId('');
+                  setSelectedSectionId('');
+                }}
+                disabled={userRole !== 'super_admin'}
+                className="w-full px-3 py-2 text-xs rounded-lg border border-input bg-background text-foreground font-semibold focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-75 cursor-pointer"
+              >
+                {branches.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.branch_name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          {/* Academic Year */}
-          <div>
-            <label className="block text-[11px] font-bold text-[#625e7d] uppercase tracking-wider mb-1.5">
-              Academic Year
-            </label>
-            <select id="attendance-ay-select" value={selectedAcademicYearId} onChange={e => {
-              const newAyId = Number(e.target.value);
-              setSelectedAcademicYearId(newAyId);
-              setSelectedClassId('');
-              setSelectedSectionId('');
-            }} className="w-full px-3.5 py-2 text-xs rounded-xl border border-[#ece7f0] bg-[#faf7f2] text-[#1e1b3a] font-semibold focus:outline-hidden focus:ring-2 focus:ring-[#4f46e5]/20">
-              {academicYears.map(ay => (<option key={ay.id} value={ay.id}>{ay.name} {ay.is_active ? '(Active)' : ''}</option>))}
-            </select>
-          </div>
+            {/* Academic Year */}
+            <div>
+              <label className="block text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
+                Academic Year
+              </label>
+              <select
+                id="attendance-ay-select"
+                value={selectedAcademicYearId}
+                onChange={(e) => {
+                  const newAyId = Number(e.target.value);
+                  setSelectedAcademicYearId(newAyId);
+                  setSelectedClassId('');
+                  setSelectedSectionId('');
+                }}
+                className="w-full px-3 py-2 text-xs rounded-lg border border-input bg-background text-foreground font-semibold focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 cursor-pointer"
+              >
+                {academicYears.map((ay) => (
+                  <option key={ay.id} value={ay.id}>
+                    {ay.name} {ay.is_active ? '(Active)' : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          {/* Date */}
-          <div>
-            <label className="block text-[11px] font-bold text-[#625e7d] uppercase tracking-wider mb-1.5">
-              Date <span className="text-[#ff7a5c]">*</span>
-            </label>
-            <input id="attendance-date-input" type="date" value={attendanceDate} onChange={e => setAttendanceDate(e.target.value)} className="w-full px-3.5 py-2 text-xs rounded-xl border border-[#ece7f0] bg-[#faf7f2] text-[#1e1b3a] font-semibold focus:outline-hidden focus:ring-2 focus:ring-[#4f46e5]/20"/>
-          </div>
+            {/* Date */}
+            <div>
+              <label className="block text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
+                Date <span className="text-destructive">*</span>
+              </label>
+              <Input
+                id="attendance-date-input"
+                type="date"
+                value={attendanceDate}
+                onChange={(e) => setAttendanceDate(e.target.value)}
+                className="w-full text-xs font-semibold h-9"
+              />
+            </div>
 
-          {/* Class */}
-          <div>
-            <label className="block text-[11px] font-bold text-[#625e7d] uppercase tracking-wider mb-1.5">
-              Class <span className="text-[#ff7a5c]">*</span>
-            </label>
-            <select id="attendance-class-select" value={selectedClassId} onChange={e => {
-              setSelectedClassId(Number(e.target.value));
-              setSelectedSectionId('');
-            }} className="w-full px-3.5 py-2 text-xs rounded-xl border border-[#ece7f0] bg-[#faf7f2] text-[#1e1b3a] font-semibold focus:outline-hidden focus:ring-2 focus:ring-[#4f46e5]/20">
-              {classes.length === 0 && <option value="">No classes found</option>}
-              {classes.map(c => (<option key={c.id} value={c.id}>{c.name}</option>))}
-            </select>
-          </div>
+            {/* Class */}
+            <div>
+              <label className="block text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
+                Class <span className="text-destructive">*</span>
+              </label>
+              <select
+                id="attendance-class-select"
+                value={selectedClassId}
+                onChange={(e) => {
+                  setSelectedClassId(Number(e.target.value));
+                  setSelectedSectionId('');
+                }}
+                className="w-full px-3 py-2 text-xs rounded-lg border border-input bg-background text-foreground font-semibold focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 cursor-pointer"
+              >
+                {classes.length === 0 && <option value="">No classes found</option>}
+                {classes.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          {/* Section */}
-          <div>
-            <label className="block text-[11px] font-bold text-[#625e7d] uppercase tracking-wider mb-1.5">
-              Section <span className="text-[#ff7a5c]">*</span>
-            </label>
-            <select id="attendance-section-select" value={selectedSectionId} onChange={e => setSelectedSectionId(Number(e.target.value))} disabled={sections.length === 0} className="w-full px-3.5 py-2 text-xs rounded-xl border border-[#ece7f0] bg-[#faf7f2] text-[#1e1b3a] font-semibold focus:outline-hidden focus:ring-2 focus:ring-[#4f46e5]/20 disabled:opacity-50">
-              {sections.length === 0 && <option value="">No sections found</option>}
-              {sections.map(s => (<option key={s.id} value={s.id}>Section {s.name}</option>))}
-            </select>
+            {/* Section */}
+            <div>
+              <label className="block text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
+                Section <span className="text-destructive">*</span>
+              </label>
+              <select
+                id="attendance-section-select"
+                value={selectedSectionId}
+                onChange={(e) => setSelectedSectionId(Number(e.target.value))}
+                disabled={sections.length === 0}
+                className="w-full px-3 py-2 text-xs rounded-lg border border-input bg-background text-foreground font-semibold focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-50 cursor-pointer"
+              >
+                {sections.length === 0 && <option value="">No sections found</option>}
+                {sections.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    Section {s.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* 2. Timing Schedule Prerequisite State Banners */}
       {selectedClassId && selectedSectionId && hasTimingMapping === false && !isLoadingTiming && (
-        <div className="bg-[#fff0eb] border-2 border-dashed border-[#ffd5cc] p-6 rounded-3xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs">
+        <Card className="bg-amber-50/60 dark:bg-amber-950/20 border-2 border-dashed border-amber-300 dark:border-amber-800 p-5 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs">
           <div className="flex items-start space-x-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-[#fff0eb] text-[#ff7a5c] border border-[#ffd5cc] flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center justify-center shrink-0">
               <Clock className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-xs font-black text-[#b1361b] uppercase tracking-wider">
+                <span className="text-xs font-black text-amber-900 dark:text-amber-200 uppercase tracking-wider">
                   Attendance Timing Schedule Required
                 </span>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#ff7a5c] text-white uppercase">
+                <Badge variant="destructive" className="text-[10px] uppercase font-black">
                   Action Needed
-                </span>
+                </Badge>
               </div>
-              <p className="text-xs text-[#b1361b] mt-1 font-medium leading-relaxed">
+              <p className="text-xs text-amber-800 dark:text-amber-300 mt-1 font-medium leading-relaxed">
                 Class <strong>{selectedClassObj?.name || `Class #${selectedClassId}`}</strong> (Section <strong>{selectedSectionObj?.name || 'A'}</strong>) does not have an active attendance timing assigned for <strong>{academicYearName || activeAcademicYear?.name || 'the current academic year'}</strong>.
                 You cannot take or record attendance until an attendance timing schedule (session window) is mapped to this class.
               </p>
             </div>
           </div>
-          <button
+          <Button
             type="button"
             id="map-timing-schedule-btn"
             onClick={() => onNavigateToMapping && onNavigateToMapping({ classId: selectedClassId, sectionId: selectedSectionId })}
-            className="shrink-0 px-4 py-2.5 rounded-2xl bg-[#ff7a5c] hover:bg-[#f2603f] text-white text-xs font-black shadow-sm transition-all flex items-center space-x-2 cursor-pointer"
+            variant="destructive"
+            className="shrink-0 text-xs font-black cursor-pointer shadow-xs"
           >
-            <Layers className="w-4 h-4" />
+            <Layers className="w-4 h-4 mr-1.5" />
             <span>Map Timing Schedule Now →</span>
-          </button>
-        </div>
+          </Button>
+        </Card>
       )}
 
       {selectedClassId && selectedSectionId && hasTimingMapping === true && activeTiming && (
-        <div className="bg-[#e4f5eb] border border-[#bfe7cd] px-5 py-3 rounded-2xl flex flex-wrap items-center justify-between text-xs gap-3">
-          <div className="flex flex-wrap items-center gap-2 text-[#177245] font-bold">
-            <Clock className="w-4 h-4 text-[#177245] shrink-0" />
+        <div className="bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 px-5 py-3 rounded-xl flex flex-wrap items-center justify-between text-xs gap-3">
+          <div className="flex flex-wrap items-center gap-2 text-emerald-800 dark:text-emerald-300 font-bold">
+            <Clock className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <span>Assigned Schedule: <strong>{activeTiming.name}</strong></span>
-            <span className="text-[#bfe7cd]">•</span>
-            <span className="font-semibold text-[#1e1b3a]">
+            <span className="text-emerald-300 dark:text-emerald-700">•</span>
+            <span className="font-semibold text-foreground">
               Morning: {activeTiming.morning_start_time || activeTiming.start_time} - {activeTiming.morning_end_time || activeTiming.end_time}
             </span>
             {Boolean(activeTiming.is_second_session) && activeTiming.afternoon_start_time && (
               <>
-                <span className="text-[#bfe7cd]">•</span>
-                <span className="font-semibold text-[#1e1b3a]">
+                <span className="text-emerald-300 dark:text-emerald-700">•</span>
+                <span className="font-semibold text-foreground">
                   Afternoon: {activeTiming.afternoon_start_time} - {activeTiming.afternoon_end_time}
                 </span>
               </>
             )}
             {activeTiming.grace_period > 0 && (
-              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-white text-[#177245] font-black border border-[#bfe7cd]">
+              <Badge variant="outline" className="text-[10px] bg-background text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700">
                 Grace: {activeTiming.grace_period}m
-              </span>
+              </Badge>
             )}
           </div>
           <button
             type="button"
             onClick={() => onNavigateToMapping && onNavigateToMapping({ classId: selectedClassId, sectionId: selectedSectionId })}
-            className="text-[11px] font-bold text-[#177245] hover:underline flex items-center space-x-1 cursor-pointer"
+            className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 hover:underline flex items-center space-x-1 cursor-pointer"
           >
             <span>Change Timing Mapping</span>
           </button>
         </div>
       )}
 
-      {/* 2. Existing Attendance Warning Banner */}
-      {existingRecord?.exists && (<div className={`p-5 rounded-3xl border transition-all ${isEditMode
-                ? 'bg-[#fff0eb] border-[#ffd5cc] text-[#b1361b]'
-                : 'bg-[#eeedff] border-[#d8d5ff] text-[#3730a3]'}`}>
+      {/* Existing Attendance Warning Banner */}
+      {existingRecord?.exists && (
+        <div className={`p-4 rounded-xl border transition-all ${
+          isEditMode
+            ? 'bg-amber-50/70 dark:bg-amber-950/30 border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200'
+            : 'bg-indigo-50/70 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200'
+        }`}>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div className="flex items-start space-x-3.5">
-              <AlertCircle className={`w-5 h-5 shrink-0 mt-0.5 ${isEditMode ? 'text-[#ff7a5c]' : 'text-[#4f46e5]'}`}/>
+              <AlertCircle className={`w-5 h-5 shrink-0 mt-0.5 ${isEditMode ? 'text-amber-600' : 'text-indigo-600'}`} />
               <div>
                 <div className="text-xs font-black flex items-center space-x-2">
                   <span>Attendance already marked for this class on {attendanceDate}.</span>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${isEditMode
-                ? 'bg-[#ff7a5c] text-white'
-                : 'bg-[#4f46e5] text-white'}`}>
+                  <Badge variant={isEditMode ? 'destructive' : 'default'} className="text-[10px] font-black uppercase">
                     {isEditMode ? 'Edit Mode Active' : 'View Only Mode'}
-                  </span>
+                  </Badge>
                 </div>
-                <p className="text-[11px] mt-1 text-[#625e7d]">
+                <p className="text-[11px] mt-1 text-muted-foreground">
                   Marked by <strong>{existingRecord.submitted_by || 'Staff'}</strong> at {formatDateTime(existingRecord.submitted_at)}
                   {existingRecord.updated_by ? ` • Last updated by ${existingRecord.updated_by} at ${formatDateTime(existingRecord.updated_at)}` : ''}.
                   {!isEditMode && ' Controls are locked to prevent accidental changes.'}
@@ -599,54 +651,65 @@ export const TakeAttendanceView = ({ branchId, academicYearId, onNavigateToRemar
 
             {/* Mode Switcher Buttons */}
             <div className="flex items-center space-x-2 shrink-0">
-              <button type="button" id="view-only-mode-btn" onClick={() => setIsEditMode(false)} className={`px-3.5 py-2 rounded-xl text-xs font-bold inline-flex items-center space-x-1.5 transition-colors cursor-pointer ${!isEditMode
-                ? 'bg-[#4f46e5] text-white shadow-xs'
-                : 'bg-white text-[#1e1b3a] border border-[#ece7f0] hover:bg-[#f5f2fa]'}`}>
-                <Eye className="w-3.5 h-3.5"/>
+              <Button
+                type="button"
+                id="view-only-mode-btn"
+                variant={!isEditMode ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setIsEditMode(false)}
+                className="text-xs font-bold"
+              >
+                <Eye className="w-3.5 h-3.5 mr-1.5" />
                 <span>View Only</span>
-              </button>
+              </Button>
 
-              <button type="button" id="edit-attendance-mode-btn" onClick={() => setIsEditMode(true)} className={`px-3.5 py-2 rounded-xl text-xs font-bold inline-flex items-center space-x-1.5 transition-colors cursor-pointer ${isEditMode
-                ? 'bg-[#ff7a5c] text-white shadow-xs'
-                : 'bg-white text-[#b1361b] border border-[#ffd5cc] hover:bg-[#fff0eb]'}`}>
-                <Edit3 className="w-3.5 h-3.5"/>
+              <Button
+                type="button"
+                id="edit-attendance-mode-btn"
+                variant={isEditMode ? 'destructive' : 'outline'}
+                size="sm"
+                onClick={() => setIsEditMode(true)}
+                className="text-xs font-bold"
+              >
+                <Edit3 className="w-3.5 h-3.5 mr-1.5" />
                 <span>Edit Attendance</span>
-              </button>
+              </Button>
             </div>
           </div>
-        </div>)}
+        </div>
+      )}
 
-      {/* 3. Live Statistics Counter Bar (Homeroom Style Soft Rounded Cards) */}
+      {/* 3. Live Statistics Counter Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-6 gap-3.5">
-        <div className="bg-white p-4 rounded-3xl border border-[#ece7f0] shadow-sm text-center">
-          <span className="text-[11px] font-bold text-[#625e7d] uppercase tracking-wider">Total</span>
-          <div className="text-xl font-black text-[#1e1b3a] mt-0.5">{counts.total}</div>
-        </div>
+        <Card className="p-3.5 text-center shadow-xs">
+          <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Total</span>
+          <div className="text-xl font-black text-foreground mt-0.5">{counts.total}</div>
+        </Card>
 
-        <div className="bg-[#e4f5eb] p-4 rounded-3xl border border-[#bfe7cd] shadow-sm text-center">
-          <span className="text-[11px] font-bold text-[#177245] uppercase tracking-wider">Present</span>
-          <div className="text-xl font-black text-[#177245] mt-0.5">{counts.present}</div>
-        </div>
+        <Card className="p-3.5 text-center shadow-xs bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40">
+          <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider">Present</span>
+          <div className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5">{counts.present}</div>
+        </Card>
 
-        <div className="bg-[#fff0eb] p-4 rounded-3xl border border-[#ffd5cc] shadow-sm text-center">
-          <span className="text-[11px] font-bold text-[#b1361b] uppercase tracking-wider">Absent</span>
-          <div className="text-xl font-black text-[#b1361b] mt-0.5">{counts.absent}</div>
-        </div>
+        <Card className="p-3.5 text-center shadow-xs bg-destructive/10 border-destructive/20">
+          <span className="text-[11px] font-bold text-destructive uppercase tracking-wider">Absent</span>
+          <div className="text-xl font-black text-destructive mt-0.5">{counts.absent}</div>
+        </Card>
 
-        <div className="bg-[#fdf0d8] p-4 rounded-3xl border border-[#f5dcaf] shadow-sm text-center">
-          <span className="text-[11px] font-bold text-[#9a5a00] uppercase tracking-wider">Leave</span>
-          <div className="text-xl font-black text-[#9a5a00] mt-0.5">{counts.leave}</div>
-        </div>
+        <Card className="p-3.5 text-center shadow-xs bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/40">
+          <span className="text-[11px] font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider">Leave</span>
+          <div className="text-xl font-black text-amber-600 dark:text-amber-400 mt-0.5">{counts.leave}</div>
+        </Card>
 
-        <div className="bg-[#eeedff] p-4 rounded-3xl border border-[#d8d5ff] shadow-sm text-center">
-          <span className="text-[11px] font-bold text-[#4f46e5] uppercase tracking-wider">Late</span>
-          <div className="text-xl font-black text-[#4f46e5] mt-0.5">{counts.late}</div>
-        </div>
+        <Card className="p-3.5 text-center shadow-xs bg-sky-50/50 dark:bg-sky-950/20 border-sky-200 dark:border-sky-900/40">
+          <span className="text-[11px] font-bold text-sky-800 dark:text-sky-300 uppercase tracking-wider">Late</span>
+          <div className="text-xl font-black text-sky-600 dark:text-sky-400 mt-0.5">{counts.late}</div>
+        </Card>
 
-        <div className="bg-[#1e1b3a] p-4 rounded-3xl border border-[#1e1b3a] text-white shadow-sm text-center">
-          <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider">% Rate</span>
-          <div className="text-xl font-black text-emerald-400 mt-0.5">{counts.percentage}%</div>
-        </div>
+        <Card className="p-3.5 text-center shadow-xs bg-primary text-primary-foreground">
+          <span className="text-[11px] font-bold opacity-80 uppercase tracking-wider">% Rate</span>
+          <div className="text-xl font-black mt-0.5">{counts.percentage}%</div>
+        </Card>
       </div>
 
       {/* 4. Student Roster & Marking Table */}

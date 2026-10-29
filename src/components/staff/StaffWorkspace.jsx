@@ -11,6 +11,8 @@ import {
   Plus
 } from 'lucide-react';
 import staffService from '../../services/staffService';
+import { useErp } from '../../context/ErpContext';
+import { Card } from '@/components/ui/card';
 import StaffDirectoryView from './StaffDirectoryView';
 import AcademicAllocationsView from './AcademicAllocationsView';
 import TeachingWorkloadView from './TeachingWorkloadView';
@@ -20,12 +22,13 @@ import AddStaffModal from './AddStaffModal';
 export default function StaffWorkspace() {
   const { subTab } = useParams();
   const navigate = useNavigate();
+  const { activeBranchId, effectiveActiveBranchId } = useErp();
 
   // Active view matches subTab in url
   // Options: 'directory' (default), 'allocations', 'workload', 'credentials'
   const activeTab = subTab || 'directory';
 
-  const [branchId, setBranchId] = useState(1);
+  const branchId = Number(activeBranchId || effectiveActiveBranchId || 1);
   const [staffList, setStaffList] = useState([]);
   const [stats, setStats] = useState({ total_staff: 0, teaching_staff: 0, non_teaching_staff: 0, active_staff: 0 });
   const [loading, setLoading] = useState(true);
@@ -67,48 +70,48 @@ export default function StaffWorkspace() {
       {/* Top Stat Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {/* Total Staff */}
-        <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-xs flex items-center justify-between">
+        <Card className="rounded-xl border border-slate-200/80 p-4 shadow-xs flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Total Staff</p>
-            <p className="text-2xl font-black text-gray-900 mt-1">{stats.total_staff || 0}</p>
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Staff</p>
+            <p className="text-2xl font-black text-slate-900 mt-1">{stats.total_staff || 0}</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-gray-100 text-gray-700 flex items-center justify-center font-bold">
+          <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold">
             <Users className="w-5 h-5" />
           </div>
-        </div>
+        </Card>
 
         {/* Teaching Staff */}
-        <div className="bg-white p-4 rounded-xl border border-indigo-100 shadow-xs flex items-center justify-between">
+        <Card className="rounded-xl border border-slate-200/80 p-4 shadow-xs flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-bold text-indigo-500 uppercase tracking-wider">Teaching Staff</p>
-            <p className="text-2xl font-black text-indigo-700 mt-1">{stats.teaching_staff || 0}</p>
+            <p className="text-[11px] font-bold text-sky-600 uppercase tracking-wider">Teaching Staff</p>
+            <p className="text-2xl font-black text-sky-700 mt-1">{stats.teaching_staff || 0}</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+          <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">
             <GraduationCap className="w-5 h-5" />
           </div>
-        </div>
+        </Card>
 
         {/* Non-Teaching Staff */}
-        <div className="bg-white p-4 rounded-xl border border-amber-100 shadow-xs flex items-center justify-between">
+        <Card className="rounded-xl border border-slate-200/80 p-4 shadow-xs flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Non-Teaching</p>
+            <p className="text-[11px] font-bold text-amber-600 uppercase tracking-wider">Non-Teaching</p>
             <p className="text-2xl font-black text-amber-700 mt-1">{stats.non_teaching_staff || 0}</p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
             <Building className="w-5 h-5" />
           </div>
-        </div>
+        </Card>
 
         {/* Active Today */}
-        <div className="bg-white p-4 rounded-xl border border-emerald-100 shadow-xs flex items-center justify-between">
+        <Card className="rounded-xl border border-slate-200/80 p-4 shadow-xs flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-bold text-emerald-500 uppercase tracking-wider">Active Staff</p>
+            <p className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Active Staff</p>
             <p className="text-2xl font-black text-emerald-700 mt-1">{stats.active_staff || 0}</p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
             <CheckCircle2 className="w-5 h-5" />
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* Render Direct Sub-view based on Sidebar URL */}

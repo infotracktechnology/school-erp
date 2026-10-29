@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, BookOpen, Search, Filter, RefreshCw, AlertCircle, CheckCircle2, XCircle, Eye, Edit2, Trash2, Layers, Copy, FolderTree } from 'lucide-react';
+import { Card } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 import { getClassSubjectsList, createClassSubject, updateClassSubject, updateClassSubjectStatus, deleteClassSubject, getClasses, getAcademicGroupsList, getSubjectCategoriesList } from '../../services/api';
 import { useErp } from '../../context/ErpContext';
 import { AcademicBranchYearSelector } from '../academic/AcademicBranchYearSelector';
@@ -261,7 +264,7 @@ export const SubjectsPage = ({ branches, activeBranchId, onActiveBranchChange, a
         <div className="space-y-4">
           {/* Quick KPI Summary Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs">
+            <Card className="p-3.5 shadow-2xs">
               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
                 Total Configured
               </span>
@@ -269,9 +272,9 @@ export const SubjectsPage = ({ branches, activeBranchId, onActiveBranchChange, a
                 <span>{stats.total}</span>
                 <span className="text-[10px] text-slate-400 font-medium">Subjects</span>
               </div>
-            </div>
+            </Card>
 
-            <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs">
+            <Card className="p-3.5 shadow-2xs">
               <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider block">
                 Compulsory
               </span>
@@ -279,9 +282,9 @@ export const SubjectsPage = ({ branches, activeBranchId, onActiveBranchChange, a
                 <span>{stats.compulsory}</span>
                 <span className="text-[10px] text-emerald-600 font-medium">Core</span>
               </div>
-            </div>
+            </Card>
 
-            <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs">
+            <Card className="p-3.5 shadow-2xs">
               <span className="text-[11px] font-bold text-purple-700 uppercase tracking-wider block">
                 Elective & Opt.
               </span>
@@ -289,9 +292,9 @@ export const SubjectsPage = ({ branches, activeBranchId, onActiveBranchChange, a
                 <span>{stats.elective + stats.optional}</span>
                 <span className="text-[10px] text-purple-500 font-medium">{stats.elective} Electives</span>
               </div>
-            </div>
+            </Card>
 
-            <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs">
+            <Card className="p-3.5 shadow-2xs">
               <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider block">
                 Practicals / Labs
               </span>
@@ -299,9 +302,9 @@ export const SubjectsPage = ({ branches, activeBranchId, onActiveBranchChange, a
                 <span>{stats.practical}</span>
                 <span className="text-[10px] text-blue-500 font-medium">Lab Modules</span>
               </div>
-            </div>
+            </Card>
 
-            <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs">
+            <Card className="p-3.5 shadow-2xs">
               <span className="text-[11px] font-bold text-amber-600 uppercase tracking-wider block">
                 Languages
               </span>
@@ -309,9 +312,9 @@ export const SubjectsPage = ({ branches, activeBranchId, onActiveBranchChange, a
                 <span>{stats.languages}</span>
                 <span className="text-[10px] text-amber-500 font-medium">Tracks</span>
               </div>
-            </div>
+            </Card>
 
-            <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs">
+            <Card className="p-3.5 shadow-2xs">
               <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">
                 Exam Applicable
               </span>
@@ -319,7 +322,7 @@ export const SubjectsPage = ({ branches, activeBranchId, onActiveBranchChange, a
                 <span>{stats.examApplicable}</span>
                 <span className="text-[10px] text-slate-500 font-medium">Evaluated</span>
               </div>
-            </div>
+            </Card>
           </div>
 
           {/* HIERARCHICAL FILTER BAR (Board -> Class -> Stream -> Category -> Search) */}

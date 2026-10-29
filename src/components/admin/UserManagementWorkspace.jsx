@@ -4,6 +4,11 @@ import {
   CheckCircle2, XCircle, MoreVertical, Edit2, Trash2, Eye, EyeOff,
   AlertCircle, ShieldCheck, Mail, Calendar, Check, Sparkles, Filter
 } from 'lucide-react';
+import { Card } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '../ui/table';
 import { useErp } from '../../context/ErpContext';
 
 export const UserManagementWorkspace = () => {
@@ -198,34 +203,34 @@ export const UserManagementWorkspace = () => {
           </div>
         </div>
 
-        <button
+        <Button
           type="button"
           onClick={() => setIsCreateModalOpen(true)}
-          className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-xs flex items-center justify-center space-x-2 transition-all cursor-pointer shrink-0 active:scale-95"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-xs flex items-center justify-center space-x-2 shrink-0"
         >
-          <UserPlus className="w-4 h-4" />
+          <UserPlus className="w-4 h-4 mr-1.5" />
           <span>Create New User</span>
-        </button>
+        </Button>
       </div>
 
       {/* Stats Counters */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white border border-slate-200/80 p-4 rounded-xl shadow-xs">
+        <Card className="p-4 shadow-xs">
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Total Administrative Users</span>
           <span className="text-2xl font-extrabold text-slate-900 mt-1 block">{stats.total || users.length}</span>
-        </div>
-        <div className="bg-white border border-slate-200/80 p-4 rounded-xl shadow-xs">
+        </Card>
+        <Card className="p-4 shadow-xs">
           <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider block">Super Admins</span>
           <span className="text-2xl font-extrabold text-indigo-700 mt-1 block">{stats.super_admins || 0}</span>
-        </div>
-        <div className="bg-white border border-slate-200/80 p-4 rounded-xl shadow-xs">
+        </Card>
+        <Card className="p-4 shadow-xs">
           <span className="text-xs font-semibold text-teal-600 uppercase tracking-wider block">Campus Principals</span>
           <span className="text-2xl font-extrabold text-teal-700 mt-1 block">{stats.branch_admins || 0}</span>
-        </div>
-        <div className="bg-white border border-slate-200/80 p-4 rounded-xl shadow-xs">
+        </Card>
+        <Card className="p-4 shadow-xs">
           <span className="text-xs font-semibold text-amber-600 uppercase tracking-wider block">Accountants</span>
           <span className="text-2xl font-extrabold text-amber-700 mt-1 block">{stats.accountants || 0}</span>
-        </div>
+        </Card>
       </div>
 
       {/* Filters & Search Toolbar */}
@@ -287,20 +292,20 @@ export const UserManagementWorkspace = () => {
       </div>
 
       {/* Users Table */}
-      <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
+      <Card className="rounded-2xl shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50/80 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                <th className="py-3.5 px-4">User Details</th>
-                <th className="py-3.5 px-4">Role / Grade</th>
-                <th className="py-3.5 px-4">Assigned Campus</th>
-                <th className="py-3.5 px-4">Status</th>
-                <th className="py-3.5 px-4">Created Date</th>
-                <th className="py-3.5 px-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-xs">
+          <Table className="w-full text-left border-collapse">
+            <TableHeader className="bg-slate-50/80 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <TableRow>
+                <TableHead className="py-3.5 px-4">User Details</TableHead>
+                <TableHead className="py-3.5 px-4">Role / Grade</TableHead>
+                <TableHead className="py-3.5 px-4">Assigned Campus</TableHead>
+                <TableHead className="py-3.5 px-4">Status</TableHead>
+                <TableHead className="py-3.5 px-4">Created Date</TableHead>
+                <TableHead className="py-3.5 px-4 text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="divide-y divide-slate-100 text-xs">
               {isLoading ? (
                 <tr>
                   <td colSpan="6" className="text-center py-12 text-slate-400">
@@ -412,10 +417,10 @@ export const UserManagementWorkspace = () => {
                   );
                 })
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
-      </div>
+      </Card>
 
       {/* CREATE NEW USER MODAL */}
       {isCreateModalOpen && (
