@@ -1,9 +1,9 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiConfig {
-  // Production server URL
+  // Production live server domain
   static const String defaultBaseUrl = 'https://schoolerp.campuseyeplus.com/api';
-  static const String _serverUrlKey = 'custom_server_base_url';
+  static const String _serverUrlKey = 'custom_server_base_url_prod_v1';
 
   static String baseUrl = defaultBaseUrl;
 
@@ -16,14 +16,7 @@ class ApiConfig {
       final prefs = await SharedPreferences.getInstance();
       final saved = prefs.getString(_serverUrlKey);
       
-      // If saved URL is an old local IP, upgrade to production domain
-      if (saved != null && 
-          saved.trim().isNotEmpty && 
-          !saved.contains('192.168.') &&
-          !saved.contains('10.28.') &&
-          !saved.contains('10.18.') && 
-          !saved.contains('10.0.2.2') &&
-          !saved.contains('127.0.0.1')) {
+      if (saved != null && saved.trim().isNotEmpty) {
         baseUrl = saved.trim();
       } else {
         baseUrl = defaultBaseUrl;
