@@ -83,7 +83,7 @@ export default function StudentCredentialsView({
         setClasses(cData.data);
       }
 
-      const sRes = await fetch(`/api/sections?branch_id=${branchId}`);
+      const sRes = await fetch(`/api/sections?branch_id=${branchId}&raw=true`);
       const sData = await sRes.json();
       if (sData.success && Array.isArray(sData.data)) {
         setSections(sData.data);
@@ -96,10 +96,38 @@ export default function StudentCredentialsView({
     fetchClassesAndSections();
   }, [branchId, academicYearId]);
 
+  // Deduplicate and filter sections by selected class
+  const availableSections = useMemo(() => {
+    if (selectedClassId !== 'All') {
+      const matched = sections.filter(s => String(s.class_id) === String(selectedClassId));
+      const map = new Map();
+      matched.forEach(s => {
+        const name = (s.section_name || s.name || '').trim();
+        if (name && !map.has(name)) map.set(name, s);
+      });
+      return Array.from(map.values());
+    }
+    const map = new Map();
+    sections.forEach(s => {
+      const name = (s.section_name || s.name || '').trim();
+      if (name && !map.has(name)) map.set(name, s);
+    });
+    return Array.from(map.values());
+  }, [sections, selectedClassId]);
+
   // Filtering Logic
   const filteredStudents = students.filter((s) => {
     const classMatch = selectedClassId === 'All' || String(s.class_id) === String(selectedClassId);
-    const sectionMatch = selectedSectionId === 'All' || String(s.section_id) === String(selectedSectionId);
+    let sectionMatch = selectedSectionId === 'All';
+    if (!sectionMatch) {
+      if (selectedClassId !== 'All') {
+        sectionMatch = String(s.section_id) === String(selectedSectionId);
+      } else {
+        const targetSec = sections.find(sec => String(sec.id) === String(selectedSectionId));
+        const targetName = targetSec ? (targetSec.section_name || targetSec.name) : '';
+        sectionMatch = String(s.section_id) === String(selectedSectionId) || (Boolean(targetName) && s.section_name === targetName);
+      }
+    }
     
     const fullName = `${s.first_name || ''} ${s.last_name || ''}`.trim().toLowerCase();
     const adm = (s.admission_number || s.admission_no || '').toLowerCase();
@@ -391,7 +419,10 @@ export default function StudentCredentialsView({
             {/* Class Filter */}
             <select
               value={selectedClassId}
-              onChange={(e) => setSelectedClassId(e.target.value)}
+              onChange={(e) => {
+                setSelectedClassId(e.target.value);
+                setSelectedSectionId('All');
+              }}
               className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-700 dark:text-slate-200 font-medium outline-hidden"
             >
               <option value="All">All Classes</option>
@@ -409,7 +440,7 @@ export default function StudentCredentialsView({
               className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-700 dark:text-slate-200 font-medium outline-hidden"
             >
               <option value="All">All Sections</option>
-              {sections.map((sec) => (
+              {availableSections.map((sec) => (
                 <option key={sec.id} value={sec.id}>
                   {sec.section_name || sec.name}
                 </option>

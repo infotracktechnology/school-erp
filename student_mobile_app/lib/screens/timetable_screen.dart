@@ -33,8 +33,8 @@ class _TimetableScreenState extends State<TimetableScreen> {
 
   Future<void> _loadTimetable() async {
     setState(() => _isLoading = true);
-    final classId = widget.user.student?.id ?? 5; // Fallback to class 5
-    const sectionId = 17; // Section A
+    final classId = widget.user.student?.classId ?? 1;
+    final sectionId = widget.user.student?.sectionId ?? 1;
     final periods = await PortalService.getTimetableForDay(
       classId: classId,
       sectionId: sectionId,

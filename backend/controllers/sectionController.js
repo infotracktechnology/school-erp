@@ -43,6 +43,13 @@ export const sectionController = {
       const rawList = await query.orderBy('section_name', 'asc').get();
       const listArray = rawList.all ? rawList.all() : (Array.isArray(rawList) ? rawList : []);
 
+      // Query class names to associate with sections
+      const [classRows] = await sutando.connection().raw('SELECT id, class_name FROM classes');
+      const classMap = new Map();
+      if (Array.isArray(classRows)) {
+        for (const cr of classRows) classMap.set(Number(cr.id), cr.class_name);
+      }
+
       // Query student counts grouped by section_id
       const [countRows] = await sutando.connection().raw(`
         SELECT section_id, COUNT(*) as count 
@@ -60,8 +67,49 @@ export const sectionController = {
       const formatted = listArray.map((s) => {
         const json = typeof s.toJSON === 'function' ? s.toJSON() : s;
         const count = countMap.get(Number(json.id)) || 0;
-        return formatSection(json, count);
+        const resObj = formatSection(json, count);
+        resObj.class_name = classMap.get(Number(json.class_id)) || (json.class_id ? `Class ${json.class_id}` : '');
+        return resObj;
       });
+
+      // When querying without a specific class_id, deduplicate / group by section_name
+      // so duplicate "A", "B" entries across multiple classes do not flood dropdowns and section management tables
+      if ((!class_id || class_id === 'all') && req.query.raw !== 'true') {
+        const grouped = new Map();
+        for (const sec of formatted) {
+          const secName = (sec.section_name || sec.name || '').trim();
+          if (!grouped.has(secName)) {
+            grouped.set(secName, {
+              ...sec,
+              code: sec.code || `SEC-${secName}`,
+              mappedClasses: sec.class_name ? [sec.class_name] : [],
+              class_count: sec.class_name ? 1 : 0,
+              student_count: sec.student_count || 0,
+              section_ids: [sec.id]
+            });
+          } else {
+            const existing = grouped.get(secName);
+            if (sec.class_name && !existing.mappedClasses.includes(sec.class_name)) {
+              existing.mappedClasses.push(sec.class_name);
+              existing.class_count = existing.mappedClasses.length;
+            }
+            existing.student_count += (sec.student_count || 0);
+            existing.section_ids.push(sec.id);
+            if (sec.is_enabled) existing.is_enabled = true;
+            if (sec.status === 'Active') existing.status = 'Active';
+          }
+        }
+
+        const deduplicated = Array.from(grouped.values()).map(g => ({
+          ...g,
+          classes: g.mappedClasses.join(', '),
+          is_locked: g.student_count > 0,
+          student_status: g.student_count > 0 ? 'Students Assigned' : 'No Students'
+        }));
+
+        return res.json({ success: true, data: deduplicated });
+      }
+
       res.json({ success: true, data: formatted });
     } catch (err) {
       next(err);

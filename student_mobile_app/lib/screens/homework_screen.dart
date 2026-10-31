@@ -26,7 +26,7 @@ class _HomeworkScreenState extends State<HomeworkScreen> {
   @override
   void initState() {
     super.initState();
-    final now = DateTime(2026, 10, 27);
+    final now = DateTime.now();
     _selectedMonth = DateTime(now.year, now.month, 1);
     _selectedDate = now;
     _loadHomework();
@@ -229,7 +229,8 @@ class _HomeworkScreenState extends State<HomeworkScreen> {
                     _selectedDate.year == date.year &&
                     _selectedDate.month == date.month &&
                     _selectedDate.day == date.day;
-                final isToday = date.year == 2026 && date.month == 10 && date.day == 27;
+                final now = DateTime.now();
+                final isToday = date.year == now.year && date.month == now.month && date.day == now.day;
                 final hasHomework = _hasHomeworkOnDate(date);
                 final dayName = DateFormat('E').format(date); // Mon, Tue, etc.
 
@@ -433,8 +434,9 @@ class _HomeworkScreenState extends State<HomeworkScreen> {
       subjectColor = const Color(0xFFEA580C);
     }
 
+    final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final isDueToday = item.status?.toLowerCase().contains('today') == true ||
-        item.dueDate == '2026-10-27';
+        item.dueDate == todayStr;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),

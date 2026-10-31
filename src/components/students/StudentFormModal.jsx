@@ -96,7 +96,7 @@ export const StudentFormModal = ({ isOpen, studentId, branchId, academicYearId, 
       getClasses(branchId, academicYearId)
         .then(res => setClasses(res?.data || []))
         .catch(console.error);
-      getSections(branchId, academicYearId)
+      getSections(branchId, academicYearId, { raw: true })
         .then(res => setSections(res?.data || []))
         .catch(console.error);
       getAcademicGroups({ branch_id: branchId, academic_year_id: academicYearId })
@@ -104,6 +104,49 @@ export const StudentFormModal = ({ isOpen, studentId, branchId, academicYearId, 
         .catch(console.error);
     }
   }, [isOpen, branchId, academicYearId]);
+
+  // Dynamically load class-specific sections when class_id changes
+  useEffect(() => {
+    if (formData.class_id && branchId && academicYearId) {
+      getSections(branchId, academicYearId, { class_id: formData.class_id })
+        .then(res => {
+          if (res?.data && res.data.length > 0) {
+            setSections(prev => {
+              const other = prev.filter(p => Number(p.class_id) !== Number(formData.class_id));
+              return [...other, ...res.data];
+            });
+          }
+        })
+        .catch(console.error);
+    }
+  }, [formData.class_id, branchId, academicYearId]);
+
+  // Filter sections by selected class, displaying uniquely
+  const availableSections = React.useMemo(() => {
+    if (!formData.class_id) {
+      const map = new Map();
+      sections.forEach(s => {
+        const name = (s.section_name || s.name || '').trim();
+        if (name && !map.has(name)) map.set(name, s);
+      });
+      return Array.from(map.values());
+    }
+    const matched = sections.filter(s => Number(s.class_id) === Number(formData.class_id));
+    if (matched.length > 0) {
+      const map = new Map();
+      matched.forEach(s => {
+        const name = (s.section_name || s.name || '').trim();
+        if (name && !map.has(name)) map.set(name, s);
+      });
+      return Array.from(map.values());
+    }
+    const map = new Map();
+    sections.forEach(s => {
+      const name = (s.section_name || s.name || '').trim();
+      if (name && !map.has(name)) map.set(name, s);
+    });
+    return Array.from(map.values());
+  }, [sections, formData.class_id]);
 
   // Load existing student for edit
   useEffect(() => {
@@ -361,9 +404,9 @@ export const StudentFormModal = ({ isOpen, studentId, branchId, academicYearId, 
                           className="w-full h-9 px-3 py-1.5 bg-background border border-input rounded-md text-foreground text-xs focus:ring-2 focus:ring-ring cursor-pointer" 
                           required
                         >
-                          <option value="">Select Section</option>
-                          {sections.map(s => (
-                            <option key={s.id} value={s.id}>Section {s.name}</option>
+                          <option value="">{formData.class_id ? 'Select Section' : 'Select Class First'}</option>
+                          {availableSections.map(s => (
+                            <option key={s.id} value={s.id}>Section {s.name || s.section_name}</option>
                           ))}
                         </select>
                       </div>

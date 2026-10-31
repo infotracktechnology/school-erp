@@ -456,17 +456,14 @@ export async function saveClassMappings(branchId, academicYearId, classId, secti
 }
 export async function getSectionsByClass(classId, branchId, academicYearId) {
     try {
-        const secRes = await getSections(branchId, academicYearId);
+        const secRes = await getSections(branchId, academicYearId, { class_id: classId });
         if (secRes && Array.isArray(secRes.data) && secRes.data.length > 0) {
-            const matched = secRes.data.filter((s) => Number(s.class_id) === Number(classId));
-            if (matched.length > 0) {
-                return matched.map((s) => ({
-                    ...s,
-                    id: s.id,
-                    name: s.section_name || s.name,
-                    section_name: s.section_name || s.name
-                }));
-            }
+            return secRes.data.map((s) => ({
+                ...s,
+                id: s.id,
+                name: s.section_name || s.name,
+                section_name: s.section_name || s.name
+            }));
         }
 
         const res = await getClassSectionMatrix(branchId, academicYearId);

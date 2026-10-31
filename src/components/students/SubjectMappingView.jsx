@@ -402,7 +402,7 @@ export const SubjectMappingView = ({ branchId, academicYearId }) => {
                             className="text-xs font-semibold rounded-xl border border-slate-300 px-3 py-2 bg-white focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600 cursor-pointer shadow-2xs"
                         >
                             <option value="all">All Sections</option>
-                            {sections.map(s => (
+                            {Array.from(new Map((sections || []).map(s => [s.name || s.section_name, s])).values()).map(s => (
                                 <option key={s.id} value={s.id}>{s.name || s.section_name}</option>
                             ))}
                         </select>

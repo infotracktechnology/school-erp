@@ -4,7 +4,42 @@ import { Card } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '../ui/table';
 
-export const SectionTable = ({ sections, onView, onEdit, onToggleStatus, isReadOnly = false }) => {
+export const SectionTable = ({ sections = [], onView, onEdit, onToggleStatus, isReadOnly = false }) => {
+    const displaySections = React.useMemo(() => {
+      const map = new Map();
+      (sections || []).forEach((sec) => {
+        const key = (sec.section_name || sec.name || '').trim();
+        if (!key) {
+          map.set(`sec-${sec.id}`, sec);
+          return;
+        }
+        if (!map.has(key)) {
+          map.set(key, {
+            ...sec,
+            code: sec.code || `SEC-${key}`,
+            mappedClasses: sec.classes 
+              ? sec.classes.split(', ').map(c => c.trim()) 
+              : (sec.class_name ? [sec.class_name] : [])
+          });
+        } else {
+          const existing = map.get(key);
+          const newClasses = sec.classes 
+            ? sec.classes.split(', ').map(c => c.trim()) 
+            : (sec.class_name ? [sec.class_name] : []);
+          for (const cls of newClasses) {
+            if (cls && !existing.mappedClasses.includes(cls)) {
+              existing.mappedClasses.push(cls);
+            }
+          }
+        }
+      });
+
+      return Array.from(map.values()).map(sec => ({
+        ...sec,
+        classes: sec.mappedClasses && sec.mappedClasses.length > 0 ? sec.mappedClasses.join(', ') : (sec.classes || '')
+      }));
+    }, [sections]);
+
     return (
       <Card className="shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
@@ -20,7 +55,7 @@ export const SectionTable = ({ sections, onView, onEdit, onToggleStatus, isReadO
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-slate-100 font-medium text-slate-700">
-              {sections.map((sec) => {
+              {displaySections.map((sec) => {
               const isActive = sec.status === 'Active';
               return (
                 <TableRow key={sec.id} className="hover:bg-slate-50/70 transition-colors">

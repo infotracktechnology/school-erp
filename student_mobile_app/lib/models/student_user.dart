@@ -1,5 +1,7 @@
 class StudentProfile {
   final int id;
+  final int? classId;
+  final int? sectionId;
   final String admissionNumber;
   final String? rollNumber;
   final String firstName;
@@ -15,6 +17,8 @@ class StudentProfile {
 
   StudentProfile({
     required this.id,
+    this.classId,
+    this.sectionId,
     required this.admissionNumber,
     this.rollNumber,
     required this.firstName,
@@ -35,6 +39,8 @@ class StudentProfile {
   factory StudentProfile.fromJson(Map<String, dynamic> json) {
     return StudentProfile(
       id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
+      classId: json['class_id'] is int ? json['class_id'] : int.tryParse(json['class_id']?.toString() ?? ''),
+      sectionId: json['section_id'] is int ? json['section_id'] : int.tryParse(json['section_id']?.toString() ?? ''),
       admissionNumber: json['admission_number']?.toString() ?? '',
       rollNumber: json['roll_number']?.toString(),
       firstName: json['first_name']?.toString() ?? '',
@@ -53,6 +59,8 @@ class StudentProfile {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'class_id': classId,
+      'section_id': sectionId,
       'admission_number': admissionNumber,
       'roll_number': rollNumber,
       'first_name': firstName,

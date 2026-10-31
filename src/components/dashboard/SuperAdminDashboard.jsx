@@ -61,7 +61,7 @@ export const SuperAdminDashboard = ({ onNavigateToStudents, onNavigateToSettings
     }
     setFetchError(null);
     try {
-      const yearName = activeAcademicYear?.name || '2026-2027';
+      const yearName = activeAcademicYear?.year_name || activeAcademicYear?.name || '2025-2026';
       const data = await getSuperAdminDashboardData(activeBranchId || 'all', yearName, userRole, assignedBranchId);
       setDashboardData(data);
     } catch (err) {
@@ -99,7 +99,7 @@ export const SuperAdminDashboard = ({ onNavigateToStudents, onNavigateToSettings
     return `₹ ${val.toLocaleString('en-IN')}`;
   };
 
-  const currentYearName = activeAcademicYear?.name || '2026–2027';
+  const currentYearName = activeAcademicYear?.year_name || activeAcademicYear?.name || '2025–2026';
 
   // Safe extraction of KPI cards from either data.cards or data.metrics
   const cards = dashboardData?.cards || dashboardData?.metrics || {};
@@ -287,11 +287,11 @@ export const SuperAdminDashboard = ({ onNavigateToStudents, onNavigateToSettings
           </div>
           <div className="mt-3">
             <div className="text-2xl font-black text-foreground flex items-center justify-between">
-              <span>{(cards?.total_students || 4850).toLocaleString()}</span>
+              <span>{isLoading ? '...' : (cards?.total_students ?? 0).toLocaleString()}</span>
               <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-sky-600" />
             </div>
             <div className="text-[11px] text-emerald-600 font-medium mt-0.5">
-              {(cards?.active_students || 4792).toLocaleString()} Active • {cards?.inactive_students || 58} Inactive
+              {isLoading ? 'Loading...' : `${(cards?.active_students ?? cards?.total_students ?? 0).toLocaleString()} Active • ${cards?.inactive_students ?? 0} Inactive`}
             </div>
           </div>
         </Card>
@@ -311,7 +311,7 @@ export const SuperAdminDashboard = ({ onNavigateToStudents, onNavigateToSettings
           </div>
           <div className="mt-3">
             <div className="text-2xl font-black text-foreground flex items-center justify-between">
-              <span>{cards?.overall_attendance_percentage || cards?.today_attendance_percentage || 92.5}%</span>
+              <span>{cards?.overall_attendance_percentage || cards?.today_attendance_percentage || 0}%</span>
               <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-emerald-600" />
             </div>
             <div className="text-[11px] text-emerald-600 font-medium mt-0.5">
@@ -335,11 +335,11 @@ export const SuperAdminDashboard = ({ onNavigateToStudents, onNavigateToSettings
           </div>
           <div className="mt-3">
             <div className="text-2xl font-black text-foreground flex items-center justify-between">
-              <span>{cards?.fee_recovery_rate || 89}%</span>
+              <span>{cards?.fee_recovery_rate || 0}%</span>
               <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-amber-600" />
             </div>
             <div className="text-[11px] text-muted-foreground mt-0.5">
-              Collected: {formatINR(cards?.fee_collection || 89240000)}
+              Collected: {formatINR(cards?.fee_collection || 0)}
             </div>
           </div>
         </Card>
@@ -359,11 +359,11 @@ export const SuperAdminDashboard = ({ onNavigateToStudents, onNavigateToSettings
           </div>
           <div className="mt-3">
             <div className="text-2xl font-black text-foreground flex items-center justify-between">
-              <span>{cards?.total_staff || 420}</span>
+              <span>{isLoading ? '...' : (cards?.total_staff ?? 0)}</span>
               <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-emerald-600" />
             </div>
             <div className="text-[11px] text-muted-foreground mt-0.5">
-              Ratio: 1 : {cards?.student_staff_ratio || 12} (Students/Staff)
+              Ratio: 1 : {cards?.student_staff_ratio || 0} (Students/Staff)
             </div>
           </div>
         </Card>
@@ -383,11 +383,11 @@ export const SuperAdminDashboard = ({ onNavigateToStudents, onNavigateToSettings
           </div>
           <div className="mt-3">
             <div className="text-2xl font-black text-foreground flex items-center justify-between">
-              <span>{cards?.total_classes || 140} Classes</span>
+              <span>{isLoading ? '...' : `${cards?.total_classes ?? 0} Classes`}</span>
               <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-indigo-600" />
             </div>
             <div className="text-[11px] text-muted-foreground mt-0.5">
-              {cards?.total_sections || 310} Assigned Sections
+              {isLoading ? '...' : `${cards?.total_sections ?? 0} Assigned Sections`}
             </div>
           </div>
         </Card>

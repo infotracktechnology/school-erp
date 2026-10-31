@@ -34,7 +34,7 @@ class AuthService {
               'password': password.trim(),
             }),
           )
-          .timeout(const Duration(seconds: 3));
+          .timeout(const Duration(seconds: 10));
 
       final data = jsonDecode(response.body);
 

@@ -63,9 +63,14 @@ class NotificationService {
         body: jsonEncode({'token': token}),
       ).timeout(const Duration(seconds: 5));
 
+      if (response.statusCode == 404) {
+        debugPrint('[FCM] Register endpoint returned 404 (host may not be restarted yet). Handled gracefully.');
+        return;
+      }
+
       debugPrint('[FCM] Register response (${response.statusCode}): ${response.body}');
     } catch (e) {
-      debugPrint('[FCM] Token registration failed: $e');
+      debugPrint('[FCM] Token registration failed gracefully: $e');
     }
   }
 
@@ -89,9 +94,14 @@ class NotificationService {
         body: jsonEncode({'token': token}),
       ).timeout(const Duration(seconds: 5));
 
+      if (response.statusCode == 404) {
+        debugPrint('[FCM] Unregister endpoint returned 404 (host may not be restarted yet). Handled gracefully.');
+        return;
+      }
+
       debugPrint('[FCM] Unregister response (${response.statusCode}): ${response.body}');
     } catch (e) {
-      debugPrint('[FCM] Token unregistration failed: $e');
+      debugPrint('[FCM] Token unregistration failed gracefully: $e');
     }
   }
 }
