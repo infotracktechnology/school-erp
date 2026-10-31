@@ -27,7 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       NotificationService.requestPermission();
-      NotificationService.registerToken(widget.user.id, authToken: widget.user.token);
+      final studentId = widget.user.student?.id ?? widget.user.id;
+      NotificationService.registerToken(studentId, authToken: widget.user.token);
     });
   }
 

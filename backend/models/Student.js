@@ -3,6 +3,10 @@
 export class Student extends Model {
   table = 'students';
 
+  casts = {
+    fcm_tokens: 'json',
+  };
+
   branch() {
     return this.belongsTo('Branch', 'branch_id');
   }

@@ -127,7 +127,7 @@ export const communicationController = {
 
           // Find target user IDs (prefer student.user_id, fallback to student.id if user_id is null)
           const targetUserIds = studentRows
-            .map(row => row.user_id || row.id)
+            .map(row => row.id)
             .filter(Boolean);
 
           console.log(`[Homework Notification] Targeting ${targetUserIds.length} students for class=${payload.class_id}, section=${payload.section_id}:`, targetUserIds);

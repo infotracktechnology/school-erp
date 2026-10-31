@@ -74,7 +74,8 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       // Register FCM token upon successful login
-      NotificationService.registerToken(user.id, authToken: user.token);
+      final studentId = user.student?.id ?? user.id;
+      NotificationService.registerToken(studentId, authToken: user.token);
 
       if (!mounted) return;
 

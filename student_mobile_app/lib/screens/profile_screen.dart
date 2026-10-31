@@ -1,3 +1,4 @@
+import '../services/notification_service.dart';
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../models/student_user.dart';
@@ -32,6 +33,8 @@ class ProfileScreen extends StatelessWidget {
     );
 
     if (confirmed == true) {
+      final studentId = student?.id ?? user.id;
+      await NotificationService.unregisterToken(studentId, authToken: user.token);
       await AuthService.logout();
       if (!context.mounted) return;
       Navigator.pushReplacement(

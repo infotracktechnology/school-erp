@@ -39,17 +39,17 @@ class NotificationService {
     }
   }
 
-  /// Get device FCM token and register it with backend
-  static Future<void> registerToken(int userId, {String? authToken}) async {
+  /// Get device FCM token and register it with student profile in backend
+  static Future<void> registerToken(int studentId, {String? authToken}) async {
     try {
       final token = await _fcm.getToken();
       if (token == null) {
         debugPrint('[FCM] Token is null');
         return;
       }
-      debugPrint('[FCM] Fetched token for user $userId: $token');
+      debugPrint('[FCM] Fetched token for student $studentId: $token');
 
-      final url = Uri.parse('${ApiConfig.baseUrl}/admin/users/$userId/fcm-token');
+      final url = Uri.parse('${ApiConfig.baseUrl}/students/$studentId/fcm-token');
       final headers = <String, String>{
         'Content-Type': 'application/json',
       };
@@ -63,9 +63,35 @@ class NotificationService {
         body: jsonEncode({'token': token}),
       ).timeout(const Duration(seconds: 5));
 
-      debugPrint('[FCM] Server response (${response.statusCode}): ${response.body}');
+      debugPrint('[FCM] Register response (${response.statusCode}): ${response.body}');
     } catch (e) {
       debugPrint('[FCM] Token registration failed: $e');
+    }
+  }
+
+  /// Unregister device FCM token on logout
+  static Future<void> unregisterToken(int studentId, {String? authToken}) async {
+    try {
+      final token = await _fcm.getToken();
+      if (token == null) return;
+
+      final url = Uri.parse('${ApiConfig.baseUrl}/students/$studentId/fcm-token');
+      final headers = <String, String>{
+        'Content-Type': 'application/json',
+      };
+      if (authToken != null && authToken.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $authToken';
+      }
+
+      final response = await http.delete(
+        url,
+        headers: headers,
+        body: jsonEncode({'token': token}),
+      ).timeout(const Duration(seconds: 5));
+
+      debugPrint('[FCM] Unregister response (${response.statusCode}): ${response.body}');
+    } catch (e) {
+      debugPrint('[FCM] Token unregistration failed: $e');
     }
   }
 }

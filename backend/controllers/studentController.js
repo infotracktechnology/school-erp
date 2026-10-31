@@ -1082,6 +1082,88 @@ export const studentController = {
     } catch (err) {
       next(err);
     }
+  },
+
+  // Register or update student FCM token (supports multiple devices, pruned to latest 5)
+  async saveFcmToken(req, res, next) {
+    try {
+      const studentId = Number(req.params.id);
+      const { token } = req.body;
+      if (!token) {
+        return res.status(400).json({ success: false, msg: 'FCM token required' });
+      }
+
+      const student = await knex('students').where('id', studentId).first();
+      if (!student) {
+        return res.status(404).json({ success: false, msg: 'Student not found' });
+      }
+
+      let tokens = [];
+      if (student.fcm_tokens) {
+        try {
+          tokens = typeof student.fcm_tokens === 'string' ? JSON.parse(student.fcm_tokens) : student.fcm_tokens;
+          if (!Array.isArray(tokens)) tokens = [];
+        } catch (e) {
+          tokens = [];
+        }
+      }
+
+      // Remove current token if already exists to move it to the end (most recent)
+      tokens = tokens.filter(t => t && t !== token);
+      tokens.push(token);
+
+      // Keep only up to 5 most recent device tokens
+      if (tokens.length > 5) {
+        tokens = tokens.slice(-5);
+      }
+
+      await knex('students').where('id', studentId).update({
+        fcm_tokens: JSON.stringify(tokens),
+        updated_at: new Date()
+      });
+
+      console.log(`✅ [FCM] Saved device token for student ${studentId}. Total active tokens: ${tokens.length}`);
+      return res.json({ success: true, msg: 'FCM token saved successfully', activeDevices: tokens.length });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // Remove device token on logout
+  async deleteFcmToken(req, res, next) {
+    try {
+      const studentId = Number(req.params.id);
+      const { token } = req.body;
+
+      const student = await knex('students').where('id', studentId).first();
+      if (!student) {
+        return res.status(404).json({ success: false, msg: 'Student not found' });
+      }
+
+      let tokens = [];
+      if (student.fcm_tokens) {
+        try {
+          tokens = typeof student.fcm_tokens === 'string' ? JSON.parse(student.fcm_tokens) : student.fcm_tokens;
+          if (!Array.isArray(tokens)) tokens = [];
+        } catch (e) {
+          tokens = [];
+        }
+      }
+
+      if (token) {
+        tokens = tokens.filter(t => t !== token);
+      }
+
+      await knex('students').where('id', studentId).update({
+        fcm_tokens: JSON.stringify(tokens),
+        updated_at: new Date()
+      });
+
+      console.log(`✅ [FCM] Unregistered device token for student ${studentId}. Remaining tokens: ${tokens.length}`);
+      return res.json({ success: true, msg: 'FCM token removed successfully' });
+    } catch (err) {
+      next(err);
+    }
   }
 };
 

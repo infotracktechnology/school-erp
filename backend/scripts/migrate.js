@@ -267,10 +267,19 @@ export async function runMigrations(options = {}) {
       table.string('parent_email', 191).nullable();
       table.string('address', 255).nullable();
       table.date('admission_date').nullable();
+      table.text('fcm_tokens').nullable();
       table.string('status', 20).defaultTo('Active');
       table.timestamps(true, true);
     });
     console.log('✓ Created students table');
+  } else {
+    const hasFcmTokens = await conn.schema.hasColumn('students', 'fcm_tokens');
+    if (!hasFcmTokens) {
+      await conn.schema.alterTable('students', (table) => {
+        table.text('fcm_tokens').nullable();
+      });
+      console.log('✓ Added fcm_tokens column to students table');
+    }
   }
 
   // 14. Student Profiles
@@ -615,15 +624,10 @@ export async function runMigrations(options = {}) {
     console.log('✓ Created student_subjects table');
   }
 
-  // User FCM Tokens
-  if (!(await conn.schema.hasTable('user_fcm_tokens'))) {
-    await conn.schema.createTable('user_fcm_tokens', (table) => {
-      table.increments('id').primary();
-      table.integer('user_id').unsigned().notNullable().unique();
-      table.string('token', 500).notNullable();
-      table.timestamps(true, true);
-    });
-    console.log('✓ Created user_fcm_tokens table');
+  // Drop legacy user_fcm_tokens table if it exists
+  if (await conn.schema.hasTable('user_fcm_tokens')) {
+    await conn.schema.dropTable('user_fcm_tokens');
+    console.log('✓ Dropped legacy user_fcm_tokens table (fcm_tokens stored directly in students)');
   }
 
   console.log('[Sutando Migrations] All schema migrations completed successfully!');
