@@ -86,24 +86,12 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
     } catch (e) {
-      // If live connection failed (e.g. phone not on same Wi-Fi), provide seamless directory fallback
-      final query = _usernameController.text.trim();
-      final user = StudentDirectoryService.getStudentUser(query);
-
       if (!mounted) return;
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Logged in as ${user.name} (${user.student?.classSection ?? ''})'),
-          backgroundColor: AppTheme.primary,
-          duration: const Duration(seconds: 2),
-        ),
-      );
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => HomeScreen(user: user),
+          content: Text(e.toString().replaceAll('Exception: ', '')),
+          backgroundColor: const Color(0xFFDC2626),
+          duration: const Duration(seconds: 4),
         ),
       );
     } finally {
