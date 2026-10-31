@@ -314,7 +314,7 @@ export async function runMigrations(options = {}) {
       table.integer('to_academic_year_id').unsigned().nullable();
       table.string('from_academic_year', 50).nullable().index();
       table.string('to_academic_year', 50).nullable().index();
-      table.integer('from_class_id').unsigned().notNullable();
+      table.integer('from_class_id').unsigned().nullable();
       table.integer('from_section_id').unsigned().nullable();
       table.integer('to_class_id').unsigned().notNullable();
       table.integer('to_section_id').unsigned().nullable();
