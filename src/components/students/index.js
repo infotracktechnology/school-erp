@@ -8,3 +8,5 @@ export * from './StudentProfileModal';
 export * from './StudentPromotionWizard';
 export * from './StudentsWorkspace';
 export * from './StudentUpdateView';
+export { default as StudentCredentialsView } from './StudentCredentialsView';
+export { default as StudentCredentialsModal } from './StudentCredentialsModal';

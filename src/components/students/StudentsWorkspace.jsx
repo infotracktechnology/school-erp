@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Users, ArrowRightLeft, TrendingUp, Layers, UserX, ShieldCheck, Edit, GraduationCap, BookOpen } from 'lucide-react';
+import { Users, ArrowRightLeft, TrendingUp, Layers, UserX, ShieldCheck,
+  Key, Edit, GraduationCap, BookOpen } from 'lucide-react';
 import { useErp } from '../../context/ErpContext';
 import { StudentDetailsList } from './StudentDetailsList';
 import { StudentUpdateView } from './StudentUpdateView';
@@ -11,6 +12,7 @@ import { AcademicGroupsView } from './AcademicGroupsView';
 import { InactiveStudentsView } from './InactiveStudentsView';
 import { StudentApprovalsView } from './StudentApprovalsView';
 import { SubjectMappingView } from './SubjectMappingView';
+import StudentCredentialsView from './StudentCredentialsView';
 export const StudentsWorkspace = ({ initialSubTab = 'details', onSubTabChange }) => {
     const { activeBranchId, activeBranch, activeAcademicYearId, activeAcademicYear, isReadOnly, isHistoricalYear, showToast } = useErp();
     const [activeSubTab, setActiveSubTab] = useState(initialSubTab);
@@ -197,6 +199,15 @@ export const StudentsWorkspace = ({ initialSubTab = 'details', onSubTabChange })
 
       {/* Submodule 7: Student Approvals */}
       {activeSubTab === 'approvals' && (<StudentApprovalsView branchId={activeBranchId} academicYearId={activeAcademicYearId}/>)}
+
+      {/* Submodule 8: Student ERP Credentials */}
+      {activeSubTab === 'credentials' && (
+        <StudentCredentialsView
+          branchId={activeBranchId}
+          academicYearId={activeAcademicYearId}
+          onRefresh={() => setRefreshTrigger((prev) => prev + 1)}
+        />
+      )}
 
       {/* 15-Tab Comprehensive Student Profile Viewer Modal */}
       {profileModalStudentId && (<StudentProfileModal studentId={profileModalStudentId} academicYearId={activeAcademicYearId} onClose={() => setProfileModalStudentId(null)} onEdit={(id) => {

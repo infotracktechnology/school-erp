@@ -205,6 +205,7 @@ export const Sidebar = ({
     { id: 'subject-mapping', label: 'Subject Mapping', icon: BookOpen },
     { id: 'inactive', label: 'Inactive Students / TC', icon: UserX },
     { id: 'approvals', label: 'Student Approvals', icon: ShieldCheck },
+    { id: 'credentials', label: 'Bulk Reset Credentials', icon: Key },
   ];
 
   // Master definition of all 16 ERP modules with icons and role permissions

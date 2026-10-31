@@ -1164,6 +1164,176 @@ export const studentController = {
     } catch (err) {
       next(err);
     }
+  },
+
+  // Update credentials for a single student (creates or updates users table record)
+  async updateStudentCredentials(req, res, next) {
+    try {
+      const studentId = Number(req.params.id);
+      const { username, password } = req.body;
+
+      if (!username || !password) {
+        return res.status(400).json({ success: false, message: 'Username and password are required.' });
+      }
+
+      const student = await knex('students').where('id', studentId).first();
+      if (!student) {
+        return res.status(404).json({ success: false, message: 'Student not found.' });
+      }
+
+      const now = new Date();
+      const studentFullName = `${student.first_name || ''} ${student.last_name || ''}`.trim() || 'Student';
+
+      let userId = student.user_id;
+      if (!userId) {
+        const existingUser = await knex('users').where('email', username.trim()).first();
+        if (existingUser) {
+          userId = existingUser.id;
+        }
+      }
+
+      if (userId) {
+        await knex('users').where('id', userId).update({
+          name: studentFullName,
+          email: username.trim(),
+          password: password.trim(),
+          role_id: 4,
+          status: 'Active',
+          updated_at: now
+        });
+      } else {
+        const [newUserId] = await knex('users').insert({
+          name: studentFullName,
+          email: username.trim(),
+          password: password.trim(),
+          role_id: 4,
+          branch_id: student.branch_id || 1,
+          status: 'Active',
+          created_at: now,
+          updated_at: now
+        });
+        userId = newUserId;
+      }
+
+      await knex('students').where('id', studentId).update({
+        user_id: userId,
+        updated_at: now
+      });
+
+      console.log(`✅ [Student Credentials] Updated student ${studentId} linked to user ${userId} (username: ${username.trim()})`);
+      return res.json({
+        success: true,
+        message: 'Credentials updated successfully.',
+        data: { student_id: studentId, user_id: userId, username: username.trim() }
+      });
+    } catch (err) {
+      console.error('[updateStudentCredentials Error]:', err);
+      next(err);
+    }
+  },
+
+  // Bulk update credentials for multiple students
+  async bulkUpdateStudentCredentials(req, res, next) {
+    try {
+      const {
+        student_ids = [],
+        password_pattern = 'admission_no',
+        custom_password = '',
+        username_pattern = 'admission_no'
+      } = req.body;
+
+      if (!Array.isArray(student_ids) || student_ids.length === 0) {
+        return res.status(400).json({ success: false, message: 'Please select at least one student.' });
+      }
+
+      const now = new Date();
+      let updatedCount = 0;
+
+      for (const sId of student_ids) {
+        const student = await knex('students').where('id', Number(sId)).first();
+        if (!student) continue;
+
+        const adm = (student.admission_no || student.admission_number || `ADM-${student.id}`).trim();
+        const studentFullName = `${student.first_name || ''} ${student.last_name || ''}`.trim() || `Student ${adm}`;
+
+        // 1. Determine Password
+        let pwd = adm;
+        if (password_pattern === 'admission_no') {
+          pwd = adm;
+        } else if (password_pattern === 'dob' && (student.dob || student.date_of_birth)) {
+          const d = new Date(student.dob || student.date_of_birth);
+          if (!isNaN(d.getTime())) {
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            pwd = `${day}${month}${year}`;
+          } else {
+            pwd = adm;
+          }
+        } else if (password_pattern === 'custom' && custom_password.trim()) {
+          pwd = custom_password.trim();
+        } else if (password_pattern === 'default') {
+          pwd = 'student123';
+        }
+
+        // 2. Determine Username
+        let username = adm;
+        if (username_pattern === 'email' && (student.parent_email || student.email)) {
+          username = (student.parent_email || student.email).trim();
+        } else {
+          username = adm;
+        }
+
+        // 3. Find or Create User Record
+        let userId = student.user_id;
+        if (!userId) {
+          const existingUser = await knex('users').where('email', username).first();
+          if (existingUser) {
+            userId = existingUser.id;
+          }
+        }
+
+        if (userId) {
+          await knex('users').where('id', userId).update({
+            name: studentFullName,
+            email: username,
+            password: pwd,
+            role_id: 4,
+            status: 'Active',
+            updated_at: now
+          });
+        } else {
+          const [newUserId] = await knex('users').insert({
+            name: studentFullName,
+            email: username,
+            password: pwd,
+            role_id: 4,
+            branch_id: student.branch_id || 1,
+            status: 'Active',
+            created_at: now,
+            updated_at: now
+          });
+          userId = newUserId;
+        }
+
+        await knex('students').where('id', Number(sId)).update({
+          user_id: userId,
+          updated_at: now
+        });
+
+        updatedCount++;
+      }
+
+      console.log(`✅ [Bulk Student Credentials] Synchronized ${updatedCount} student(s) to users table`);
+      return res.json({
+        success: true,
+        message: `Credentials successfully updated for ${updatedCount} student(s).`,
+        updatedCount
+      });
+    } catch (err) {
+      console.error('[bulkUpdateStudentCredentials Error]:', err);
+      next(err);
+    }
   }
 };
 
