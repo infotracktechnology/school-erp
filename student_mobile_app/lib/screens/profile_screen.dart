@@ -33,8 +33,11 @@ class ProfileScreen extends StatelessWidget {
     );
 
     if (confirmed == true) {
-      final studentId = student?.id ?? user.id;
-      await NotificationService.unregisterToken(studentId, authToken: user.token);
+      await NotificationService.unregisterToken(
+        studentId: student?.id,
+        userId: user.id,
+        authToken: user.token,
+      );
       await AuthService.logout();
       if (!context.mounted) return;
       Navigator.pushReplacement(

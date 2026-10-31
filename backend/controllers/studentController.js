@@ -1122,6 +1122,28 @@ export const studentController = {
         updated_at: new Date()
       });
 
+      // Also mirror token into user_fcm_tokens for legacy/live API compatibility
+      if (student.user_id) {
+        try {
+          const hasUserTable = await knex.schema.hasTable('user_fcm_tokens');
+          if (hasUserTable) {
+            const existing = await knex('user_fcm_tokens')
+              .where({ user_id: student.user_id, token })
+              .first();
+            if (!existing) {
+              await knex('user_fcm_tokens').insert({
+                user_id: student.user_id,
+                token,
+                created_at: new Date(),
+                updated_at: new Date(),
+              });
+            }
+          }
+        } catch (e) {
+          console.warn('[FCM] Error mirroring to user_fcm_tokens:', e.message);
+        }
+      }
+
       console.log(`✅ [FCM] Saved device token for student ${studentId}. Total active tokens: ${tokens.length}`);
       return res.json({ success: true, msg: 'FCM token saved successfully', activeDevices: tokens.length });
     } catch (err) {

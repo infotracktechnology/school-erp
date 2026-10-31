@@ -32,8 +32,11 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (savedUser != null) {
       // Sync/register FCM token with backend
-      final studentId = savedUser.student?.id ?? savedUser.id;
-      NotificationService.registerToken(studentId, authToken: savedUser.token);
+      NotificationService.registerToken(
+        studentId: savedUser.student?.id,
+        userId: savedUser.id,
+        authToken: savedUser.token,
+      );
     }
 
     if (!mounted) return;

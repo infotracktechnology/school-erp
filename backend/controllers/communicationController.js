@@ -314,6 +314,35 @@ export const communicationController = {
         user_id: payload.created_by || 1
       });
 
+      // Dispatch FCM Push Notification to students
+      try {
+        let q = knex('students').select('id', 'user_id');
+        if (payload.branch_id && payload.branch_id !== 'all') {
+          q = q.where('branch_id', Number(payload.branch_id));
+        }
+        if (payload.target_class_id && payload.target_class_id !== 'all') {
+          q = q.where('class_id', Number(payload.target_class_id));
+        }
+        if (payload.target_section_id && payload.target_section_id !== 'all') {
+          q = q.where('section_id', Number(payload.target_section_id));
+        }
+        const studentRows = await q;
+        const targetIds = studentRows.map(r => r.user_id || r.id).filter(Boolean);
+        const notifPayload = {
+          title: 'Announcement: ' + (payload.title || 'Campus Circular'),
+          body: payload.message ? (payload.message.length > 100 ? payload.message.substring(0, 100) + '...' : payload.message) : 'New announcement posted.',
+          data: {
+            announcementId: id.toString(),
+            type: 'announcement',
+          },
+        };
+        console.log('[Announcement Notification] Broadcasting to ' + targetIds.length + ' recipients for announcement #' + id);
+        Promise.all(targetIds.map(uid => sendToUser(uid, notifPayload)))
+          .catch(err => console.error('[Announcement Notification] Batch send error:', err));
+      } catch (notifErr) {
+        console.error('[Announcement Notification] Error querying students:', notifErr);
+      }
+
       res.status(201).json({ success: true, id, message: 'Announcement created successfully' });
     } catch (err) {
       next(err);
