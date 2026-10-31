@@ -244,6 +244,7 @@ export const StudentFormModal = ({ isOpen, studentId, branchId, academicYearId, 
       setFormData(prev => ({ 
         ...prev, 
         [name]: value,
+        ...(name === 'class_id' ? { section_id: '' } : {}),
         ...(name === 'admission_number' ? { admission_no: value } : {})
       }));
     }

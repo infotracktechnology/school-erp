@@ -68,14 +68,21 @@ class _HomeworkScreenState extends State<HomeworkScreen> {
   // Fallback rich demo items if database has no homework for this student yet
   List<HomeworkItem> get _effectiveHomework {
     if (_allHomework.isNotEmpty) return _allHomework;
+    final now = DateTime.now();
+    final todayStr = DateFormat('yyyy-MM-dd').format(now);
+    final yesterdayStr = DateFormat('yyyy-MM-dd').format(now.subtract(const Duration(days: 1)));
+    final tomorrowStr = DateFormat('yyyy-MM-dd').format(now.add(const Duration(days: 1)));
+    final inTwoDaysStr = DateFormat('yyyy-MM-dd').format(now.add(const Duration(days: 2)));
+    final inThreeDaysStr = DateFormat('yyyy-MM-dd').format(now.add(const Duration(days: 3)));
+
     return [
       HomeworkItem(
         id: 1,
         title: 'Exercise 4.2 - Fractions & Decimals',
         subject: 'Mathematics',
         description: 'Complete problems 1 to 15 in the class notebook. Show step-by-step working.',
-        assignedDate: '2026-10-26',
-        dueDate: '2026-10-27',
+        assignedDate: yesterdayStr,
+        dueDate: todayStr,
         status: 'Due Today',
       ),
       HomeworkItem(
@@ -83,8 +90,8 @@ class _HomeworkScreenState extends State<HomeworkScreen> {
         title: 'Poem Comprehension: The Road Not Taken',
         subject: 'English',
         description: 'Read stanzas 3 and 4. Answer the 5 questions written in your textbook page 42.',
-        assignedDate: '2026-10-25',
-        dueDate: '2026-10-28',
+        assignedDate: yesterdayStr,
+        dueDate: tomorrowStr,
         status: 'Assigned',
       ),
       HomeworkItem(
@@ -92,8 +99,8 @@ class _HomeworkScreenState extends State<HomeworkScreen> {
         title: 'Plant Cells & Organelles Diagram',
         subject: 'Science',
         description: 'Draw a neat labeled diagram of a plant cell on an A4 sheet and color the chloroplasts green.',
-        assignedDate: '2026-10-24',
-        dueDate: '2026-10-27',
+        assignedDate: yesterdayStr,
+        dueDate: todayStr,
         status: 'Due Today',
       ),
       HomeworkItem(
@@ -101,8 +108,8 @@ class _HomeworkScreenState extends State<HomeworkScreen> {
         title: 'Tamil Thirukkural Recitation',
         subject: 'Tamil',
         description: 'Kural 11 to 15 with meaning for oral recitation test tomorrow.',
-        assignedDate: '2026-10-26',
-        dueDate: '2026-10-29',
+        assignedDate: todayStr,
+        dueDate: inTwoDaysStr,
         status: 'Assigned',
       ),
       HomeworkItem(
@@ -110,8 +117,8 @@ class _HomeworkScreenState extends State<HomeworkScreen> {
         title: 'Social Science: Ancient Civilizations Map',
         subject: 'Social Science',
         description: 'Mark Harappa, Mohenjo-Daro, and Lothal on the outline map of India.',
-        assignedDate: '2026-10-27',
-        dueDate: '2026-10-30',
+        assignedDate: todayStr,
+        dueDate: inThreeDaysStr,
         status: 'Assigned',
       ),
     ];

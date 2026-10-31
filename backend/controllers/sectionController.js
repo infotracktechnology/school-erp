@@ -178,9 +178,13 @@ export const sectionController = {
       const item = await Section.query().find(req.params.id);
       if (!item) return res.status(404).json({ success: false, message: 'Section not found' });
 
+      const ids = Array.isArray(req.body.section_ids) && req.body.section_ids.length > 0
+        ? req.body.section_ids.map(Number)
+        : [Number(req.params.id)];
+
       const { status, is_enabled } = req.body;
       if (status === 'Inactive' || is_enabled === 0 || is_enabled === false) {
-        const [countResult] = await sutando.connection().raw('SELECT COUNT(*) as count FROM students WHERE section_id = ?', [Number(req.params.id)]);
+        const [countResult] = await sutando.connection().raw(`SELECT COUNT(*) as count FROM students WHERE section_id IN (${ids.join(',')})`);
         const count = Number(countResult?.[0]?.count || 0);
         if (count > 0) {
           return res.status(400).json({
@@ -195,7 +199,9 @@ export const sectionController = {
       const updateData = {};
       if (status !== undefined) updateData.status = status;
       if (is_enabled !== undefined) updateData.is_enabled = is_enabled ? 1 : 0;
-      await item.update(updateData);
+      
+      await sutando.connection().table('sections').whereIn('id', ids).update(updateData);
+      await item.refresh();
 
       res.json({ success: true, data: item, message: 'Section status updated' });
     } catch (err) {

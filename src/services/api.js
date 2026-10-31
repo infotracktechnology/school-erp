@@ -330,9 +330,17 @@ export async function updateClassStatus(id, status) {
 // -------------------------------------------------------------
 export async function getSections(branchId, academicYearId, filters = {}) {
     const params = new URLSearchParams();
-    params.append('branch_id', String(branchId));
-    if (academicYearId) {
+    if (branchId !== undefined && branchId !== null && branchId !== 'all') {
+        params.append('branch_id', String(branchId));
+    }
+    if (academicYearId !== undefined && academicYearId !== null && academicYearId !== 'all') {
         params.append('academic_year_id', String(academicYearId));
+    }
+    if (filters.class_id !== undefined && filters.class_id !== null && filters.class_id !== 'all') {
+        params.append('class_id', String(filters.class_id));
+    }
+    if (filters.raw) {
+        params.append('raw', String(filters.raw));
     }
     if (filters.search)
         params.append('search', filters.search);

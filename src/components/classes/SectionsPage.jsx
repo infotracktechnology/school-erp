@@ -101,8 +101,11 @@ export const SectionsPage = ({ branches, activeBranchId, onActiveBranchChange, a
         if (!statusTargetSection)
             return;
         try {
-            const updated = await updateSectionStatus(statusTargetSection.id, newStatus);
-            showToast(`Section "${updated.name}" status changed to ${newStatus}.`, 'success');
+            const ids = Array.isArray(statusTargetSection.section_ids) && statusTargetSection.section_ids.length > 0
+                ? statusTargetSection.section_ids
+                : [statusTargetSection.id];
+            await Promise.all(ids.map(id => updateSectionStatus(id, newStatus)));
+            showToast(`Section "${statusTargetSection.name}" status changed to ${newStatus}.`, 'success');
             await fetchSections();
         }
         catch (err) {

@@ -50,10 +50,13 @@ export const classController = {
         });
       }
 
-      // Resolve academic year row
+      // Resolve academic year row supporting both year_name and name
       let ayRow = null;
       if (ayStr && ayStr !== 'all' && ayStr !== 'undefined') {
-        ayRow = await knex('academic_years').where('year_name', ayStr).first();
+        ayRow = await knex('academic_years')
+          .where('year_name', ayStr)
+          .orWhere('name', ayStr)
+          .first();
       } else if (!isNaN(ayId) && ayId > 0 && academic_year_id !== 'all' && academic_year_id !== 'undefined') {
         ayRow = await knex('academic_years').where('id', ayId).first();
       }
@@ -62,6 +65,10 @@ export const classController = {
       }
 
       const effectiveAyId = ayRow ? Number(ayRow.id) : (ayId || 1);
+      const ayNames = [];
+      if (ayRow?.year_name) ayNames.push(ayRow.year_name);
+      if (ayRow?.name && !ayNames.includes(ayRow.name)) ayNames.push(ayRow.name);
+      if (ayStr && !ayNames.includes(ayStr)) ayNames.push(ayStr);
       const effectiveAyStr = ayRow ? (ayRow.year_name || ayRow.name) : (ayStr || '2025-2026');
 
       // If branch_id is provided, apply academic year class enablement & student counts
@@ -71,7 +78,7 @@ export const classController = {
           .where('branch_id', bId)
           .where((builder) => {
             builder.where('academic_year_id', effectiveAyId);
-            if (effectiveAyStr) builder.orWhere('academic_year', effectiveAyStr);
+            if (ayNames.length > 0) builder.orWhereIn('academic_year', ayNames);
           });
         const enableMap = new Map();
         for (const yc of yearClasses) {
@@ -79,14 +86,27 @@ export const classController = {
         }
 
         // 2. Fetch student enrollment counts for this branch and academic year grouped by class_id
-        const [countRows] = await sutando.connection().raw(`
-          SELECT s.class_id, COUNT(*) as count 
-          FROM students s 
-          LEFT JOIN sections sec ON s.section_id = sec.id 
-          WHERE (s.academic_year = ? OR sec.academic_year = ? OR s.academic_year_id = ? OR sec.academic_year_id = ?) 
-            AND s.branch_id = ?
-          GROUP BY s.class_id
-        `, [effectiveAyStr, effectiveAyStr, effectiveAyId, effectiveAyId, bId]);
+        let countQuery = knex('students as s')
+          .leftJoin('sections as sec', 's.section_id', 'sec.id')
+          .where('s.branch_id', bId);
+
+        if (ayNames.length > 0 || effectiveAyId) {
+          countQuery = countQuery.where((builder) => {
+            if (ayNames.length > 0) {
+              builder.whereIn('s.academic_year', ayNames)
+                     .orWhereIn('sec.academic_year', ayNames);
+            }
+            if (effectiveAyId) {
+              builder.orWhere('s.academic_year_id', effectiveAyId)
+                     .orWhere('sec.academic_year_id', effectiveAyId);
+            }
+          });
+        }
+
+        const countRows = await countQuery
+          .groupBy('s.class_id')
+          .select('s.class_id')
+          .select(sutando.connection().raw('COUNT(s.id) as count'));
 
         const countMap = new Map();
         if (Array.isArray(countRows)) {

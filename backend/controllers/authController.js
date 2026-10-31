@@ -183,6 +183,8 @@ export const authController = {
           address: user.address,
         } : {
           id: 1,
+          class_id: 1,
+          section_id: 1,
           admission_number: 'ADM-ADMIN-PREVIEW',
           roll_number: '001',
           first_name: user.name,

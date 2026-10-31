@@ -55,33 +55,6 @@ export const StudentComprehensiveEditModal = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Filter sections by selected class, displaying uniquely
-  const availableSections = useMemo(() => {
-    if (!formData.class_id) {
-      const map = new Map();
-      (sections || []).forEach((s) => {
-        const name = (s.section_name || s.name || '').trim();
-        if (name && !map.has(name)) map.set(name, s);
-      });
-      return Array.from(map.values());
-    }
-    const matched = (sections || []).filter((s) => Number(s.class_id) === Number(formData.class_id));
-    if (matched.length > 0) {
-      const map = new Map();
-      matched.forEach((s) => {
-        const name = (s.section_name || s.name || '').trim();
-        if (name && !map.has(name)) map.set(name, s);
-      });
-      return Array.from(map.values());
-    }
-    const map = new Map();
-    (sections || []).forEach((s) => {
-      const name = (s.section_name || s.name || '').trim();
-      if (name && !map.has(name)) map.set(name, s);
-    });
-    return Array.from(map.values());
-  }, [sections, formData.class_id]);
-
   const [formData, setFormData] = useState({
     // 1. Student Name
     first_name: '',
@@ -106,6 +79,7 @@ export const StudentComprehensiveEditModal = ({
     admission_date: '',
     admission_class_id: '',
     current_class_id: '',
+    class_id: '',
     section_id: '',
     stream: 'General',
     house: 'Ruby',
@@ -330,6 +304,35 @@ export const StudentComprehensiveEditModal = ({
     }
   }, [isOpen, studentId, showToast]);
 
+  const selectedClassId = formData.current_class_id || formData.class_id;
+
+  // Filter sections by selected class, displaying uniquely
+  const availableSections = useMemo(() => {
+    if (!selectedClassId) {
+      const map = new Map();
+      (sections || []).forEach((s) => {
+        const name = (s.section_name || s.name || '').trim();
+        if (name && !map.has(name)) map.set(name, s);
+      });
+      return Array.from(map.values());
+    }
+    const matched = (sections || []).filter((s) => Number(s.class_id) === Number(selectedClassId));
+    if (matched.length > 0) {
+      const map = new Map();
+      matched.forEach((s) => {
+        const name = (s.section_name || s.name || '').trim();
+        if (name && !map.has(name)) map.set(name, s);
+      });
+      return Array.from(map.values());
+    }
+    const map = new Map();
+    (sections || []).forEach((s) => {
+      const name = (s.section_name || s.name || '').trim();
+      if (name && !map.has(name)) map.set(name, s);
+    });
+    return Array.from(map.values());
+  }, [sections, selectedClassId]);
+
   if (!isOpen) return null;
 
   const handleChange = (e) => {
@@ -337,6 +340,7 @@ export const StudentComprehensiveEditModal = ({
     setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
+      ...(name === 'current_class_id' ? { class_id: value, section_id: '' } : {})
     }));
   };
 
@@ -723,7 +727,7 @@ export const StudentComprehensiveEditModal = ({
                         className="w-full px-3 py-2 border border-slate-300 rounded-lg font-bold text-emerald-900"
                         required
                       >
-                        <option value="">{formData.class_id ? 'Select Section' : 'Select Class First'}</option>
+                        <option value="">{selectedClassId ? 'Select Section' : 'Select Class First'}</option>
                         {availableSections.map((sec) => (
                           <option key={sec.id} value={sec.id}>
                             Section {sec.name || sec.section_name}

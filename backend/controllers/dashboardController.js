@@ -25,7 +25,10 @@ export const dashboardController = {
       }
 
       const effectiveAyId = ayRow ? Number(ayRow.id) : (ayId || null);
-      const effectiveAyStr = ayRow ? (ayRow.year_name || ayRow.name) : (ayStr || null);
+      const ayNames = [];
+      if (ayRow?.year_name) ayNames.push(ayRow.year_name);
+      if (ayRow?.name && !ayNames.includes(ayRow.name)) ayNames.push(ayRow.name);
+      if (ayStr && !ayNames.includes(ayStr)) ayNames.push(ayStr);
 
       let stuQuery = knex('students as s').leftJoin('sections as sec', 's.section_id', 'sec.id');
       let activeStuQuery = knex('students as s').leftJoin('sections as sec', 's.section_id', 'sec.id').where('s.status', 'Active');
@@ -43,11 +46,11 @@ export const dashboardController = {
         secQuery = secQuery.where('branch_id', bId);
       }
 
-      if (effectiveAyStr || effectiveAyId) {
+      if (ayNames.length > 0 || effectiveAyId) {
         stuQuery = stuQuery.where((builder) => {
-          if (effectiveAyStr) {
-            builder.where('s.academic_year', effectiveAyStr)
-                   .orWhere('sec.academic_year', effectiveAyStr);
+          if (ayNames.length > 0) {
+            builder.whereIn('s.academic_year', ayNames)
+                   .orWhereIn('sec.academic_year', ayNames);
           }
           if (effectiveAyId) {
             builder.orWhere('s.academic_year_id', effectiveAyId)
@@ -56,9 +59,9 @@ export const dashboardController = {
         });
 
         activeStuQuery = activeStuQuery.where((builder) => {
-          if (effectiveAyStr) {
-            builder.where('s.academic_year', effectiveAyStr)
-                   .orWhere('sec.academic_year', effectiveAyStr);
+          if (ayNames.length > 0) {
+            builder.whereIn('s.academic_year', ayNames)
+                   .orWhereIn('sec.academic_year', ayNames);
           }
           if (effectiveAyId) {
             builder.orWhere('s.academic_year_id', effectiveAyId)
