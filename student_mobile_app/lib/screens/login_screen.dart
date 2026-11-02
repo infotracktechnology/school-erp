@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../config/api_config.dart';
 import '../config/theme.dart';
 import '../services/auth_service.dart';
 import '../services/permission_service.dart';
@@ -21,13 +20,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isPasswordVisible = false;
   bool _isLoading = false;
-  bool _isTestingConnection = false;
-  bool? _isServerConnected;
 
   @override
   void initState() {
     super.initState();
-    _checkServer();
     // Request media and storage permissions on first launch
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await NotificationService.requestPermission();
@@ -40,17 +36,6 @@ class _LoginScreenState extends State<LoginScreen> {
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-
-  Future<void> _checkServer() async {
-    setState(() => _isTestingConnection = true);
-    final ok = await AuthService.testConnection();
-    if (mounted) {
-      setState(() {
-        _isServerConnected = ok;
-        _isTestingConnection = false;
-      });
-    }
   }
 
   void _fillCredentials(String username, String password) {
@@ -148,12 +133,19 @@ class _LoginScreenState extends State<LoginScreen> {
                             children: [
                               Text(
                                 'Select Student Account',
-                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppTheme.textPrimary,
+                                ),
                               ),
                               SizedBox(height: 2),
                               Text(
                                 'Pick any student to check their dashboard',
-                                style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppTheme.textSecondary,
+                                ),
                               ),
                             ],
                           ),
@@ -178,7 +170,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                         ),
                         onChanged: (val) {
                           setModalState(() {
@@ -218,7 +213,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                     backgroundColor: AppTheme.primaryLight,
                                     child: Text(
                                       s.name[0],
-                                      style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppTheme.primary,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 12),
@@ -228,17 +226,28 @@ class _LoginScreenState extends State<LoginScreen> {
                                       children: [
                                         Text(
                                           s.name,
-                                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppTheme.textPrimary,
+                                          ),
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
                                           '${s.classSection} • ${s.admissionNo}',
-                                          style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: AppTheme.textSecondary,
+                                          ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                  const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppTheme.primary),
+                                  const Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 14,
+                                    color: AppTheme.primary,
+                                  ),
                                 ],
                               ),
                             ),
@@ -256,96 +265,9 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _showServerConfigDialog() {
-    final controller = TextEditingController(text: ApiConfig.baseUrl);
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Server Connection Settings', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Enter your computer Wi-Fi IP so this phone can reach the backend server:',
-              style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: controller,
-              decoration: const InputDecoration(
-                labelText: 'Base API URL',
-                hintText: 'https://schoolerp.campuseyeplus.com/api',
-              ),
-              style: const TextStyle(fontSize: 13, fontFamily: 'monospace'),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 6,
-              children: [
-                ActionChip(
-                  label: const Text('Production Server', style: TextStyle(fontSize: 11)),
-                  onPressed: () {
-                    controller.text = 'https://schoolerp.campuseyeplus.com/api';
-                  },
-                ),
-                ActionChip(
-                  label: const Text('Wi-Fi PC (192.168.1.11)', style: TextStyle(fontSize: 11)),
-                  onPressed: () {
-                    controller.text = 'http://192.168.1.11:5000/api';
-                  },
-                ),
-                ActionChip(
-                  label: const Text('Emulator (10.0.2.2)', style: TextStyle(fontSize: 11)),
-                  onPressed: () {
-                    controller.text = 'http://10.0.2.2:5000/api';
-                  },
-                ),
-                ActionChip(
-                  label: const Text('Localhost (127.0.0.1)', style: TextStyle(fontSize: 11)),
-                  onPressed: () {
-                    controller.text = 'http://127.0.0.1:5000/api';
-                  },
-                ),
-              ],
-            )
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (controller.text.trim().isNotEmpty) {
-                await ApiConfig.setCustomBaseUrl(controller.text.trim());
-                setState(() {});
-                _checkServer();
-              }
-              if (ctx.mounted) Navigator.pop(ctx);
-            },
-            child: const Text('Save & Apply'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings_outlined, color: AppTheme.textSecondary),
-            tooltip: 'Configure Server IP',
-            onPressed: _showServerConfigDialog,
-          ),
-        ],
-      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -405,66 +327,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: AppTheme.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: 14),
-
-                  // Server Connection Chip with Live Status Indicator
-                  Center(
-                    child: InkWell(
-                      onTap: _showServerConfigDialog,
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: _isServerConnected == true
-                              ? const Color(0xFFDCFCE7)
-                              : (_isServerConnected == false ? const Color(0xFFFEE2E2) : const Color(0xFFF1F5F9)),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: _isServerConnected == true
-                                ? const Color(0xFF86EFAC)
-                                : (_isServerConnected == false ? const Color(0xFFFECACA) : const Color(0xFFE2E8F0)),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: _isServerConnected == true
-                                    ? const Color(0xFF16A34A)
-                                    : (_isServerConnected == false ? const Color(0xFFDC2626) : Colors.amber),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              ApiConfig.baseUrl.replaceAll('/api', ''),
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontFamily: 'monospace',
-                                color: _isServerConnected == true
-                                    ? const Color(0xFF166534)
-                                    : (_isServerConnected == false ? const Color(0xFF991B1B) : AppTheme.textSecondary),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            if (_isTestingConnection)
-                              const SizedBox(
-                                width: 10,
-                                height: 10,
-                                child: CircularProgressIndicator(strokeWidth: 1.5),
-                              )
-                            else
-                              const Icon(Icons.edit, size: 12, color: AppTheme.primary),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 24),
 
                   // Username / Admission Number Field
                   TextFormField(

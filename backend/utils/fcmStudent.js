@@ -1,20 +1,9 @@
 import Student from '../models/Student.js';
 import admin from '../config/firebase.js';
-import { sutando } from '../config/database.js';
 
-const knex = (table) => sutando.connection().table(table);
-
-/**
- * Send notification to a student across all registered devices
- * Checks both student.fcm_tokens and user_fcm_tokens table
- * @param {number} targetId - Student ID or User ID
- * @param {object} payload - Notification payload { title, body, data }
- */
-export async function sendToStudent(targetId, payload) {
+export async function sendToStudent(targetId, payload = {}) {
   try {
     const tokens = new Set();
-
-    // 1. Find student by id OR user_id
     let student = null;
     try {
       student = await Student.query()
@@ -27,30 +16,21 @@ export async function sendToStudent(targetId, payload) {
 
     if (student && student.fcm_tokens) {
       try {
-        const parsed = typeof student.fcm_tokens === 'string' ? JSON.parse(student.fcm_tokens) : student.fcm_tokens;
+        const parsed =
+          typeof student.fcm_tokens === 'string'
+            ? JSON.parse(student.fcm_tokens)
+            : student.fcm_tokens;
+
         if (Array.isArray(parsed)) {
-          parsed.forEach(t => {
-            if (typeof t === 'string' && t.trim().length > 0) tokens.add(t.trim());
+          parsed.forEach((t) => {
+            if (typeof t === 'string' && t.trim().length > 0) {
+              tokens.add(t.trim());
+            }
           });
         }
-      } catch (e) {}
-    }
-
-    // 2. Also check user_fcm_tokens table
-    try {
-      const hasUserFcm = await knex.schema.hasTable('user_fcm_tokens');
-      if (hasUserFcm) {
-        const uids = [targetId];
-        if (student && student.user_id) uids.push(student.user_id);
-        const rows = await knex('user_fcm_tokens').whereIn('user_id', uids).select('token');
-        rows.forEach(r => {
-          if (r.token && typeof r.token === 'string' && r.token.trim().length > 0) {
-            tokens.add(r.token.trim());
-          }
-        });
+      } catch (e) {
+        console.warn(`[FCM] Error parsing fcm_tokens for ${targetId}:`, e.message);
       }
-    } catch (e) {
-      console.warn('[FCM] Error checking user_fcm_tokens:', e.message);
     }
 
     const tokenList = Array.from(tokens);
@@ -59,19 +39,24 @@ export async function sendToStudent(targetId, payload) {
       return { success: false, reason: 'No token' };
     }
 
+    
+    const sanitizedData = Object.entries(payload.data || {}).reduce((acc, [k, v]) => {
+      if (v !== undefined && v !== null) {
+        acc[k] = typeof v === 'object' ? JSON.stringify(v) : String(v);
+      }
+      return acc;
+    }, {});
+
     const message = {
       notification: {
         title: payload.title || 'CampusEye Notification',
         body: payload.body || '',
       },
-      data: Object.fromEntries(
-        Object.entries(payload.data || {}).map(([k, v]) => [k, String(v)])
-      ),
+      data: sanitizedData,
       android: {
         priority: 'high',
         notification: {
           channelId: 'campuseye_channel',
-          priority: 'high',
           defaultSound: true,
           defaultVibrateTimings: true,
         },
@@ -80,34 +65,38 @@ export async function sendToStudent(targetId, payload) {
     };
 
     const response = await admin.messaging().sendEachForMulticast(message);
-    console.log(`✅ [FCM] Sent to target ${targetId} (${tokenList.length} devices): Success: ${response.successCount}, Failure: ${response.failureCount}`);
+    console.log(
+      `✅ [FCM] Sent to target ${targetId} (${tokenList.length} devices): Success: ${response.successCount}, Failure: ${response.failureCount}`
+    );
 
-    // Prune invalid tokens from student if needed
-    if (response.failureCount > 0 && student) {
-      const tokensToRemove = new Set();
+    if (response.failureCount > 0) {
+      const invalidTokens = [];
       response.responses.forEach((resp, idx) => {
         if (!resp.success) {
-          const errCode = resp.error?.code;
+          const errorCode = resp.error?.code;
           if (
-            errCode === 'messaging/invalid-registration-token' ||
-            errCode === 'messaging/registration-token-not-registered'
+            errorCode === 'messaging/invalid-registration-token' ||
+            errorCode === 'messaging/registration-token-not-registered'
           ) {
-            tokensToRemove.add(tokenList[idx]);
+            invalidTokens.push(tokenList[idx]);
           }
         }
       });
 
-      if (tokensToRemove.size > 0) {
-        let currentTokens = [];
+      if (invalidTokens.length > 0) {
+        const validTokens = tokenList.filter((t) => !invalidTokens.includes(t));
         try {
-          currentTokens = typeof student.fcm_tokens === 'string' ? JSON.parse(student.fcm_tokens) : student.fcm_tokens;
-        } catch (_) {}
-        if (Array.isArray(currentTokens)) {
-          const remainingTokens = currentTokens.filter(t => !tokensToRemove.has(t));
-          await Student.query().where('id', student.id).update({
-            fcm_tokens: JSON.stringify(remainingTokens),
-            updated_at: new Date()
-          });
+          await Student.query()
+            .where('id', student.id)
+            .patch({
+              fcm_tokens:
+                typeof student.fcm_tokens === 'string'
+                  ? JSON.stringify(validTokens)
+                  : validTokens,
+            });
+          console.log(`🧹 [FCM] Removed ${invalidTokens.length} stale tokens for target ${targetId}`);
+        } catch (cleanupErr) {
+          console.warn('[FCM] Failed to clean up invalid tokens:', cleanupErr.message);
         }
       }
     }
@@ -119,5 +108,4 @@ export async function sendToStudent(targetId, payload) {
   }
 }
 
-// Backward compatibility alias
 export const sendToUser = sendToStudent;

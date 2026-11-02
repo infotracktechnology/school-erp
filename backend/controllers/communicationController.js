@@ -113,8 +113,7 @@ export const communicationController = {
         try {
           const studentRows = await knex('students')
             .where('class_id', payload.class_id)
-            .andWhere('section_id', payload.section_id)
-            .select('id', 'user_id');
+            .andWhere('section_id', payload.section_id);
 
           const notifPayload = {
             title: `New Homework: ${payload.title || payload.subject_name || 'Assignment'}`,
@@ -126,10 +125,8 @@ export const communicationController = {
           };
 
           // Find target user IDs (prefer student.user_id, fallback to student.id if user_id is null)
-          const targetUserIds = studentRows
-            .map(row => row.id)
-            .filter(Boolean);
-
+          const targetUserIds = studentRows.map(row => row.id).filter(Boolean);
+          
           console.log(`[Homework Notification] Targeting ${targetUserIds.length} students for class=${payload.class_id}, section=${payload.section_id}:`, targetUserIds);
 
           // Fire-and-forget notifications
@@ -139,7 +136,6 @@ export const communicationController = {
         } catch (notifErr) {
           console.error('[Homework Notification] Query error:', notifErr);
         }
-
         res.status(201).json({ success: true, id, message: 'Homework created' });
     } catch (err) {
       next(err);

@@ -11,14 +11,12 @@ class NotificationService {
   /// Request Notification Permission (Prompt on Android 13+) and setup foreground alerts
   static Future<bool> requestPermission() async {
     try {
-      // 1. Configure foreground notification presentation options
       await _fcm.setForegroundNotificationPresentationOptions(
         alert: true,
         badge: true,
         sound: true,
       );
 
-      // 2. Trigger Android 13+ native POST_NOTIFICATIONS dialog via permission_handler
       final status = await Permission.notification.status;
       debugPrint('[NotificationService] Current system notification status: $status');
       if (!status.isGranted) {
@@ -26,7 +24,7 @@ class NotificationService {
         debugPrint('[NotificationService] System notification requested result: $reqStatus');
       }
 
-      // 3. Register FCM messaging permissions
+  
       final settings = await _fcm.requestPermission(
         alert: true,
         announcement: false,
@@ -75,7 +73,6 @@ class NotificationService {
         debugPrint('[FCM] Token is null');
         return;
       }
-      debugPrint('[FCM] Fetched token: $token (studentId=$studentId, userId=$userId)');
 
       final headers = <String, String>{
         'Content-Type': 'application/json',
@@ -85,18 +82,6 @@ class NotificationService {
       }
 
       final body = jsonEncode({'token': token});
-
-      // 1. Register with User ID (live production server target)
-      if (userId != null && userId > 0) {
-        try {
-          final userUrl = Uri.parse('${ApiConfig.baseUrl}/admin/users/$userId/fcm-token');
-          final userRes = await http.post(userUrl, headers: headers, body: body)
-              .timeout(const Duration(seconds: 5));
-          debugPrint('[FCM] /admin/users/$userId/fcm-token response (${userRes.statusCode}): ${userRes.body}');
-        } catch (e) {
-          debugPrint('[FCM] Error posting to user fcm-token: $e');
-        }
-      }
 
       // 2. Register with Student ID (student endpoint)
       if (studentId != null && studentId > 0) {
@@ -132,13 +117,6 @@ class NotificationService {
       }
 
       final body = jsonEncode({'token': token});
-
-      if (userId != null && userId > 0) {
-        try {
-          final userUrl = Uri.parse('${ApiConfig.baseUrl}/admin/users/$userId/fcm-token');
-          await http.delete(userUrl, headers: headers, body: body).timeout(const Duration(seconds: 5));
-        } catch (_) {}
-      }
 
       if (studentId != null && studentId > 0) {
         try {
