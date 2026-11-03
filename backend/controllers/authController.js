@@ -1,6 +1,6 @@
 import { Users, Student } from '../models/index.js';
 
-// Helper: Role identifier
+// Helper: Role key mapper
 const getRoleKey = (roleId, roleName) => {
   const id = Number(roleId);
   if (id === 1) return 'super_admin';
@@ -9,20 +9,18 @@ const getRoleKey = (roleId, roleName) => {
   return roleName ? roleName.toLowerCase().replace(/\s+/g, '_') : 'user';
 };
 
-// Helper: Token generator & parser (Identifies type: user vs student)
+// Helper: Token generator & parser
 const createToken = (type, id) => `auth_token_${type}_${id}_${Date.now()}`;
 
 const parseToken = (authHeader) => {
   if (!authHeader) return null;
   const token = authHeader.replace(/^Bearer\s+/i, '').trim();
 
-  // Pattern: auth_token_user_1_... or auth_token_student_5_...
   const match = token.match(/^auth_token_(user|student)_(\d+)_/i);
   if (match) {
     return { type: match[1].toLowerCase(), id: parseInt(match[2], 10) };
   }
 
-  // Legacy fallback: auth_token_1_...
   const legacyMatch = token.match(/^auth_token_(\d+)_/);
   if (legacyMatch) {
     return { type: 'user', id: parseInt(legacyMatch[1], 10) };
@@ -31,7 +29,7 @@ const parseToken = (authHeader) => {
   return null;
 };
 
-// Formatter: Users (Staff, Admin, Principal)
+// Formatter: User profile (Staff, Admin, Principal)
 const formatUserResponse = (model) => {
   const u = typeof model.toJSON === 'function' ? model.toJSON() : model;
   const roleName = u.role?.name || '';
@@ -51,7 +49,7 @@ const formatUserResponse = (model) => {
   };
 };
 
-// Formatter: Student
+// Formatter: Student profile
 const formatStudentResponse = (model) => {
   const s = typeof model.toJSON === 'function' ? model.toJSON() : model;
   const admNo = s.admission_no || s.admission_number || '';
@@ -103,14 +101,14 @@ export const authController = {
       const inputUser = username.trim();
       const inputPass = password.trim();
 
-      // ========================================================
-      // 1. CHECK USERS MODEL (Staff, Admin, Principal)
-      // ========================================================
+      // ==========================================
+      // 1. QUERY USERS TABLE (Using Sutando Model)
+      // ==========================================
       const user = await Users.query()
         .with(['role', 'branch'])
         .where((q) => {
-          q.whereRaw('LOWER(email) = ?', [inputUser.toLowerCase()])
-           .orWhereRaw('LOWER(name) = ?', [inputUser.toLowerCase()]);
+          q.where('email', inputUser)
+           .orWhere('name', inputUser);
         })
         .first();
 
@@ -122,7 +120,6 @@ export const authController = {
           });
         }
 
-        // Verify password
         const isUserPassValid =
           user.password === inputPass ||
           (Number(user.role_id) === 1 && (inputPass === 'admin123' || inputPass === 'School@123'));
@@ -139,14 +136,16 @@ export const authController = {
         });
       }
 
-      // ========================================================
-      // 2. CHECK STUDENT MODEL (Students login)
-      // ========================================================
+      // ==========================================
+      // 2. QUERY STUDENT TABLE (Using Sutando Model)
+      // ==========================================
       const student = await Student.query()
         .with(['class', 'section', 'branch'])
         .where((q) => {
-          q.whereRaw('LOWER(COALESCE(admission_no, "")) = ?', [inputUser.toLowerCase()])
-           .orWhereRaw('LOWER(COALESCE(email, "")) = ?', [inputUser.toLowerCase()])
+          q.where('admission_no', inputUser)
+           .orWhere('admission_number', inputUser)
+           .orWhere('email', inputUser)
+           .orWhere('parent_email', inputUser)
            .orWhere('roll_number', inputUser);
         })
         .first();
@@ -161,7 +160,7 @@ export const authController = {
       if (student.status && student.status.toLowerCase() === 'inactive') {
         return res.status(403).json({
           success: false,
-          message: 'Student account is inactive. Please contact school office.'
+          message: 'Student account is inactive. Please contact the school office.'
         });
       }
 
@@ -200,7 +199,7 @@ export const authController = {
 
       const { type, id } = parsed;
 
-      // 1. Fetch User by ID
+      // User / Staff
       if (type === 'user') {
         const user = await Users.query()
           .with(['role', 'branch'])
@@ -216,7 +215,7 @@ export const authController = {
         });
       }
 
-      // 2. Fetch Student by ID
+      // Student
       if (type === 'student') {
         const student = await Student.query()
           .with(['class', 'section', 'branch'])
