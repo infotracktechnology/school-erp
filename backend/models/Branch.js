@@ -12,7 +12,7 @@ export class Branch extends Model {
   }
 
   classes() {
-    return this.hasMany('ClassModel', 'branch_id');
+    return this.hasMany('Class', 'branch_id');
   }
 
   students() {

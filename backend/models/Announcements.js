@@ -7,7 +7,7 @@ export class Announcements extends Model {
     return this.belongsTo('Branch', 'branch_id');
   }
    class() {
-    return this.belongsTo('ClassModel', 'class_id');
+    return this.belongsTo('Class', 'class_id');
   }
   section() {
     return this.belongsTo('Section', 'section_id');

@@ -16,7 +16,7 @@ export class Student extends Model {
   }
 
   class() {
-    return this.belongsTo('ClassModel', 'class_id');
+    return this.belongsTo('Class', 'class_id');
   }
 
   section() {

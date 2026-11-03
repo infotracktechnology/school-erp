@@ -1,7 +1,8 @@
 ﻿import { Model } from 'sutando';
 
-export class ClassModel extends Model {
+export class Class extends Model {
   table = 'classes';
+
 
   branch() {
     return this.belongsTo('Branch', 'branch_id');
@@ -20,4 +21,4 @@ export class ClassModel extends Model {
   }
 }
 
-export default ClassModel;
+export default Class;

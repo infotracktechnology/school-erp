@@ -11,7 +11,7 @@ export class TimetableClassMapping extends Model {
   }
 
   class() {
-    return this.belongsTo('ClassModel', 'class_id');
+    return this.belongsTo('Class', 'class_id');
   }
 
   section() {
