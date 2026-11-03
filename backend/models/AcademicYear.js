@@ -8,7 +8,7 @@ export class AcademicYear extends Model {
   }
 
   classes() {
-    return this.hasMany('Class', 'academic_year_id');
+    return this.hasMany('ClassModel', 'academic_year_id');
   }
 
   students() {

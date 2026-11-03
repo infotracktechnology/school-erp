@@ -12,7 +12,7 @@ export class TimetableSlot extends Model {
   }
 
   class() {
-    return this.belongsTo('Class', 'class_id');
+    return this.belongsTo('ClassModel', 'class_id');
   }
 
   section() {

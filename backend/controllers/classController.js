@@ -1,4 +1,4 @@
-import { ClassModel } from '../models/ClassModel.js';
+import { Class } from '../models/ClassModel.js';
 import { sutando } from '../config/database.js';
 
 const knex = (table) => sutando.connection().table(table);

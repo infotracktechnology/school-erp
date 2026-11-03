@@ -15,8 +15,8 @@ export class Student extends Model {
     return this.belongsTo('AcademicYear', 'academic_year_id');
   }
 
-  class() {
-    return this.belongsTo('Class', 'class_id');
+  student_class() {
+    return this.belongsTo('ClassModel', 'class_id');
   }
 
   section() {

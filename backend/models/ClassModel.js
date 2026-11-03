@@ -1,6 +1,6 @@
 ﻿import { Model } from 'sutando';
 
-export class Class extends Model {
+export class ClassModel extends Model {
   table = 'classes';
 
 
@@ -21,4 +21,4 @@ export class Class extends Model {
   }
 }
 
-export default Class;
+export default ClassModel;
