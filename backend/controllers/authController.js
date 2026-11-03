@@ -140,7 +140,7 @@ export const authController = {
       // 2. QUERY STUDENT TABLE (Using Sutando Model)
       // ==========================================
       const student = await Student.query()
-        .with(['class', 'section', 'branch'])
+        .with(['classmodel', 'section', 'branch'])
         .where((q) => {
           q.where('admission_no', inputUser)
            .orWhere('admission_number', inputUser)
