@@ -47,9 +47,7 @@ export const anecdoteController = {
         JOIN students s ON a.student_id = s.id
         LEFT JOIN classes c ON a.class_id = c.id
         LEFT JOIN sections sec ON a.section_id = sec.id
-        LEFT JOIN users u ON a.created_by_user_id = u.id
-        WHERE 1=1
-      `;
+        LEFT JOIN users u ON a.created_by_user_id = u.id`;
       const params = [];
 
       if (branch_id && branch_id !== 'all' && branch_id !== '0') {
