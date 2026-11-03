@@ -146,7 +146,6 @@ export const authController = {
         .with(['class', 'section', 'branch'])
         .where((q) => {
           q.whereRaw('LOWER(COALESCE(admission_no, "")) = ?', [inputUser.toLowerCase()])
-           .orWhereRaw('LOWER(COALESCE(admission_number, "")) = ?', [inputUser.toLowerCase()])
            .orWhereRaw('LOWER(COALESCE(email, "")) = ?', [inputUser.toLowerCase()])
            .orWhere('roll_number', inputUser);
         })
