@@ -1,5 +1,6 @@
 import Student from '../models/Student.js';
-import admin from '../config/firebase.js';
+import { getMessaging } from 'firebase-admin/messaging';
+import '../config/firebase.js'; // Ensures firebase initializes
 
 export async function sendToStudent(targetId, payload = {}) {
   try {
@@ -39,7 +40,6 @@ export async function sendToStudent(targetId, payload = {}) {
       return { success: false, reason: 'No token' };
     }
 
-    
     const sanitizedData = Object.entries(payload.data || {}).reduce((acc, [k, v]) => {
       if (v !== undefined && v !== null) {
         acc[k] = typeof v === 'object' ? JSON.stringify(v) : String(v);
@@ -64,7 +64,8 @@ export async function sendToStudent(targetId, payload = {}) {
       tokens: tokenList,
     };
 
-    const response = await admin.messaging().sendEachForMulticast(message);
+    // 2. Use getMessaging() instead of admin.messaging()
+    const response = await getMessaging().sendEachForMulticast(message);
     console.log(
       `✅ [FCM] Sent to target ${targetId} (${tokenList.length} devices): Success: ${response.successCount}, Failure: ${response.failureCount}`
     );

@@ -1,4 +1,4 @@
-import admin from 'firebase-admin';
+import { initializeApp, cert, getApps, getApp } from 'firebase-admin/app';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -11,26 +11,25 @@ const serviceAccountPath = path.resolve(
   'school-erp-66d10-firebase-adminsdk-fbsvc-9b3d500817.json'
 );
 
-const apps = admin.getApps ? admin.getApps() : [];
 let app;
 
-if (!apps.length) {
+if (!getApps().length) {
   try {
     if (fs.existsSync(serviceAccountPath)) {
       const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
-      app = admin.initializeApp({
-        credential: admin.cert(serviceAccount),
+      app = initializeApp({
+        credential: cert(serviceAccount),
       });
       console.log('✅ [Firebase Admin] Initialized successfully with service account');
     } else {
       console.warn('⚠️ [Firebase Admin] Service account file not found at:', serviceAccountPath);
-      app = admin.initializeApp();
+      app = initializeApp();
     }
   } catch (error) {
     console.error('❌ [Firebase Admin] Initialization failed:', error);
   }
 } else {
-  app = admin.getApp();
+  app = getApp();
 }
 
-export default admin;
+export default app;
