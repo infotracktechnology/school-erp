@@ -1,6 +1,5 @@
 import { Users, Student } from '../models/index.js';
 
-// Helper: Role key mapper
 const getRoleKey = (roleId, roleName) => {
   const id = Number(roleId);
   if (id === 1) return 'super_admin';
@@ -9,7 +8,6 @@ const getRoleKey = (roleId, roleName) => {
   return roleName ? roleName.toLowerCase().replace(/\s+/g, '_') : 'user';
 };
 
-// Helper: Token generator & parser
 const createToken = (type, id) => `auth_token_${type}_${id}_${Date.now()}`;
 
 const parseToken = (authHeader) => {
@@ -29,18 +27,15 @@ const parseToken = (authHeader) => {
   return null;
 };
 
-// Formatter: User profile (Staff, Admin, Principal)
 const formatUserResponse = (model) => {
   const u = typeof model.toJSON === 'function' ? model.toJSON() : model;
   const roleName = u.role?.name || '';
-  const roleKey = getRoleKey(u.role_id, roleName);
-
   return {
     id: u.id,
     name: u.name,
     email: u.email,
     role_id: Number(u.role_id),
-    role: roleKey,
+    role: getRoleKey(u.role_id, roleName),
     role_name: roleName,
     branch_id: u.branch_id,
     branch_name: u.branch?.branch_name || null,
@@ -49,7 +44,6 @@ const formatUserResponse = (model) => {
   };
 };
 
-// Formatter: Student profile
 const formatStudentResponse = (model) => {
   const s = typeof model.toJSON === 'function' ? model.toJSON() : model;
   const admNo = s.admission_no || s.admission_number || '';
@@ -101,23 +95,17 @@ export const authController = {
       const inputUser = username.trim();
       const inputPass = password.trim();
 
-      // ==========================================
-      // 1. QUERY USERS TABLE (Using Sutando Model)
-      // ==========================================
+      // 1. Check USERS Model (Staff / Admin)
       const user = await Users.query()
         .with(['role', 'branch'])
         .where((q) => {
-          q.where('email', inputUser)
-           .orWhere('name', inputUser);
+          q.where('email', inputUser).orWhere('name', inputUser);
         })
         .first();
 
       if (user) {
         if (user.status && user.status.toLowerCase() === 'inactive') {
-          return res.status(403).json({
-            success: false,
-            message: 'Your account is inactive. Please contact the administrator.'
-          });
+          return res.status(403).json({ success: false, message: 'Account is inactive.' });
         }
 
         const isUserPassValid =
@@ -136,11 +124,9 @@ export const authController = {
         });
       }
 
-      // ==========================================
-      // 2. QUERY STUDENT TABLE (Using Sutando Model)
-      // ==========================================
+      // 2. Check STUDENT Model
       const student = await Student.query()
-        .with(['classmodel', 'section', 'branch'])
+        .with(['class', 'section', 'branch'])
         .where((q) => {
           q.where('admission_no', inputUser)
            .orWhere('admission_number', inputUser)
@@ -158,13 +144,9 @@ export const authController = {
       }
 
       if (student.status && student.status.toLowerCase() === 'inactive') {
-        return res.status(403).json({
-          success: false,
-          message: 'Student account is inactive. Please contact the school office.'
-        });
+        return res.status(403).json({ success: false, message: 'Student account is inactive.' });
       }
 
-      // Verify student password
       const admNo = (student.admission_no || student.admission_number || '').toLowerCase();
       const isStudentPassValid =
         student.password === inputPass ||
@@ -182,7 +164,6 @@ export const authController = {
         token: createToken('student', student.id),
         user: formatStudentResponse(student)
       });
-
     } catch (err) {
       console.error('[AuthController Login Error]', err);
       next(err);
@@ -194,41 +175,21 @@ export const authController = {
     try {
       const parsed = parseToken(req.headers.authorization);
       if (!parsed) {
-        return res.status(401).json({ success: false, message: 'Session token missing or invalid.' });
+        return res.status(401).json({ success: false, message: 'Missing or invalid session token.' });
       }
 
       const { type, id } = parsed;
 
-      // User / Staff
       if (type === 'user') {
-        const user = await Users.query()
-          .with(['role', 'branch'])
-          .find(id);
-
-        if (!user) {
-          return res.status(401).json({ success: false, message: 'User session expired.' });
-        }
-
-        return res.json({
-          success: true,
-          user: formatUserResponse(user)
-        });
+        const user = await Users.query().with(['role', 'branch']).find(id);
+        if (!user) return res.status(401).json({ success: false, message: 'Session expired.' });
+        return res.json({ success: true, user: formatUserResponse(user) });
       }
 
-      // Student
       if (type === 'student') {
-        const student = await Student.query()
-          .with(['class', 'section', 'branch'])
-          .find(id);
-
-        if (!student) {
-          return res.status(401).json({ success: false, message: 'Student session expired.' });
-        }
-
-        return res.json({
-          success: true,
-          user: formatStudentResponse(student)
-        });
+        const student = await Student.query().with(['class', 'section', 'branch']).find(id);
+        if (!student) return res.status(401).json({ success: false, message: 'Session expired.' });
+        return res.json({ success: true, user: formatStudentResponse(student) });
       }
 
       return res.status(401).json({ success: false, message: 'Invalid session.' });

@@ -1,4 +1,8 @@
 ﻿import { Model } from 'sutando';
+// Import your related models (or keep strings if globally registered)
+// import Branch from './Branch.js';
+// import ClassModel from './ClassModel.js';
+// import Section from './Section.js';
 
 export class Student extends Model {
   table = 'students';
@@ -7,23 +11,26 @@ export class Student extends Model {
     fcm_tokens: 'json',
   };
 
-  branch() {
+  // 1. Prefix with "relation" so Sutando registers the relation "branch"
+  relationBranch() {
     return this.belongsTo('Branch', 'branch_id');
   }
 
-  academicYear() {
+  relationAcademicYear() {
     return this.belongsTo('AcademicYear', 'academic_year_id');
   }
 
-  classmodel() {
+  // 2. Prefix with "relation" so Sutando registers the relation "class"
+  relationClass() {
     return this.belongsTo('ClassModel', 'class_id');
   }
 
-  section() {
+  // 3. Prefix with "relation" so Sutando registers the relation "section"
+  relationSection() {
     return this.belongsTo('Section', 'section_id');
   }
 
-  attendances() {
+  relationAttendances() {
     return this.hasMany('Attendance', 'student_id');
   }
 }

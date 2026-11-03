@@ -2,10 +2,12 @@
 
 export class Users extends Model {
   table = 'users';
-  branch() {
+
+  relationBranch() {
     return this.belongsTo('Branch', 'branch_id');
   }
-  role() {
+
+  relationRole() {
     return this.belongsTo('Roles', 'role_id');
   }
 }
