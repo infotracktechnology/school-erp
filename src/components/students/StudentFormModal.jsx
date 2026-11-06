@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Users, MapPin, GraduationCap, Bus, Save, Loader2, AlertCircle } from 'lucide-react';
+import { User, Users, MapPin, GraduationCap, Bus, Save, Loader2, AlertCircle, ChevronRight, ChevronLeft, CheckCircle } from 'lucide-react';
 import { createStudent, updateStudent, getStudentById, getClasses, getSections, getAcademicGroups } from '../../services/api';
 import {
   Dialog,
@@ -250,25 +250,79 @@ export const StudentFormModal = ({ isOpen, studentId, branchId, academicYearId, 
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const SECTIONS = ['academic', 'personal', 'parents', 'address', 'facilities'];
+  const currentStepIndex = SECTIONS.indexOf(activeSection);
+  const isFirstStep = currentStepIndex <= 0;
+  const isLastStep = currentStepIndex === SECTIONS.length - 1;
+
+  useEffect(() => {
+    if (isOpen) {
+      setActiveSection('academic');
+      setErrorMessage(null);
+    }
+  }, [isOpen]);
+
+  const handleNext = (e) => {
+    if (e) e.preventDefault();
     setErrorMessage(null);
 
-    // Validate required fields
-    if (!formData.first_name.trim() || !formData.last_name.trim()) {
-      setErrorMessage('First and Last names are mandatory required fields.');
-      setActiveSection('personal');
+    // Step-specific validation before moving forward
+    if (activeSection === 'academic') {
+      const admNo = formData.admission_number || formData.admission_no || '';
+      if (!admNo.trim()) {
+        setErrorMessage('Admission Number is a mandatory required field.');
+        return;
+      }
+      if (!formData.class_id || !formData.section_id) {
+        setErrorMessage('Please assign a Class and Section for enrollment.');
+        return;
+      }
+    } else if (activeSection === 'personal') {
+      if (!formData.first_name.trim() || !formData.last_name.trim()) {
+        setErrorMessage('First and Last names are mandatory required fields.');
+        return;
+      }
+    }
+
+    if (currentStepIndex < SECTIONS.length - 1) {
+      setActiveSection(SECTIONS[currentStepIndex + 1]);
+    }
+  };
+
+  const handlePrevious = (e) => {
+    if (e) e.preventDefault();
+    setErrorMessage(null);
+    if (currentStepIndex > 0) {
+      setActiveSection(SECTIONS[currentStepIndex - 1]);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // If submitted via enter key while not on the final step, advance to next step
+    if (!isLastStep) {
+      handleNext(e);
       return;
     }
+
+    setErrorMessage(null);
+
+    // Comprehensive validation across all required sections
     const admNo = formData.admission_number || formData.admission_no || '';
     if (!admNo.trim()) {
-      setErrorMessage('Admission Number (admission_no) is mandatory required field.');
+      setErrorMessage('Admission Number (admission_no) is a mandatory required field.');
       setActiveSection('academic');
       return;
     }
     if (!formData.class_id || !formData.section_id) {
       setErrorMessage('Please assign a Class and Section for enrollment.');
       setActiveSection('academic');
+      return;
+    }
+    if (!formData.first_name.trim() || !formData.last_name.trim()) {
+      setErrorMessage('First and Last names are mandatory required fields.');
+      setActiveSection('personal');
       return;
     }
 
@@ -345,7 +399,7 @@ export const StudentFormModal = ({ isOpen, studentId, branchId, academicYearId, 
           </div>
 
           {/* Form Body */}
-          <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          <form noValidate onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0 overflow-hidden">
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
               {errorMessage && (
                 <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center space-x-2">
@@ -831,23 +885,51 @@ export const StudentFormModal = ({ isOpen, studentId, branchId, academicYearId, 
 
             {/* Footer Actions */}
             <DialogFooter className="bg-muted/30 p-4 px-6 border-t border-border flex items-center justify-between sm:justify-between">
-              <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
-                Cancel
-              </Button>
-
-              <Button type="submit" variant="emerald" disabled={isSubmitting} className="font-bold">
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    <span>Saving record...</span>
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    <span>{isEdit ? 'Save Changes' : 'Register Student'}</span>
-                  </>
+              <div className="flex items-center space-x-2">
+                <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
+                  Cancel
+                </Button>
+                {!isFirstStep && (
+                  <Button type="button" variant="outline" onClick={handlePrevious} disabled={isSubmitting}>
+                    <ChevronLeft className="w-4 h-4 mr-1" />
+                    <span>Previous</span>
+                  </Button>
                 )}
-              </Button>
+              </div>
+
+              <div>
+                {!isLastStep ? (
+                  <Button 
+                    type="button" 
+                    variant="emerald" 
+                    onClick={handleNext} 
+                    disabled={isSubmitting} 
+                    className="font-bold flex items-center"
+                  >
+                    <span>Save & Next</span>
+                    <ChevronRight className="w-4 h-4 ml-1.5" />
+                  </Button>
+                ) : (
+                  <Button 
+                    type="submit" 
+                    variant="emerald" 
+                    disabled={isSubmitting} 
+                    className="font-bold flex items-center"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        <span>Saving record...</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        <span>Finish</span>
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
             </DialogFooter>
           </form>
         </Tabs>
