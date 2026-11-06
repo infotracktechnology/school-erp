@@ -41,12 +41,7 @@ export const HomeworkView = ({ branchId, academicYearId, classes, sections, show
     const [formTitle, setFormTitle] = useState('');
     const [formDescription, setFormDescription] = useState('');
     const [formAssignedDate, setFormAssignedDate] = useState(new Date().toISOString().split('T')[0]);
-    const [formDueDate, setFormDueDate] = useState(() => {
-        const d = new Date();
-        d.setDate(d.getDate() + 2);
-        return d.toISOString().split('T')[0];
-    });
-
+  
     // Schedule Checkbox & start_at
     const [isScheduled, setIsScheduled] = useState(false);
     const [formStartAt, setFormStartAt] = useState('');
@@ -156,7 +151,7 @@ export const HomeworkView = ({ branchId, academicYearId, classes, sections, show
         setFormAssignedDate(new Date().toISOString().split('T')[0]);
         const d = new Date();
         d.setDate(d.getDate() + 2);
-        setFormDueDate(d.toISOString().split('T')[0]);
+        //setFormDueDate(d.toISOString().split('T')[0]);
         setIsScheduled(false);
         setFormStartAt('');
         setHasAttachments(false);
@@ -176,7 +171,7 @@ export const HomeworkView = ({ branchId, academicYearId, classes, sections, show
         setFormTitle(hw.title || '');
         setFormDescription(hw.description || hw.instructions || '');
         setFormAssignedDate(hw.assigned_date ? hw.assigned_date.split('T')[0] : new Date().toISOString().split('T')[0]);
-        setFormDueDate(hw.due_date ? hw.due_date.split('T')[0] : '');
+        //setFormDueDate(hw.due_date ? hw.due_date.split('T')[0] : '');
 
         const scheduled = Boolean(hw.is_scheduled || hw.status === 'Scheduled');
         setIsScheduled(scheduled);
@@ -302,7 +297,7 @@ export const HomeworkView = ({ branchId, academicYearId, classes, sections, show
                 description: formDescription.trim(),
                 instructions: '',
                 assigned_date: formAssignedDate,
-                due_date: formDueDate,
+                //due_date: formDueDate,
                 is_scheduled: isScheduled ? 1 : 0,
                 start_at: isScheduled && formStartAt ? formStartAt : null,
                 status: finalStatus,
@@ -799,18 +794,7 @@ export const HomeworkView = ({ branchId, academicYearId, classes, sections, show
                                 </div>
 
                                 {/* Due Date */}
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                                        Due Date <span className="text-rose-500">*</span>
-                                    </label>
-                                    <input 
-                                        type="date" 
-                                        required 
-                                        value={formDueDate} 
-                                        onChange={(e) => setFormDueDate(e.target.value)} 
-                                        className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 font-medium focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500" 
-                                    />
-                                </div>
+                                
                             </div>
 
                             {/* Schedule Checkbox & Conditional start_at */}

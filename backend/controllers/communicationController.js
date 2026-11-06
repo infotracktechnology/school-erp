@@ -109,33 +109,46 @@ export const communicationController = {
         user_id: payload.created_by || 1
       });
 
-              // Send notification to all students of the class/section
-        try {
-          const studentRows = await knex('students')
-            .where('class_id', payload.class_id)
-            .andWhere('section_id', payload.section_id);
+      // Send notification to all students of the class/section
+      try {
+        let studentQuery = knex('students').select('id', 'user_id');
 
-          const notifPayload = {
-            title: `New Homework: ${payload.title || payload.subject_name || 'Assignment'}`,
-            body: payload.description || payload.topic || 'New homework posted for your class.',
-            data: { 
-              homeworkId: id.toString(),
-              type: 'homework'
-            },
-          };
-
-          // Find target user IDs (prefer student.user_id, fallback to student.id if user_id is null)
-          const targetUserIds = studentRows.map(row => row.id).filter(Boolean);
-          
-          console.log(`[Homework Notification] Targeting ${targetUserIds.length} students for class=${payload.class_id}, section=${payload.section_id}:`, targetUserIds);
-
-          // Fire-and-forget notifications
-          Promise.all(
-            targetUserIds.map((userId) => sendToUser(userId, notifPayload))
-          ).catch(err => console.error('[Homework Notification] Error in batch send:', err));
-        } catch (notifErr) {
-          console.error('[Homework Notification] Query error:', notifErr);
+        if (payload.branch_id && payload.branch_id !== 'all') {
+          studentQuery = studentQuery.where('branch_id', Number(payload.branch_id));
         }
+
+        if (payload.class_id && payload.class_id !== 'all') {
+          studentQuery = studentQuery.where('class_id', Number(payload.class_id));
+        }
+
+        // Only filter by section_id if a specific section is chosen (and not null / 0 / 'all')
+        if (payload.section_id && payload.section_id !== 'all' && Number(payload.section_id) > 0) {
+          studentQuery = studentQuery.where('section_id', Number(payload.section_id));
+        }
+
+        const studentRows = await studentQuery;
+
+        const notifPayload = {
+          title: `New Homework: ${payload.title || payload.subject_name || 'Assignment'}`,
+          body: payload.description || payload.topic || 'New homework posted for your class.',
+          data: { 
+            homeworkId: id.toString(),
+            type: 'homework'
+          },
+        };
+
+        // Find target user IDs (prefer student.user_id, fallback to student.id if user_id is null)
+        const targetUserIds = studentRows.map(row => row.user_id || row.id).filter(Boolean);
+        
+        console.log(`[Homework Notification] Targeting ${targetUserIds.length} students for class=${payload.class_id}, section=${payload.section_id || 'all'}:`, targetUserIds);
+
+        // Fire-and-forget notifications
+        Promise.all(
+          targetUserIds.map((userId) => sendToUser(userId, notifPayload))
+        ).catch(err => console.error('[Homework Notification] Error in batch send:', err));
+      } catch (notifErr) {
+        console.error('[Homework Notification] Query error:', notifErr);
+      }
         res.status(201).json({ success: true, id, message: 'Homework created' });
     } catch (err) {
       next(err);

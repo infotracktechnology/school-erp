@@ -86,9 +86,13 @@ export const studentController = {
         const numTerm = Number(search.trim());
         query = query.where((builder) => {
           builder
-            .where('sp.first_name', 'like', term)
+            .where('s.first_name', 'like', term)
+            .orWhere('s.last_name', 'like', term)
+            .orWhere('sp.first_name', 'like', term)
             .orWhere('sp.last_name', 'like', term)
             .orWhere('s.admission_no', 'like', term)
+            .orWhere('s.admission_number', 'like', term)
+            .orWhere('s.parent_name', 'like', term)
             .orWhere('p.father_name', 'like', term);
           if (!isNaN(numTerm) && numTerm > 0) {
             builder.orWhere('s.id', numTerm);
@@ -105,6 +109,8 @@ export const studentController = {
       const ps = Math.max(1, Number(page_size));
       const offset = (p - 1) * ps;
 
+      const sortCol = sort_by === 'first_name' ? 's.first_name' : (sort_by === 'admission_number' ? 's.admission_no' : (sort_by === 'class_id' ? 's.class_id' : 's.id'));
+
       const rows = await query
         .select(
           's.id',
@@ -112,6 +118,14 @@ export const studentController = {
           's.branch_id',
           's.user_id',
           's.admission_no',
+          's.admission_number as s_admission_number',
+          's.roll_number as s_roll_number',
+          's.first_name as s_first_name',
+          's.last_name as s_last_name',
+          's.parent_name as s_parent_name',
+          's.parent_phone as s_parent_phone',
+          's.parent_email as s_parent_email',
+          's.address as s_address',
           's.dob',
           's.gender',
           's.class_id',
@@ -120,11 +134,12 @@ export const studentController = {
           's.status',
           's.created_at',
           's.updated_at',
-          'sp.first_name',
-          'sp.last_name',
-          'sp.blood_group',
-          'sp.address',
-          'sp.parent_phone',
+          'sp.first_name as sp_first_name',
+          'sp.last_name as sp_last_name',
+          'sp.blood_group as sp_blood_group',
+          'sp.address as sp_address',
+          'sp.parent_phone as sp_parent_phone',
+          'sp.parent_name as sp_parent_name',
           'sp.extra_details',
           'c.class_name',
           'c.numeric_value',
@@ -136,7 +151,7 @@ export const studentController = {
           'p.email as father_email',
           'b.branch_name'
         )
-        .orderBy('s.id', sort_order?.toLowerCase() === 'desc' ? 'desc' : 'asc')
+        .orderBy(sortCol, sort_order?.toLowerCase() === 'desc' ? 'desc' : 'asc')
         .limit(ps)
         .offset(offset);
 
@@ -150,14 +165,19 @@ export const studentController = {
           }
         }
 
-        const fn = r.first_name || '';
-        const ln = r.last_name || '';
+        const fn = (r.s_first_name || r.sp_first_name || '').trim();
+        const ln = (r.s_last_name || r.sp_last_name || '').trim();
         const fullName = `${fn} ${ln}`.trim() || `Student #${r.id}`;
+        const admNo = r.s_admission_number || r.admission_no || (r.id ? `ADM-2025-${String(r.id).padStart(3, '0')}` : '');
+        const parentName = r.s_parent_name || r.father_name || r.sp_parent_name || extra.father_name || '';
+        const parentMobile = r.s_parent_phone || r.father_phone || r.sp_parent_phone || extra.father_mobile || '';
+        const rollNo = r.s_roll_number || extra.roll_number || (idx + 1);
+
         return {
           ...extra,
           id: r.id,
           student_id: r.id,
-          admission_number: r.admission_no || `ADM-${r.id}`,
+          admission_number: admNo,
           first_name: fn,
           last_name: ln,
           middle_name: extra.middle_name || '',
@@ -167,19 +187,21 @@ export const studentController = {
           section_id: r.section_id,
           section_name: r.section_name || 'A',
           academic_year_id: r.academic_year_id || null,
-          roll_number: extra.roll_number || r.numeric_value || (idx + 1),
+          roll_number: rollNo,
           gender: r.gender || 'Male',
           dob: r.dob,
-          blood_group: r.blood_group || 'O+',
-          student_mobile: r.parent_phone || r.father_phone || '',
-          father_name: r.father_name || extra.father_name || '',
-          father_mobile: r.father_phone || extra.father_mobile || '',
+          blood_group: r.sp_blood_group || extra.blood_group || 'O+',
+          student_mobile: parentMobile,
+          parent_name: parentName,
+          father_name: parentName,
+          father_mobile: parentMobile,
           mother_name: r.mother_name || extra.mother_name || '',
           current_status: r.status || 'Active',
           fee_status: 'Paid',
           hostel_status: 'Day Scholar',
           transport_opted: 0,
           branch_name: r.branch_name || 'Main Campus',
+          address: r.s_address || r.sp_address || extra.address || '',
           created_at: r.created_at,
           updated_at: r.updated_at,
         };
@@ -217,14 +239,22 @@ export const studentController = {
         .where('s.id', req.params.id)
         .select(
           's.*',
-          'sp.first_name',
-          'sp.last_name',
+          's.first_name as s_first_name',
+          's.last_name as s_last_name',
+          's.admission_number as s_admission_number',
+          's.admission_no as s_admission_no',
+          's.roll_number as s_roll_number',
+          's.parent_name as s_parent_name',
+          's.parent_phone as s_parent_phone',
+          's.address as s_address',
+          'sp.first_name as sp_first_name',
+          'sp.last_name as sp_last_name',
           'sp.dob as sp_dob',
           'sp.gender as sp_gender',
-          'sp.blood_group',
-          'sp.address',
-          'sp.parent_name',
-          'sp.parent_phone',
+          'sp.blood_group as sp_blood_group',
+          'sp.address as sp_address',
+          'sp.parent_name as sp_parent_name',
+          'sp.parent_phone as sp_parent_phone',
           'sp.extra_details',
           'c.class_name',
           'sec.section_name',
@@ -249,24 +279,31 @@ export const studentController = {
         }
       }
 
-      const fn = r.first_name || '';
-      const ln = r.last_name || '';
+      const fn = (r.s_first_name || r.sp_first_name || r.first_name || '').trim();
+      const ln = (r.s_last_name || r.sp_last_name || r.last_name || '').trim();
+      const admNo = r.s_admission_number || r.s_admission_no || r.admission_no || (r.id ? `ADM-2025-${String(r.id).padStart(3, '0')}` : '');
+      const parentName = r.s_parent_name || r.father_name || r.sp_parent_name || extra.father_name || '';
+      const parentMobile = r.s_parent_phone || r.sp_parent_phone || r.parent_phone_fallback || extra.father_mobile || '';
+
       const studentData = {
         ...extra,
         id: r.id,
         student_id: r.id,
-        admission_number: r.admission_no || `ADM-${r.id}`,
+        admission_number: admNo,
         first_name: fn,
         last_name: ln,
         middle_name: extra.middle_name || '',
         full_name: `${fn} ${ln}`.trim() || `Student #${r.id}`,
         class_id: r.class_id,
         section_id: r.section_id,
-        roll_number: extra.roll_number || r.id,
+        roll_number: r.s_roll_number || extra.roll_number || r.id,
         gender: r.gender || 'Male',
         date_of_birth: r.dob,
-        blood_group: r.blood_group || 'O+',
-        student_mobile: r.parent_phone || r.parent_phone_fallback || '',
+        blood_group: r.sp_blood_group || extra.blood_group || 'O+',
+        student_mobile: parentMobile,
+        parent_name: parentName,
+        parent_phone: parentMobile,
+        address: r.s_address || r.sp_address || extra.address || '',
         current_status: r.status || 'Active',
         branch_id: r.branch_id,
       };
