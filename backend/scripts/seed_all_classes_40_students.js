@@ -15,31 +15,53 @@ const boyFirstNames = [
   'Aarav', 'Advait', 'Arjun', 'Aryan', 'Dhruv', 'Ishaan', 'Kabir', 'Reyansh', 'Vihaan', 'Vivaan',
   'Aadi', 'Anay', 'Atharv', 'Darsh', 'Kavin', 'Krishna', 'Madhav', 'Nirmal', 'Pranav', 'Raghav',
   'Rohan', 'Samar', 'Sai', 'Shreyas', 'Siddharth', 'Tejas', 'Utkarsh', 'Varun', 'Ved', 'Yuvan',
-  'Aditya', 'Devan', 'Harish', 'Manoj', 'Karthik', 'Sanjay', 'Vignesh', 'Balamurugan', 'Ashwin', 'Gautham'
+  'Aditya', 'Devan', 'Harish', 'Manoj', 'Karthik', 'Sanjay', 'Vignesh', 'Balamurugan', 'Ashwin', 'Gautham',
+  'Abhay', 'Akash', 'Akhil', 'Alok', 'Aman', 'Aniket', 'Anish', 'Ankit', 'Apoorv', 'Arman',
+  'Ayush', 'Bharat', 'Chirag', 'Deepak', 'Dev', 'Harsh', 'Hiten', 'Jai', 'Jayant', 'Jatin',
+  'Karan', 'Keshav', 'Kunal', 'Laksh', 'Lokesh', 'Manan', 'Mayank', 'Mohit', 'Nakul', 'Namit',
+  'Naveen', 'Neeraj', 'Nikhil', 'Nishant', 'Nitesh', 'Ojas', 'Parth', 'Piyush', 'Pradeep', 'Prakash',
+  'Puneet', 'Rahul', 'Raj', 'Rajat', 'Rajesh', 'Rakesh', 'Rishabh', 'Rituraj', 'Rohit', 'Sachin',
+  'Sahil', 'Sameer', 'Sanket', 'Satyam', 'Saurabh', 'Shashi', 'Shivam', 'Shlok', 'Soham', 'Srijan',
+  'Subhash', 'Sudhir', 'Sumit', 'Sunil', 'Suraj', 'Sushant', 'Tanish', 'Tanmay', 'Tarun', 'Uday',
+  'Vaibhav', 'Vikas', 'Vinay', 'Vishal', 'Vivek', 'Yash', 'Yogesh', 'Bhavin', 'Chetan', 'Dinesh'
 ];
 
 const girlFirstNames = [
   'Aanya', 'Aadhya', 'Aarohi', 'Ananya', 'Diya', 'Ishita', 'Kiara', 'Myra', 'Navya', 'Pari',
   'Riya', 'Saanvi', 'Samaira', 'Sara', 'Siya', 'Tara', 'Vanya', 'Anika', 'Avani', 'Divya',
   'Kavya', 'Krithika', 'Meera', 'Nitya', 'Pooja', 'Priya', 'Rithika', 'Sneha', 'Swathi', 'Tanvi',
-  'Trisha', 'Varsha', 'Vedika', 'Yashika', 'Deepa', 'Lavanya', 'Malini', 'Pavithra', 'Soundarya', 'Janani'
+  'Trisha', 'Varsha', 'Vedika', 'Yashika', 'Deepa', 'Lavanya', 'Malini', 'Pavithra', 'Soundarya', 'Janani',
+  'Aarti', 'Aditi', 'Akanksha', 'Amrita', 'Anjali', 'Anusha', 'Aparna', 'Archana', 'Barkha', 'Bhavna',
+  'Charu', 'Damini', 'Deepika', 'Drishti', 'Garima', 'Gayatri', 'Gunjan', 'Harshita', 'Heena', 'Ishani',
+  'Janki', 'Juhi', 'Jyoti', 'Kajal', 'Karishma', 'Komal', 'Kriti', 'Mahima', 'Manisha', 'Mansi',
+  'Medha', 'Muskan', 'Nalini', 'Namrata', 'Nandini', 'Natasha', 'Neha', 'Nidhi', 'Payal', 'Pallavi',
+  'Prerna', 'Priyanka', 'Radhika', 'Rashi', 'Raveena', 'Rekha', 'Ritu', 'Roshni', 'Sakshi', 'Saloni',
+  'Sanya', 'Sarita', 'Seema', 'Shalini', 'Shikha', 'Shivani', 'Shreya', 'Simran', 'Sonal', 'Sonali',
+  'Sonam', 'Sonia', 'Sunita', 'Sushma', 'Tanya', 'Tarini', 'Urvashi', 'Vaishali', 'Vidya', 'Vrinda'
 ];
 
 const lastNames = [
   'Kumar', 'Sharma', 'Iyer', 'Menon', 'Pillai', 'Nair', 'Patel', 'Reddy', 'Rao', 'Sundaram',
-  'Venkatesan', 'Krishnan', 'Raman', 'Subramanian', 'Balaji', 'Natarajan', 'Karthik', 'Murugan', 'Balamurugan', 'Ramachandran',
-  'Prakash', 'Vijay', 'Varma', 'Joshi', 'Mehta', 'Das', 'Kulkarni', 'Gupta', 'Singh', 'Bhat',
-  'Nambiar', 'Shenoy', 'Chidambaram', 'Srinivasan', 'Raghavan', 'Narayanan', 'Swaminathan', 'Muthusamy', 'Thangavel', 'Senthil'
+  'Venkatesan', 'Krishnan', 'Raman', 'Subramanian', 'Balaji', 'Natarajan', 'Murugan', 'Balamurugan', 'Ramachandran', 'Prakash',
+  'Vijay', 'Varma', 'Joshi', 'Mehta', 'Das', 'Kulkarni', 'Gupta', 'Singh', 'Bhat', 'Nambiar',
+  'Shenoy', 'Chidambaram', 'Srinivasan', 'Raghavan', 'Narayanan', 'Swaminathan', 'Muthusamy', 'Thangavel', 'Senthil', 'Bose',
+  'Sen', 'Mukherjee', 'Banerjee', 'Chatterjee', 'Dutta', 'Ghosh', 'Roy', 'Choudhury', 'Mishra', 'Pandey',
+  'Tiwari', 'Tripathi', 'Shukla', 'Dwivedi', 'Verma', 'Agarwal', 'Jain', 'Mittal', 'Bansal', 'Goel',
+  'Goyal', 'Singhal', 'Mahajan', 'Kapoor', 'Malhotra', 'Khanna', 'Chopra', 'Anand', 'Sethi', 'Grover',
+  'Arora', 'Bhatia', 'Saxena', 'Mathur', 'Srivastava', 'Deshmukh', 'Patil', 'Kadam', 'Shinde', 'Jadhav',
+  'Pawar', 'Gaikwad', 'More', 'Chauhan', 'Rathore', 'Solanki', 'Parmar', 'Shekhawat', 'Kashyap', 'Chhabra'
 ];
 
 const fatherFirstNames = [
   'Rajesh', 'Suresh', 'Venkatesh', 'Ramesh', 'Anand', 'Natarajan', 'Gopinath', 'Senthil', 'Murugan', 'Karthikeyan',
-  'Saravanan', 'Ganesh', 'Manikandan', 'Baskaran', 'Ravichandran', 'Chandran', 'Sundaram', 'Krishnakumar', 'Dhanasekaran', 'Shanmugam'
+  'Saravanan', 'Ganesh', 'Manikandan', 'Baskaran', 'Ravichandran', 'Chandran', 'Sundaram', 'Krishnakumar', 'Dhanasekaran', 'Shanmugam',
+  'Balakrishnan', 'Subramani', 'Mohan', 'Arumugam', 'Palanisamy', 'Velumani', 'Vijayan', 'Rajan', 'Radhakrishnan', 'Sridhar'
 ];
 
 const motherFirstNames = [
   'Lakshmi', 'Geetha', 'Deepa', 'Shanthi', 'Revathi', 'Radha', 'Kalyani', 'Parvathi', 'Gayathri', 'Bhuvaneshwari',
-  'Sumathi', 'Meenakshi', 'Usha', 'Saraswathi', 'Vijayalakshmi', 'Kavitha', 'Mallika', 'Vasanthi', 'Padma', 'Sudha'
+  'Sumathi', 'Meenakshi', 'Usha', 'Saraswathi', 'Vijayalakshmi', 'Kavitha', 'Mallika', 'Vasanthi', 'Padma', 'Sudha',
+  'Kamala', 'Anitha', 'Karpagam', 'Selvi', 'Sangeetha', 'Shubha', 'Malathi', 'Latha', 'Shobana', 'Vimala'
 ];
 
 const bloodGroups = ['A+', 'B+', 'O+', 'AB+', 'A-', 'B-', 'O-'];
@@ -56,17 +78,19 @@ const addresses = [
   '67 Marudhamalai Road, Vadavalli, Coimbatore 641046',
   '91 Thadagam Road, Ramanathapuram, Coimbatore 641045',
   '102 Avinashi Road, Hopes College, Coimbatore 641004',
-  '54 Bharathiar Road, Papanaickenpalayam, Coimbatore 641037'
+  '54 Bharathiar Road, Papanaickenpalayam, Coimbatore 641037',
+  '18 Cowley Brown Road, RS Puram, Coimbatore 641002',
+  '82 Mettupalayam Road, Kavundampalayam, Coimbatore 641030',
+  '27 Pollachi Road, Sundarapuram, Coimbatore 641024',
+  '94 Vilankurichi Road, Cheran Ma Nagar, Coimbatore 641035'
 ];
 
 async function run() {
-  console.log('🚀 Starting student dataset standardization to 40 students per class section...');
+  console.log('🚀 Regenerating student records with 100% UNIQUE & DIVERSE names across all 800 students...');
 
-  // 1. Fetch all Branch 1 classes and sections
   const classes = await db('classes').where('branch_id', 1).orderBy('numeric_value', 'asc');
-  console.log(`Found ${classes.length} classes for Branch 1`);
-
   let globalAdmIndex = 1;
+  const usedFullNames = new Set();
 
   for (const cls of classes) {
     const classNum = cls.numeric_value || 1;
@@ -77,57 +101,52 @@ async function run() {
       .where('class_id', cls.id)
       .orderBy('section_name', 'asc');
 
-    console.log(`\n📚 Processing Class ${classNum} (${cls.class_name}) - ${sections.length} sections:`);
-
     for (const sec of sections) {
-      console.log(`  👉 Section ${sec.section_name} (ID: ${sec.id}):`);
+      console.log(`📚 Standardizing Class ${classNum} Section ${sec.section_name} (ID: ${sec.id})...`);
 
-      // Get existing students in this section
-      const existingStudents = await db('students')
-        .where('branch_id', 1)
-        .where('class_id', cls.id)
-        .where('section_id', sec.id)
-        .orderBy('id', 'asc');
-
-      console.log(`     Current student count: ${existingStudents.length}`);
-
-      // If more than 40 students (like in Class 1 Sec A), trim non-referenced test students down to 40
-      if (existingStudents.length > 40) {
-        const toKeep = existingStudents.slice(0, 40);
-        const toRemove = existingStudents.slice(40);
-        const removeIds = toRemove.map(s => s.id);
-
-        // Delete dependencies first
-        await db('student_subjects').whereIn('student_id', removeIds).del();
-        await db('academic_group_students').whereIn('student_id', removeIds).del();
-        await db('student_profiles').whereIn('id', removeIds).del();
-        await db('students').whereIn('id', removeIds).del();
-        console.log(`     ✂️ Trimmed ${toRemove.length} excess test records down to 40 students.`);
-      }
-
-      // Re-fetch existing students after potential trim
       const currentStudents = await db('students')
         .where('branch_id', 1)
         .where('class_id', cls.id)
         .where('section_id', sec.id)
         .orderBy('id', 'asc');
 
-      // Now ensure we have exactly 40 students
+      // We need 40 unique students for this section
       for (let roll = 1; roll <= 40; roll++) {
-        const isBoy = roll % 2 !== 0;
-        const firstName = isBoy 
-          ? boyFirstNames[(roll - 1) % boyFirstNames.length]
-          : girlFirstNames[(roll - 1) % girlFirstNames.length];
-        const lastName = lastNames[(globalAdmIndex * 7 + roll) % lastNames.length];
+        const isBoy = roll % 2 !== 0; // Odd = boy, Even = girl
+
+        // Pick unique first name + last name combination
+        let firstName, lastName, fullName;
+        let attempt = 0;
+
+        do {
+          const fnIndex = isBoy 
+            ? ((globalAdmIndex * 3 + roll * 7 + attempt) % boyFirstNames.length)
+            : ((globalAdmIndex * 5 + roll * 11 + attempt) % girlFirstNames.length);
+
+          const lnIndex = (globalAdmIndex * 13 + roll * 17 + attempt * 19) % lastNames.length;
+
+          firstName = isBoy ? boyFirstNames[fnIndex] : girlFirstNames[fnIndex];
+          lastName = lastNames[lnIndex];
+          fullName = `${firstName} ${lastName}`;
+          attempt++;
+        } while (usedFullNames.has(fullName) && attempt < 200);
+
+        usedFullNames.add(fullName);
+
         const gender = isBoy ? 'Male' : 'Female';
-        const fatherName = `${fatherFirstNames[(roll * 3) % fatherFirstNames.length]} ${lastName}`;
-        const motherName = `${motherFirstNames[(roll * 5) % motherFirstNames.length]} ${lastName}`;
-        const bloodGroup = bloodGroups[(roll * 2) % bloodGroups.length];
-        const address = addresses[(roll + classNum) % addresses.length];
-        const parentPhone = `9842${String(100000 + (classNum * 1000) + (sec.id * 100) + roll).padStart(6, '0')}`.substring(0, 10);
+        const fatherFn = fatherFirstNames[(globalAdmIndex * 3 + roll) % fatherFirstNames.length];
+        const motherFn = motherFirstNames[(globalAdmIndex * 7 + roll) % motherFirstNames.length];
+        const fatherName = `${fatherFn} ${lastName}`;
+        const motherName = `${motherFn} ${lastName}`;
+        const bloodGroup = bloodGroups[(globalAdmIndex + roll) % bloodGroups.length];
+        const address = addresses[(globalAdmIndex + roll) % addresses.length];
+
+        // Unique 10-digit phone: 9842 + 6 unique digits derived from globalAdmIndex
+        const parentPhone = `9842${String(100000 + globalAdmIndex * 111).slice(-6)}`;
         const admNum = `ADM-2025-${String(globalAdmIndex).padStart(3, '0')}`;
-        const birthMonth = String(((roll * 3) % 12) + 1).padStart(2, '0');
-        const birthDay = String(((roll * 7) % 28) + 1).padStart(2, '0');
+
+        const birthMonth = String(((roll * 5 + globalAdmIndex) % 12) + 1).padStart(2, '0');
+        const birthDay = String(((roll * 7 + globalAdmIndex) % 28) + 1).padStart(2, '0');
         const dob = `${birthYear}-${birthMonth}-${birthDay}`;
 
         const studentData = {
@@ -157,12 +176,9 @@ async function run() {
 
         let studentId;
         if (roll <= currentStudents.length) {
-          // Update existing student
-          const existing = currentStudents[roll - 1];
-          studentId = existing.id;
+          studentId = currentStudents[roll - 1].id;
           await db('students').where('id', studentId).update(studentData);
         } else {
-          // Insert new student to reach 40
           const [newId] = await db('students').insert({
             ...studentData,
             created_at: new Date()
@@ -170,8 +186,7 @@ async function run() {
           studentId = newId;
         }
 
-        // Also ensure student_profiles has matching clean record
-        const existingProfile = await db('student_profiles').where('id', studentId).first();
+        // Update student_profiles with matching data
         const profileData = {
           admission_number: admNum,
           first_name: firstName,
@@ -186,6 +201,7 @@ async function run() {
           updated_at: new Date()
         };
 
+        const existingProfile = await db('student_profiles').where('id', studentId).first();
         if (existingProfile) {
           await db('student_profiles').where('id', studentId).update(profileData);
         } else {
@@ -199,75 +215,15 @@ async function run() {
 
         globalAdmIndex++;
       }
-
-      // Check section capacity is set to 40
-      await db('sections').where('id', sec.id).update({ capacity: 40 });
-
-      // Automatically map compulsory subjects for all students in this class
-      const classSubjects = await db('class_subjects')
-        .where('branch_id', 1)
-        .where('class_id', cls.id)
-        .where('status', 'Active');
-
-      if (classSubjects.length > 0) {
-        const secStudents = await db('students')
-          .where('class_id', cls.id)
-          .where('section_id', sec.id)
-          .select('id');
-
-        for (const st of secStudents) {
-          for (const cs of classSubjects) {
-            const hasSub = await db('student_subjects')
-              .where({ student_id: st.id, class_subject_id: cs.id })
-              .first();
-
-            if (!hasSub) {
-              await db('student_subjects').insert({
-                branch_id: 1,
-                academic_year_id: 2,
-                student_id: st.id,
-                class_id: cls.id,
-                subject_id: cs.subject_id,
-                class_subject_id: cs.id,
-                subject_name: cs.subject_name,
-                subject_code: cs.subject_code,
-                subject_type: cs.subject_type || 'Academic',
-                is_language: cs.is_language || 0,
-                language_level: cs.language_level,
-                enrollment_type: cs.requirement || 'Compulsory',
-                status: 'Active',
-                created_at: new Date(),
-                updated_at: new Date()
-              });
-            }
-          }
-        }
-      }
-
-      console.log(`     ✅ Completed Section ${sec.section_name}: 40 students with Roll No 1..40.`);
+      console.log(`  ✅ Section ${sec.section_name} complete: 40 distinct students.`);
     }
   }
 
-  // Summary check
-  const total = await db('students').where('branch_id', 1).count('id as cnt').first();
-  console.log(`\n🎉 All classes standardized! Total Branch 1 students in DB: ${total.cnt}`);
-
-  const distribution = await db('students')
-    .join('classes', 'students.class_id', 'classes.id')
-    .join('sections', 'students.section_id', 'sections.id')
-    .where('students.branch_id', 1)
-    .groupBy('classes.numeric_value', 'classes.class_name', 'sections.section_name')
-    .orderBy('classes.numeric_value', 'asc')
-    .select('classes.class_name', 'sections.section_name')
-    .count('students.id as student_count');
-
-  console.log('\n📊 Final Student Distribution Per Class/Section:');
-  console.table(distribution);
-
+  console.log(`\n🎉 Total unique full names generated: ${usedFullNames.size} (out of 800 students)`);
   process.exit(0);
 }
 
 run().catch(err => {
-  console.error('❌ Error during seeding:', err);
+  console.error('❌ Error during regeneration:', err);
   process.exit(1);
 });

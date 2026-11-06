@@ -85,7 +85,7 @@ export const StudentDetailsList = ({
   // Pagination & Sorting
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
-  const [sortBy, setSortBy] = useState('first_name');
+  const [sortBy, setSortBy] = useState('admission_number');
   const [sortOrder, setSortOrder] = useState('asc');
 
   // Selection
