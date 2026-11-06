@@ -46,7 +46,44 @@ export async function getStudentById(id) {
     if (!res.ok) {
         throw new Error(data.message || 'Failed to fetch student details');
     }
-    return data.data;
+    const student = data.student || data.data || {};
+    return {
+        ...data,
+        ...student,
+        student: student,
+        parents: data.parents || {
+            father_name: student.parent_name || student.father_name || '',
+            father_mobile: student.student_mobile || student.parent_phone || '',
+            mother_name: student.mother_name || '',
+        },
+        address: data.address || {
+            address_line1: student.address || '',
+            current_address: student.address || '',
+            city: 'Coimbatore',
+            state: 'Tamil Nadu',
+            country: 'India',
+        },
+        current_enrollment: data.current_enrollment || {
+            class_id: student.class_id,
+            class_name: student.class_name,
+            section_id: student.section_id,
+            section_name: student.section_name,
+            roll_number: student.roll_number,
+            academic_year_name: '2025-2026'
+        },
+        enrollments: data.enrollments || [
+            {
+                id: student.id,
+                class_id: student.class_id,
+                class_name: student.class_name,
+                section_id: student.section_id,
+                section_name: student.section_name,
+                roll_number: student.roll_number,
+                academic_year_name: '2025-2026',
+                status: student.current_status || 'Active'
+            }
+        ]
+    };
 }
 export async function createStudent(formData) {
     const res = await fetch('/api/students', {

@@ -71,10 +71,17 @@ export const StudentProfileModal = ({ isOpen, studentId, onClose, onEdit, onMove
 
   if (!isModalOpen) return null;
 
-  const s = profile?.student;
-  const p = profile?.parents;
-  const addr = profile?.address;
-  const currentEnrollment = profile?.current_enrollment;
+  const s = profile?.student || (profile?.first_name ? profile : null);
+  const p = profile?.parents || (profile?.parent_name ? { father_name: profile.parent_name, father_mobile: profile.student_mobile } : {});
+  const addr = profile?.address || (profile?.address ? { address_line1: profile.address, current_address: profile.address } : {});
+  const currentEnrollment = profile?.current_enrollment || (s ? {
+    class_id: s.class_id,
+    class_name: s.class_name || `Class ${s.class_id}`,
+    section_id: s.section_id,
+    section_name: s.section_name || 'A',
+    roll_number: s.roll_number,
+    academic_year_name: '2025-2026'
+  } : null);
   const selectedEnrollment = profile?.enrollments?.find(e => e.id === selectedYearEnrollmentId) || currentEnrollment;
 
   const attendanceRate = currentEnrollment?.attendance_percentage !== undefined
@@ -1104,7 +1111,7 @@ export const StudentProfileModal = ({ isOpen, studentId, onClose, onEdit, onMove
         {/* Modal Footer */}
         <div className="bg-muted/30 border-t border-border px-6 py-3.5 flex items-center justify-between shrink-0">
           <div className="text-xs text-muted-foreground font-medium">
-            System Student Record ID: <span className="font-mono text-foreground font-semibold">{s?.student_id || 'N/A'}</span>
+            System Student Record ID: <span className="font-mono text-foreground font-semibold">{s?.student_id || s?.id || 'N/A'}</span>
           </div>
           <Button variant="outline" size="sm" onClick={onClose} className="text-xs font-semibold">
             Close Window

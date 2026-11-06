@@ -325,10 +325,25 @@ export const studentController = {
         },
         current_enrollment: {
           class_id: r.class_id,
-          class_name: r.class_name,
+          class_name: r.class_name || `Class ${r.class_id}`,
           section_id: r.section_id,
-          section_name: r.section_name,
+          section_name: r.section_name || 'A',
+          roll_number: r.s_roll_number || r.roll_number || r.id,
+          academic_year_name: r.academic_year || '2025-2026',
+          status: r.status || 'Active',
         },
+        enrollments: [
+          {
+            id: r.id,
+            class_id: r.class_id,
+            class_name: r.class_name || `Class ${r.class_id}`,
+            section_id: r.section_id,
+            section_name: r.section_name || 'A',
+            roll_number: r.s_roll_number || r.roll_number || r.id,
+            academic_year_name: r.academic_year || '2025-2026',
+            status: r.status || 'Active',
+          }
+        ],
         subjects: await knex('student_subjects')
           .where('student_id', r.id)
           .where('status', 'Active')
